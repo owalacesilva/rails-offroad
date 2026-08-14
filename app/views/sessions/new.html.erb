@@ -1,0 +1,30 @@
+<% content_for :title, "#{t('sessions.new.title')} — OffRoad Classificados" %>
+
+<section class="mx-auto max-w-md px-4 py-16 sm:px-6 lg:py-24">
+  <div class="rounded-2xl border border-stone-800 bg-stone-900 p-8">
+    <h1 class="text-2xl font-extrabold tracking-tight text-white"><%= t("sessions.new.title") %></h1>
+    <p class="mt-2 text-sm text-stone-400"><%= t("sessions.new.subtitle") %></p>
+
+    <%= form_with url: login_path, method: :post, class: "mt-8 space-y-4" do |form| %>
+      <div>
+        <%= form.label :email, t("sessions.new.email"), class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+        <%= form.email_field :email, required: true, autofocus: true, autocomplete: "email",
+              class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+      </div>
+
+      <div>
+        <%= form.label :password, t("sessions.new.password"), class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password",
+              class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+      </div>
+
+      <%= form.submit t("sessions.new.submit"),
+            class: "w-full cursor-pointer rounded-full bg-brand-500 px-6 py-3 text-sm font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+    <% end %>
+
+    <p class="mt-6 border-t border-stone-800 pt-6 text-center text-sm text-stone-400">
+      <%= t("sessions.new.no_account") %>
+      <%= link_to t("sessions.new.signup"), signup_path, class: "font-bold text-brand-400 transition hover:text-brand-300" %>
+    </p>
+  </div>
+</section>

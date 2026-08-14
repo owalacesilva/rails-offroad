@@ -9,6 +9,13 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Autenticação: sessão em tabela com o id em cookie assinado.
+  get    "entrar",    to: "sessions#new", as: :login
+  post   "entrar",    to: "sessions#create"
+  delete "sair",      to: "sessions#destroy", as: :logout
+  get    "cadastrar", to: "registrations#new", as: :signup
+  post   "cadastrar", to: "registrations#create"
+
   # Vitrine de anúncios com filtros. Rota em português, código em inglês.
   resources :listings, only: %i[index show], path: "anuncios" do
     resources :proposals, only: :create, path: "propostas"

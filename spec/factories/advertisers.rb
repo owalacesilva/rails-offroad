@@ -7,5 +7,6 @@ FactoryBot.define do
     city { "Curitiba" }
     state { "PR" }
     member_since { Date.new(2020, 1, 15) }
+    password { "trilha123" }
   end
 end

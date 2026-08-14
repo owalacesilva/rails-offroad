@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_025211) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_14_032559) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -48,6 +48,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_025211) do
     t.string "email", null: false
     t.date "member_since", null: false
     t.string "name", null: false
+    t.string "password_digest", null: false
     t.string "phone", null: false
     t.string "state", limit: 2, null: false
     t.datetime "updated_at", null: false
@@ -100,9 +101,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_025211) do
     t.check_constraint "amount_cents > 0", name: "proposals_amount_cents_positive"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "advertiser_id", null: false
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.index ["advertiser_id"], name: "index_sessions_on_advertiser_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "listings", "advertisers"
   add_foreign_key "listings", "categories"
   add_foreign_key "proposals", "listings"
+  add_foreign_key "sessions", "advertisers"
 end

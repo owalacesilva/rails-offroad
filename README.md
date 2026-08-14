@@ -134,9 +134,11 @@ Quatro models, sem autenticação nem cadastro ainda:
   `state` (UF) e `city` como colunas, e `badge` como enum. O badge de novidade se
   chama `new_arrival` porque `new` colidiria com `Listing.new`. As fotos são
   `has_many_attached` no MinIO; as especificações ficam em `jsonb`.
-- `Advertiser` — dono dos anúncios. `phone` guarda só dígitos com código do país,
-  validado por regex, porque é o formato que o link do `wa.me` exige.
+- `Advertiser` — dono dos anúncios e também a identidade autenticada
+  (`has_secure_password`). `phone` guarda só dígitos com código do país, validado
+  por regex, porque é o formato que o link do `wa.me` exige.
 - `Proposal` — proposta recebida em um anúncio. Valor também em centavos.
+- `Session` — sessão ativa de um anunciante, com user agent e IP.
 
 Especificações usam `jsonb` porque variam por categoria (4x4 tem câmbio, peça tem
 material). Como o `jsonb` **não preserva a ordem das chaves**, a ordem de exibição
@@ -158,6 +160,28 @@ estado, cidade e ordenação.
 - O painel de filtros recolhe via `app/javascript/controllers/filters_controller.js`:
   fechado no mobile, aberto a partir de `lg`. O HTML renderiza **aberto**, então
   sem JavaScript o filtro continua funcionando.
+
+## Autenticação
+
+`/entrar` e `/cadastrar`. Quem se cadastra **já é anunciante** — não existe um
+`User` separado, a identidade autenticada é o próprio `Advertiser`, que já era
+dono dos anúncios. Comprador manda proposta sem conta.
+
+A sessão vive em tabela, com o id em cookie assinado (`httponly`, `same_site: :lax`,
+e `secure` em produção). É o mesmo desenho do gerador de autenticação do Rails 8,
+aplicado ao `Advertiser` — sem gem além do `bcrypt`.
+
+**O padrão é negar.** `ApplicationController` inclui `Authentication`, que exige
+sessão em toda action; quem é público declara `allow_unauthenticated_access`.
+Controller nova nasce protegida.
+
+Entrada normalizada antes de validar: e-mail vira minúsculas, e o telefone aceita
+`(41) 98877-0011` e é guardado como `5541988770011`. O comprimento decide se falta
+o código do país — 10 ou 11 dígitos é DDD + número; o prefixo seria ambíguo, já que
+55 também é o DDD de Santa Maria.
+
+Os anunciantes do seed usam a senha **`trilha123`** (só desenvolvimento). Ex.:
+`contato@trilhalivre.com.br` / `trilha123`.
 
 ## Página de detalhe
 
@@ -186,8 +210,10 @@ contato por WhatsApp, modal de proposta e anúncios relacionados.
 - `app/views/home/index.html.erb` — hero, grid de categorias e vitrine "Anúncios Recentes"
 - `app/views/listings/_card.html.erb` — card de anúncio, compartilhado pelas três telas
 - `app/views/listings/show.html.erb` — detalhe do anúncio
+- `app/views/sessions/new.html.erb` e `app/views/registrations/new.html.erb` — login e cadastro
 - `app/assets/tailwind/application.css` — paleta da marca (`brand-50` a `brand-950`)
-- `spec/` — 158 exemplos cobrindo models, filtros, paginação, requests, mailer e helpers
+- `spec/` — 204 exemplos cobrindo models, filtros, paginação, requests, mailer, autenticação e helpers
 
-A busca do header e os links de "Anunciar"/"Entrar" ainda são estáticos, e não há
-tela para o anunciante criar ou editar anúncio — o acervo vem do seed.
+A busca do header ainda é estática, e **nenhuma tela é exclusiva de quem está
+logado**: entrar hoje só muda o header. Não há tela para o anunciante criar ou
+editar anúncio, nem recuperação de senha — o acervo vem do seed.

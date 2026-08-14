@@ -1,4 +1,6 @@
 class ListingsController < ApplicationController
+  allow_unauthenticated_access
+
   def index
     @filter = ListingFilter.new(filter_params)
     @pagination = Pagination.new(@filter.results, page: params[:page])

@@ -1,4 +1,6 @@
 class HomeController < ApplicationController
+  allow_unauthenticated_access
+
   RECENT_LIMIT = 4
 
   def index

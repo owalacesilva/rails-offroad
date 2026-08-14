@@ -1,4 +1,7 @@
 class ProposalsController < ApplicationController
+  # Comprador manda proposta sem conta: o formulário já pede nome e e-mail.
+  allow_unauthenticated_access
+
   def create
     @listing = Listing.with_attached_photos.includes(:category, :advertiser).find(params[:listing_id])
     @proposal = @listing.proposals.new(proposal_params)

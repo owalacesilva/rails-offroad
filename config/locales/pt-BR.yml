@@ -7,6 +7,8 @@ pt-BR:
       search_placeholder: "Busque por modelo, marca ou peça..."
       search_submit: "Buscar"
       sign_in: "Entrar"
+      sign_out: "Sair"
+      greeting: "Olá, %{name}"
       new_listing: "Anunciar"
     footer:
       tagline: "O classificado de quem vive fora do asfalto. Compre e venda 4x4, motos de trilha, UTVs e peças com quem entende do assunto."
@@ -149,6 +151,37 @@ pt-BR:
         one: "1 erro impediu o envio"
         other: "%{count} erros impediram o envio"
 
+  sessions:
+    required: "Entre na sua conta para continuar."
+    already_authenticated: "Você já está autenticado."
+    new:
+      title: "Entrar"
+      subtitle: "Acesse sua conta de anunciante para gerenciar seus anúncios."
+      email: "E-mail"
+      password: "Senha"
+      submit: "Entrar"
+      no_account: "Ainda não tem conta?"
+      signup: "Cadastre-se"
+    create:
+      success: "Bem-vindo de volta, %{name}!"
+      failure: "E-mail ou senha incorretos."
+    destroy:
+      success: "Sessão encerrada."
+
+  registrations:
+    new:
+      title: "Criar conta de anunciante"
+      subtitle: "Cadastre-se para anunciar seus veículos, motos e peças no portal."
+      phone_hint: "Pode digitar com DDD e formatação; guardamos só os dígitos."
+      submit: "Criar conta"
+      have_account: "Já tem conta?"
+      login: "Entrar"
+      errors:
+        one: "1 erro impediu o cadastro"
+        other: "%{count} erros impediram o cadastro"
+    create:
+      success: "Conta criada. Bem-vindo, %{name}!"
+
   proposals:
     create:
       success: "Proposta enviada! O anunciante recebeu seus dados por e-mail."
@@ -174,3 +207,11 @@ pt-BR:
         phone: "Telefone"
         amount_cents: "Valor da proposta"
         message: "Mensagem"
+      advertiser:
+        name: "Nome ou nome da loja"
+        email: "E-mail"
+        phone: "WhatsApp"
+        city: "Cidade"
+        state: "UF"
+        password: "Senha"
+        password_confirmation: "Confirmar senha"

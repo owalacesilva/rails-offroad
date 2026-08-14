@@ -10,6 +10,10 @@ CATEGORIES = [
   { slug: "pecas-acessorios", position: 4 }
 ].freeze
 
+# Senha única para todos os anunciantes semeados, só para conseguir entrar em
+# desenvolvimento. Nada disto roda em produção.
+SEED_PASSWORD = "trilha123".freeze
+
 ADVERTISERS = [
   { name: "Garagem Trilha Livre", email: "contato@trilhalivre.com.br", phone: "5541988770011", city: "Curitiba", state: "PR", member_since: "2019-03-12" },
   { name: "Marcelo Andrade", email: "marcelo.andrade@exemplo.com.br", phone: "5511977660022", city: "São Paulo", state: "SP", member_since: "2021-07-04" },
@@ -154,7 +158,7 @@ end
 
 advertisers = ADVERTISERS.map do |attributes|
   advertiser = Advertiser.find_or_initialize_by(email: attributes[:email])
-  advertiser.update!(attributes)
+  advertiser.update!(attributes.merge(password: SEED_PASSWORD))
   advertiser
 end
 

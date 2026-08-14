@@ -6,6 +6,8 @@ en-US:
       search_placeholder: "Search by model, brand or part..."
       search_submit: "Search"
       sign_in: "Sign in"
+      sign_out: "Sign out"
+      greeting: "Hi, %{name}"
       new_listing: "Post a listing"
     footer:
       tagline: "Classifieds for people who live off the pavement. Buy and sell 4x4s, trail bikes, UTVs and parts with folks who know the terrain."
@@ -148,6 +150,37 @@ en-US:
         one: "1 error kept this from being sent"
         other: "%{count} errors kept this from being sent"
 
+  sessions:
+    required: "Sign in to your account to continue."
+    already_authenticated: "You are already signed in."
+    new:
+      title: "Sign in"
+      subtitle: "Access your advertiser account to manage your listings."
+      email: "Email"
+      password: "Password"
+      submit: "Sign in"
+      no_account: "No account yet?"
+      signup: "Create one"
+    create:
+      success: "Welcome back, %{name}!"
+      failure: "Wrong email or password."
+    destroy:
+      success: "Signed out."
+
+  registrations:
+    new:
+      title: "Create an advertiser account"
+      subtitle: "Sign up to list your vehicles, bikes and parts on the portal."
+      phone_hint: "Type it with area code and formatting; we keep only the digits."
+      submit: "Create account"
+      have_account: "Already have an account?"
+      login: "Sign in"
+      errors:
+        one: "1 error kept the account from being created"
+        other: "%{count} errors kept the account from being created"
+    create:
+      success: "Account created. Welcome, %{name}!"
+
   proposals:
     create:
       success: "Offer sent! The advertiser received your details by email."
@@ -173,3 +206,11 @@ en-US:
         phone: "Phone"
         amount_cents: "Offer amount"
         message: "Message"
+      advertiser:
+        name: "Name or shop name"
+        email: "Email"
+        phone: "WhatsApp"
+        city: "City"
+        state: "State"
+        password: "Password"
+        password_confirmation: "Confirm password"
