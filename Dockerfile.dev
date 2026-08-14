@@ -10,7 +10,10 @@ RUN apt-get update -qq && \
       pkg-config \
       git \
       curl \
-      tzdata && \
+      tzdata \
+      # libvips: variantes de imagem do Active Storage (gem image_processing).
+      libvips42 \
+      libvips-tools && \
     rm -rf /var/lib/apt/lists/*
 
 ENV LANG=C.UTF-8 \

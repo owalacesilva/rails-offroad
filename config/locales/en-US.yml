@@ -106,3 +106,70 @@ en-US:
       showing: "Showing %{from}–%{to} of %{total}"
       previous: "Previous"
       next: "Next"
+    show:
+      back: "Back to listings"
+      published_at: "Published on %{date}"
+      description: "Description"
+      no_description: "The advertiser has not written a description yet."
+      specifications: "Specifications"
+      no_specifications: "No specifications provided."
+      related: "Related listings"
+      no_related: "No other listings in this category yet."
+      advertiser: "Advertiser"
+      member_since: "On the portal since %{date}"
+      whatsapp: "Message on WhatsApp"
+      whatsapp_message: "Hi! I am interested in the listing \"%{title}\" — %{url}"
+      propose: "Send an offer"
+      gallery:
+        main: "Main photo of %{title}"
+        thumbnail: "Photo %{index} of %{title}"
+        empty: "This listing has no photos yet."
+    specifications:
+      condition: "Condition"
+      mileage_km: "Mileage"
+      engine: "Engine"
+      power: "Power"
+      transmission: "Transmission"
+      traction: "Drivetrain"
+      fuel: "Fuel"
+      doors: "Doors"
+      color: "Color"
+      brand: "Brand"
+      material: "Material"
+      warranty: "Warranty"
+    proposal_modal:
+      title: "Send an offer"
+      subtitle: "The advertiser gets your details by email and replies to you directly."
+      submit: "Send offer"
+      cancel: "Cancel"
+      close: "Close"
+      amount_hint: "Amount in BRL, no cents."
+      errors:
+        one: "1 error kept this from being sent"
+        other: "%{count} errors kept this from being sent"
+
+  proposals:
+    create:
+      success: "Offer sent! The advertiser received your details by email."
+
+  proposal_mailer:
+    received:
+      subject: "New offer for %{title}"
+      greeting: "Hi %{name}!"
+      intro: "You received an offer for the listing %{title}."
+      intro_html: "You received an offer for the listing %{title}."
+      footer: "Just reply to this email to talk to the buyer directly."
+
+  activerecord:
+    models:
+      proposal: "Offer"
+      listing: "Listing"
+      advertiser: "Advertiser"
+      category: "Category"
+    attributes:
+      proposal:
+        name: "Name"
+        email: "Email"
+        phone: "Phone"
+        amount_cents: "Offer amount"
+        message: "Message"

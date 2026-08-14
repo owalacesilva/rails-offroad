@@ -1,4 +1,8 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: "OffRoad Classificados <nao-responda@offroadclassificados.com.br>"
   layout "mailer"
+
+  # Mailer não herda os helpers da aplicação como os controllers herdam;
+  # sem isto, listing_price não existe no template do e-mail.
+  helper ListingsHelper
 end

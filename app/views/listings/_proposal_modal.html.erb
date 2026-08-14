@@ -1,0 +1,76 @@
+<%# O <dialog> nativo já dá Esc e prisão de foco; o Stimulus só abre e fecha. %>
+<dialog data-modal-target="dialog"
+        data-action="click->modal#closeOnBackdrop"
+        aria-labelledby="proposal-modal-title"
+        class="w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-stone-700 bg-stone-900 p-0 text-stone-100 backdrop:bg-stone-950/80 backdrop:backdrop-blur-sm">
+  <div class="flex items-start justify-between gap-4 border-b border-stone-800 p-6">
+    <div>
+      <h2 id="proposal-modal-title" class="text-lg font-bold text-white"><%= t("listings.proposal_modal.title") %></h2>
+      <p class="mt-1 text-sm text-stone-400"><%= t("listings.proposal_modal.subtitle") %></p>
+    </div>
+
+    <button type="button" data-action="modal#close"
+            aria-label="<%= t("listings.proposal_modal.close") %>"
+            class="shrink-0 rounded-full p-1.5 text-stone-400 transition hover:bg-stone-800 hover:text-white">
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <%= form_with model: [ listing, proposal ], class: "space-y-4 p-6" do |form| %>
+    <% if proposal.errors.any? %>
+      <div role="alert" class="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+        <p class="font-bold"><%= t("listings.proposal_modal.errors", count: proposal.errors.count) %></p>
+        <ul class="mt-2 list-disc space-y-1 pl-5">
+          <% proposal.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :name, class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+      <%= form.text_field :name, required: true, autocomplete: "name",
+            class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <%= form.label :email, class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+        <%= form.email_field :email, required: true, autocomplete: "email",
+              class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+      </div>
+
+      <div>
+        <%= form.label :phone, class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+        <%= form.telephone_field :phone, autocomplete: "tel",
+              class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :amount, Proposal.human_attribute_name(:amount_cents), class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+      <%= form.number_field :amount, required: true, min: 1, step: 1, inputmode: "numeric",
+            class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+      <p class="mt-1 text-xs text-stone-500"><%= t("listings.proposal_modal.amount_hint") %></p>
+    </div>
+
+    <div>
+      <%= form.label :message, class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+      <%= form.text_area :message, rows: 3,
+            class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-end gap-3 border-t border-stone-800 pt-5">
+      <button type="button" data-action="modal#close"
+              class="rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-400 transition hover:text-stone-200">
+        <%= t("listings.proposal_modal.cancel") %>
+      </button>
+
+      <%= form.submit t("listings.proposal_modal.submit"),
+            class: "cursor-pointer rounded-full bg-brand-500 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+    </div>
+  <% end %>
+</dialog>

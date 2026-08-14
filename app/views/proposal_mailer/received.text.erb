@@ -1,0 +1,18 @@
+<%= t(".greeting", name: @advertiser.name) %>
+
+<%= t(".intro", title: @listing.title) %>
+<%= listing_url(@listing) %>
+
+<%= Proposal.human_attribute_name(:amount_cents) %>: <%= listing_price(@proposal.amount) %>
+<%= Proposal.human_attribute_name(:name) %>: <%= @proposal.name %>
+<%= Proposal.human_attribute_name(:email) %>: <%= @proposal.email %>
+<% if @proposal.phone.present? -%>
+<%= Proposal.human_attribute_name(:phone) %>: <%= @proposal.phone %>
+<% end -%>
+<% if @proposal.message.present? -%>
+
+<%= Proposal.human_attribute_name(:message) %>:
+<%= @proposal.message %>
+<% end -%>
+
+<%= t(".footer") %>

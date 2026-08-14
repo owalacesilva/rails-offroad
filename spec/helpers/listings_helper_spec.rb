@@ -22,6 +22,39 @@ RSpec.describe ListingsHelper, type: :helper do
     end
   end
 
+  describe "#whatsapp_url" do
+    let(:advertiser) { create(:advertiser, phone: "5541988770011") }
+    let(:listing) { create(:listing, title: "Jeep Wrangler Rubicon", advertiser: advertiser) }
+
+    it "usa o telefone do anunciante" do
+      expect(helper.whatsapp_url(listing)).to start_with("https://wa.me/5541988770011?text=")
+    end
+
+    it "escapa o título dentro da mensagem" do
+      expect(helper.whatsapp_url(listing)).to include(CGI.escape(listing.title))
+    end
+  end
+
+  describe "#specification_label" do
+    it "traduz a chave conhecida" do
+      expect(helper.specification_label("mileage_km")).to eq("Quilometragem")
+    end
+
+    it "humaniza a chave desconhecida em vez de dizer translation missing" do
+      expect(helper.specification_label("torque_maximo")).to eq("Torque maximo")
+    end
+  end
+
+  describe "#specification_value" do
+    it "acrescenta unidade e separador de milhar à quilometragem" do
+      expect(helper.specification_value("mileage_km", 48_000)).to eq("48.000 km")
+    end
+
+    it "devolve o valor cru nas demais chaves" do
+      expect(helper.specification_value("engine", "3.6 V6")).to eq("3.6 V6")
+    end
+  end
+
   describe "#paginated_page_numbers" do
     it "numera todas as páginas quando são poucas" do
       pagination = stub(total_pages: 4)

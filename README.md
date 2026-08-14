@@ -125,14 +125,22 @@ funcionam normalmente.
 
 ## Domínio
 
-Dois models, sem autenticação nem cadastro ainda:
+Quatro models, sem autenticação nem cadastro ainda:
 
 - `Category` — só `slug` e `position`. Nome e descrição são taxonomia traduzível e
   vivem em `config/locales`, indexados pelo slug. `to_param` devolve o slug, então
   as URLs de filtro são legíveis.
 - `Listing` — preço em `price_cents` (inteiro, com check constraint no banco),
   `state` (UF) e `city` como colunas, e `badge` como enum. O badge de novidade se
-  chama `new_arrival` porque `new` colidiria com `Listing.new`.
+  chama `new_arrival` porque `new` colidiria com `Listing.new`. As fotos são
+  `has_many_attached` no MinIO; as especificações ficam em `jsonb`.
+- `Advertiser` — dono dos anúncios. `phone` guarda só dígitos com código do país,
+  validado por regex, porque é o formato que o link do `wa.me` exige.
+- `Proposal` — proposta recebida em um anúncio. Valor também em centavos.
+
+Especificações usam `jsonb` porque variam por categoria (4x4 tem câmbio, peça tem
+material). Como o `jsonb` **não preserva a ordem das chaves**, a ordem de exibição
+é definida em `Listing::SPECIFICATION_ORDER`, não no banco.
 
 ## Página de anúncios
 
@@ -151,14 +159,35 @@ estado, cidade e ordenação.
   fechado no mobile, aberto a partir de `lg`. O HTML renderiza **aberto**, então
   sem JavaScript o filtro continua funcionando.
 
+## Página de detalhe
+
+`/anuncios/:id` traz galeria, descrição, especificações, dados do anunciante,
+contato por WhatsApp, modal de proposta e anúncios relacionados.
+
+- **Fotos** são Active Storage de verdade, guardadas no MinIO. `Dockerfile.dev`
+  inclui `libvips42` porque as variantes (miniatura, card) passam por ele.
+  O seed gera os PNGs de placeholder com `lib/placeholder_image.rb`, que escreve
+  o arquivo na mão com `Zlib` — sem gem de imagem e sem binário no repositório.
+- **WhatsApp**: `ListingsHelper#whatsapp_url` monta `wa.me` com o telefone do
+  anunciante e a mensagem já preenchida com título e URL do anúncio.
+- **Modal de proposta** usa o `<dialog>` nativo, que já dá Esc e prisão de foco;
+  o Stimulus só abre e fecha. Validação que falha responde **422**, e o modal
+  reabre sozinho com os erros via `data-modal-open-value`.
+- **Proposta enviada** dispara `ProposalMailer` para o e-mail do anunciante, com
+  `reply_to` do interessado — em desenvolvimento cai no MailHog.
+- **Relacionados**: mesma categoria, exceto o próprio anúncio, mais recentes
+  primeiro. Deliberadamente simples — não pondera estado nem faixa de preço.
+
 ## Estado atual
 
 - `app/views/layouts/application.html.erb` — layout base com header fixo e footer
 - `app/views/shared/_header.html.erb` — logo, busca central e CTA "Anunciar"
 - `app/views/shared/_footer.html.erb` — links institucionais, contato e redes sociais
 - `app/views/home/index.html.erb` — hero, grid de categorias e vitrine "Anúncios Recentes"
-- `app/views/listings/_card.html.erb` — card de anúncio, compartilhado pelas duas telas
+- `app/views/listings/_card.html.erb` — card de anúncio, compartilhado pelas três telas
+- `app/views/listings/show.html.erb` — detalhe do anúncio
 - `app/assets/tailwind/application.css` — paleta da marca (`brand-50` a `brand-950`)
-- `spec/` — 84 exemplos cobrindo models, filtros, paginação, requests e helpers
+- `spec/` — 158 exemplos cobrindo models, filtros, paginação, requests, mailer e helpers
 
-A busca do header e os links de "Anunciar"/"Entrar" ainda são estáticos.
+A busca do header e os links de "Anunciar"/"Entrar" ainda são estáticos, e não há
+tela para o anunciante criar ou editar anúncio — o acervo vem do seed.

@@ -2,7 +2,20 @@ class Listing < ApplicationRecord
   # `new` colidiria com Listing.new, daí new_arrival.
   BADGES = { prepared: 0, featured: 1, new_arrival: 2 }.freeze
 
+  RELATED_LIMIT = 4
+
+  # jsonb não preserva a ordem das chaves, então a ordem de exibição é definida
+  # aqui. Chave fora da lista vai para o fim.
+  SPECIFICATION_ORDER = %w[
+    condition mileage_km engine power transmission traction fuel doors color
+    brand material warranty
+  ].freeze
+
   belongs_to :category
+  belongs_to :advertiser
+
+  has_many :proposals, dependent: :destroy
+  has_many_attached :photos
 
   enum :badge, BADGES, prefix: true
 
@@ -27,5 +40,19 @@ class Listing < ApplicationRecord
 
   def price
     BigDecimal(price_cents) / 100
+  end
+
+  def ordered_specifications
+    specifications.sort_by { |key, _value| SPECIFICATION_ORDER.index(key) || SPECIFICATION_ORDER.size }
+  end
+
+  # Mesma categoria, exceto o próprio anúncio. Deliberadamente simples: não
+  # pondera estado nem faixa de preço.
+  def related(limit: RELATED_LIMIT)
+    self.class.includes(:category)
+        .where(category_id: category_id)
+        .where.not(id: id)
+        .recent
+        .limit(limit)
   end
 end

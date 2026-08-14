@@ -107,3 +107,70 @@ pt-BR:
       showing: "Mostrando %{from}–%{to} de %{total}"
       previous: "Anterior"
       next: "Próxima"
+    show:
+      back: "Voltar para os anúncios"
+      published_at: "Publicado em %{date}"
+      description: "Descrição"
+      no_description: "O anunciante ainda não escreveu uma descrição."
+      specifications: "Especificações"
+      no_specifications: "Nenhuma especificação informada."
+      related: "Anúncios relacionados"
+      no_related: "Ainda não há outros anúncios nesta categoria."
+      advertiser: "Anunciante"
+      member_since: "No portal desde %{date}"
+      whatsapp: "Chamar no WhatsApp"
+      whatsapp_message: "Olá! Tenho interesse no anúncio \"%{title}\" — %{url}"
+      propose: "Enviar proposta"
+      gallery:
+        main: "Foto principal de %{title}"
+        thumbnail: "Foto %{index} de %{title}"
+        empty: "Este anúncio ainda não tem fotos."
+    specifications:
+      condition: "Estado"
+      mileage_km: "Quilometragem"
+      engine: "Motor"
+      power: "Potência"
+      transmission: "Câmbio"
+      traction: "Tração"
+      fuel: "Combustível"
+      doors: "Portas"
+      color: "Cor"
+      brand: "Marca"
+      material: "Material"
+      warranty: "Garantia"
+    proposal_modal:
+      title: "Enviar proposta"
+      subtitle: "O anunciante recebe seus dados por e-mail e responde direto para você."
+      submit: "Enviar proposta"
+      cancel: "Cancelar"
+      close: "Fechar"
+      amount_hint: "Valor em reais, sem centavos."
+      errors:
+        one: "1 erro impediu o envio"
+        other: "%{count} erros impediram o envio"
+
+  proposals:
+    create:
+      success: "Proposta enviada! O anunciante recebeu seus dados por e-mail."
+
+  proposal_mailer:
+    received:
+      subject: "Nova proposta para %{title}"
+      greeting: "Olá, %{name}!"
+      intro: "Você recebeu uma proposta para o anúncio %{title}."
+      intro_html: "Você recebeu uma proposta para o anúncio %{title}."
+      footer: "Basta responder este e-mail para falar direto com o interessado."
+
+  activerecord:
+    models:
+      proposal: "Proposta"
+      listing: "Anúncio"
+      advertiser: "Anunciante"
+      category: "Categoria"
+    attributes:
+      proposal:
+        name: "Nome"
+        email: "E-mail"
+        phone: "Telefone"
+        amount_cents: "Valor da proposta"
+        message: "Mensagem"
