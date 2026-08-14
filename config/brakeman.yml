@@ -1,0 +1,8 @@
+---
+# Configuração do Brakeman, carregada automaticamente por `bundle exec brakeman`.
+:quiet: true
+:exit_on_warn: true
+:exit_on_error: true
+:skip_files:
+  - vendor/
+  - spec/

@@ -1,0 +1,73 @@
+# Textos da interface em português do Brasil (locale padrão).
+# Traduções de Rails/Active Record vêm da gem rails-i18n.
+pt-BR:
+  layout:
+    header:
+      search_label: "Buscar anúncios"
+      search_placeholder: "Busque por modelo, marca ou peça..."
+      search_submit: "Buscar"
+      sign_in: "Entrar"
+      new_listing: "Anunciar"
+    footer:
+      tagline: "O classificado de quem vive fora do asfalto. Compre e venda 4x4, motos de trilha, UTVs e peças com quem entende do assunto."
+      headings:
+        categories: "Categorias"
+        institutional: "Institucional"
+        contact: "Contato"
+      institutional:
+        about: "Sobre nós"
+        how_to_advertise: "Como anunciar"
+        plans: "Planos e destaques"
+        safety: "Dicas de segurança"
+      contact:
+        email: "contato@offroadclassificados.com.br"
+        phone: "(41) 4002-8922"
+        help_center: "Central de ajuda"
+        careers: "Trabalhe conosco"
+      legal:
+        rights: "Todos os direitos reservados."
+        terms: "Termos de uso"
+        privacy: "Privacidade"
+        cookies: "Cookies"
+
+  categories:
+    veiculos-4x4:
+      name: "Veículos 4x4"
+      description: "Jipes, picapes e utilitários prontos para a trilha."
+    motos-quadriciclos:
+      name: "Motos e Quadriciclos"
+      description: "Trail, enduro, quadriciclos e UTVs de todas as cilindradas."
+    pecas-acessorios:
+      name: "Peças & Acessórios"
+      description: "Suspensão, pneus, guinchos, snorkel e preparação."
+    utvs:
+      name: "UTVs e Side by Side"
+      description: "Buggies e side by side para areia, lama e velocidade."
+
+  home:
+    hero:
+      badge: "Classificados 100% off-road"
+      title_lead: "Encontre ou venda sua"
+      title_highlight: "máquina de trilha"
+      subtitle: "Jipes, picapes 4x4, motos de enduro, quadriciclos, UTVs e tudo em peças e preparação — anunciados por quem realmente enfia o pé na lama."
+      cta_primary: "Anunciar grátis"
+      cta_secondary: "Explorar anúncios"
+      stats:
+        listings: "Anúncios ativos"
+        sellers: "Vendedores"
+        states: "Estados"
+    categories:
+      title: "Navegue por categoria"
+      subtitle: "Escolha o terreno e veja o que está rolando agora."
+      see_all: "Ver todos"
+      count:
+        one: "%{formatted} anúncio"
+        other: "%{formatted} anúncios"
+    listings:
+      title: "Anúncios Recentes"
+      subtitle: "Os últimos veículos e peças publicados no portal."
+      see_all: "Ver todos"
+      badges:
+        prepared: "Preparado"
+        featured: "Destaque"
+        new: "Novo"

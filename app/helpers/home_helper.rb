@@ -18,7 +18,7 @@ module HomeHelper
     paths = CATEGORY_ICON_PATHS.fetch(name.to_sym)
 
     tag.svg(
-      safe_join(paths.map { |d| tag.path(d: d, "stroke-linecap": "round", "stroke-linejoin": "round") }),
+      safe_join(paths.map { |path_data| tag.path(d: path_data, "stroke-linecap": "round", "stroke-linejoin": "round") }),
       class: css_class,
       fill: "none",
       viewBox: "0 0 24 24",
@@ -29,7 +29,18 @@ module HomeHelper
   end
 
   # Preços mockados são inteiros em reais; sem centavos na vitrine.
+  # A unidade é fixa (o portal negocia em BRL em qualquer idioma), mas separadores
+  # e espaçamento seguem o locale via rails-i18n — daí "R$" sem espaço à direita:
+  # o format do pt-BR ("%u %n") já insere o separador.
   def listing_price(amount)
-    number_to_currency(amount, unit: "R$ ", separator: ",", delimiter: ".", precision: 0)
+    number_to_currency(amount, unit: "R$", precision: 0)
+  end
+
+  def category_name(slug)
+    t("categories.#{slug}.name")
+  end
+
+  def category_description(slug)
+    t("categories.#{slug}.description")
   end
 end

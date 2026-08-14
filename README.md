@@ -50,11 +50,54 @@ Em desenvolvimento **nenhum e-mail sai para destinatário real**: tudo é captur
 ```bash
 docker compose up                              # equivale ao bin/dev
 docker compose exec web bin/rails console
-docker compose exec web bin/rails test
-docker compose exec web bin/rubocop
 docker compose run --rm web bin/rails generate model Listing
 docker compose down                            # para tudo
 ```
+
+## Testes e qualidade
+
+```bash
+docker compose exec web bin/rspec              # suíte completa
+docker compose exec web bin/rspec spec/requests
+docker compose exec web bin/rubocop            # estilo (omakase + cops de RSpec)
+docker compose exec web bundle exec reek app lib   # code smells
+docker compose exec web bin/brakeman --no-pager    # análise de segurança
+docker compose exec web bin/bundler-audit check --update
+```
+
+**RSpec** substituiu o minitest — não existe mais `test/`, nem `bin/rails test`.
+
+**Mocks são do Mocha**, não do rspec-mocks (`config.mock_with :mocha` em `spec/spec_helper.rb`).
+Na prática: `Gateway.expects(:charge)` e `obj.stubs(:call)` funcionam; `double`,
+`instance_double` e `allow(...).to receive` **não existem** nesta configuração.
+
+**Nenhum spec alcança a rede real**: o WebMock bloqueia e o VCR grava/reproduz as respostas
+em `spec/fixtures/vcr_cassettes`. Marque o exemplo com `:vcr` para usar uma cassete.
+Como o VCR está plugado no WebMock, uma chamada não stubada levanta
+`VCR::Errors::UnhandledHTTPRequestError`.
+
+`reek` **precisa dos paths** (`reek app lib`): sem argumentos ele lê da STDIN e não analisa nada.
+
+CI configurado em dois lugares — `.semaphore/semaphore.yml` (Semaphore) e
+`.github/workflows/ci.yml` (GitHub Actions). Ambos rodam a mesma bateria; provavelmente
+você vai querer manter só um.
+
+## Internacionalização
+
+`pt-BR` é o locale padrão e `en-US` está disponível. As traduções de Rails/Active Record vêm
+da gem `rails-i18n`; os textos da interface ficam em `config/locales/pt-BR.yml` e
+`config/locales/en-US.yml`. Chave ausente em `en-US` cai para `pt-BR`.
+
+A troca acontece em `ApplicationController#set_locale`, nesta ordem: `?locale=` na URL,
+depois o `Accept-Language` do navegador, senão o padrão.
+
+```bash
+curl "http://localhost:3000/?locale=en-US"
+curl -H "Accept-Language: en-US" http://localhost:3000/
+```
+
+Nomes de categoria e badges são taxonomia fixa e vivem nos arquivos de locale. Já título e
+localização dos anúncios são conteúdo do usuário: ficam literais e não se traduzem.
 
 ### Variáveis de ambiente
 
@@ -82,3 +125,6 @@ Mockup estático da home, sem models nem persistência:
 - `app/views/home/index.html.erb` — hero, grid de categorias e vitrine "Anúncios Recentes"
 - `app/controllers/home_controller.rb` — dados mockados em `CATEGORIES` e `RECENT_LISTINGS`
 - `app/assets/tailwind/application.css` — paleta da marca (`brand-50` a `brand-950`)
+- `spec/` — 15 exemplos cobrindo a home, os helpers e o isolamento de rede
+
+`spec/factories/` está vazio de propósito: não há models ainda.

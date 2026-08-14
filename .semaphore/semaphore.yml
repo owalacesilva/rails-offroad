@@ -1,0 +1,66 @@
+version: v1.0
+name: OffRoad Classificados
+
+agent:
+  machine:
+    type: e2-standard-2
+    os_image: ubuntu2204
+
+auto_cancel:
+  running:
+    when: "branch != 'main'"
+
+global_job_config:
+  prologue:
+    commands:
+      - checkout
+      # .ruby-version guarda "ruby-3.4.10"; o sem-version quer só a versão.
+      - sem-version ruby $(sed 's/^ruby-//' .ruby-version)
+      # Header do libpq para compilar a gem pg.
+      - sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libpq-dev
+      - cache restore gems-$(checksum Gemfile.lock)
+      - bundle config set --local path vendor/bundle
+      - bundle install --jobs 4 --retry 3
+      - cache store gems-$(checksum Gemfile.lock) vendor/bundle
+
+blocks:
+  - name: Testes
+    task:
+      env_vars:
+        - name: RAILS_ENV
+          value: test
+        # Os mesmos nomes lidos por config/database.yml.
+        - name: DB_HOST
+          value: 127.0.0.1
+        - name: DB_USERNAME
+          value: postgres
+        - name: DB_PASSWORD
+          value: postgres
+      prologue:
+        commands:
+          - sem-service start postgres 16 --username=postgres --password=postgres
+      jobs:
+        - name: RSpec
+          commands:
+            - bundle exec rails db:prepare
+            - bundle exec rspec
+
+  - name: Qualidade
+    task:
+      jobs:
+        - name: RuboCop
+          commands:
+            - bundle exec rubocop --format progress
+
+        - name: Reek
+          # Sem paths explícitos o reek lê da STDIN e não analisa nada.
+          commands:
+            - bundle exec reek app lib
+
+        - name: Brakeman
+          commands:
+            - bundle exec brakeman --no-pager
+
+        - name: Auditoria de gems
+          commands:
+            - bundle exec bundler-audit check --update

@@ -1,8 +1,33 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+# O omakase já carrega rubocop-performance e rubocop-rails; aqui somamos os cops de RSpec.
+plugins:
+  - rubocop-rspec
+
+inherit_mode:
+  merge:
+    - Exclude
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "bin/**/*"
+    - "db/schema.rb"
+    - "db/*_schema.rb"
+    - "storage/**/*"
+    - "vendor/**/*"
+
+# Descrições de exemplo são em português; o cop assume inglês ("should ...").
+RSpec/ExampleWording:
+  Enabled: false
+
+# Specs de request/helper deste projeto agrupam por cenário, não por classe.
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 3
+
+RSpec/ExampleLength:
+  Max: 10

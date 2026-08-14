@@ -14,43 +14,42 @@
     <div class="max-w-3xl">
       <span class="inline-flex items-center gap-2 rounded-full border border-brand-500/40 bg-brand-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-300">
         <span class="h-1.5 w-1.5 rounded-full bg-brand-400"></span>
-        Classificados 100% off-road
+        <%= t("home.hero.badge") %>
       </span>
 
       <h1 class="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-        Encontre ou venda sua
-        <span class="text-brand-400">máquina de trilha</span>
+        <%= t("home.hero.title_lead") %>
+        <span class="text-brand-400"><%= t("home.hero.title_highlight") %></span>
       </h1>
 
       <p class="mt-5 max-w-2xl text-base leading-relaxed text-stone-300 sm:text-lg">
-        Jipes, picapes 4x4, motos de enduro, quadriciclos, UTVs e tudo em peças e preparação —
-        anunciados por quem realmente enfia o pé na lama.
+        <%= t("home.hero.subtitle") %>
       </p>
 
       <div class="mt-9 flex flex-col gap-3 sm:flex-row">
         <a href="#" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-stone-950 shadow-lg shadow-brand-900/40 transition hover:bg-brand-400">
-          Anunciar grátis
+          <%= t("home.hero.cta_primary") %>
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>
         </a>
         <a href="#" class="inline-flex items-center justify-center rounded-full border border-stone-600 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300">
-          Explorar anúncios
+          <%= t("home.hero.cta_secondary") %>
         </a>
       </div>
 
       <dl class="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-stone-700/60 pt-8">
         <div>
-          <dt class="text-2xl font-extrabold text-white sm:text-3xl">5.600+</dt>
-          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400">Anúncios ativos</dd>
+          <dt class="text-2xl font-extrabold text-white sm:text-3xl"><%= number_with_delimiter(5_600) %>+</dt>
+          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.listings") %></dd>
         </div>
         <div>
-          <dt class="text-2xl font-extrabold text-white sm:text-3xl">1.240</dt>
-          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400">Vendedores</dd>
+          <dt class="text-2xl font-extrabold text-white sm:text-3xl"><%= number_with_delimiter(1_240) %></dt>
+          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.sellers") %></dd>
         </div>
         <div>
           <dt class="text-2xl font-extrabold text-white sm:text-3xl">27</dt>
-          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400">Estados</dd>
+          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.states") %></dd>
         </div>
       </dl>
     </div>
@@ -60,8 +59,8 @@
 <%# -------------------------------------------------------- Categorias %>
 <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
   <div class="max-w-2xl">
-    <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Navegue por categoria</h2>
-    <p class="mt-2 text-sm text-stone-400">Escolha o terreno e veja o que está rolando agora.</p>
+    <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl"><%= t("home.categories.title") %></h2>
+    <p class="mt-2 text-sm text-stone-400"><%= t("home.categories.subtitle") %></p>
   </div>
 
   <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -71,15 +70,15 @@
           <%= category_icon(category[:icon], css_class: "h-7 w-7") %>
         </span>
 
-        <h3 class="mt-6 text-lg font-bold text-white"><%= category[:name] %></h3>
-        <p class="mt-2 flex-1 text-sm leading-relaxed text-stone-400"><%= category[:description] %></p>
+        <h3 class="mt-6 text-lg font-bold text-white"><%= category_name(category[:slug]) %></h3>
+        <p class="mt-2 flex-1 text-sm leading-relaxed text-stone-400"><%= category_description(category[:slug]) %></p>
 
         <div class="mt-6 flex items-center justify-between border-t border-stone-800 pt-4">
           <span class="text-xs font-semibold uppercase tracking-wide text-stone-500">
-            <%= number_with_delimiter(category[:count], delimiter: ".") %> anúncios
+            <%= t("home.categories.count", count: category[:count], formatted: number_with_delimiter(category[:count])) %>
           </span>
           <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-400">
-            Ver todos
+            <%= t("home.categories.see_all") %>
             <svg class="h-4 w-4 transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
@@ -95,11 +94,11 @@
   <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Anúncios Recentes</h2>
-        <p class="mt-2 text-sm text-stone-400">Os últimos veículos e peças publicados no portal.</p>
+        <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl"><%= t("home.listings.title") %></h2>
+        <p class="mt-2 text-sm text-stone-400"><%= t("home.listings.subtitle") %></p>
       </div>
       <a href="#" class="inline-flex items-center gap-1.5 rounded-full border border-stone-700 px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300">
-        Ver todos
+        <%= t("home.listings.see_all") %>
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
         </svg>
@@ -119,12 +118,12 @@
             </div>
 
             <span class="absolute left-3 top-3 rounded-full bg-stone-950/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-200 backdrop-blur">
-              <%= listing[:category] %>
+              <%= category_name(listing[:category]) %>
             </span>
 
             <% if listing[:badge].present? %>
               <span class="absolute right-3 top-3 rounded-full bg-brand-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-950">
-                <%= listing[:badge] %>
+                <%= t("home.listings.badges.#{listing[:badge]}") %>
               </span>
             <% end %>
           </div>

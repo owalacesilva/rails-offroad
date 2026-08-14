@@ -14,7 +14,7 @@
           </span>
         </div>
         <p class="mt-4 max-w-xs text-sm leading-relaxed text-stone-400">
-          O classificado de quem vive fora do asfalto. Compre e venda 4x4, motos de trilha, UTVs e peças com quem entende do assunto.
+          <%= t("layout.footer.tagline") %>
         </p>
         <div class="mt-5 flex items-center gap-3">
           <a href="#" aria-label="Instagram" class="flex h-9 w-9 items-center justify-center rounded-full border border-stone-800 text-stone-400 transition hover:border-brand-500 hover:text-brand-400">
@@ -41,44 +41,41 @@
       </div>
 
       <div>
-        <h3 class="text-sm font-bold uppercase tracking-wide text-white">Categorias</h3>
+        <h3 class="text-sm font-bold uppercase tracking-wide text-white"><%= t("layout.footer.headings.categories") %></h3>
         <ul class="mt-4 space-y-2.5 text-sm text-stone-400">
-          <li><a href="#" class="transition hover:text-brand-400">Veículos 4x4</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">Motos e Quadriciclos</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">UTVs e Side by Side</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">Peças &amp; Acessórios</a></li>
+          <% %w[veiculos-4x4 motos-quadriciclos utvs pecas-acessorios].each do |slug| %>
+            <li><a href="#" class="transition hover:text-brand-400"><%= category_name(slug) %></a></li>
+          <% end %>
         </ul>
       </div>
 
       <div>
-        <h3 class="text-sm font-bold uppercase tracking-wide text-white">Institucional</h3>
+        <h3 class="text-sm font-bold uppercase tracking-wide text-white"><%= t("layout.footer.headings.institutional") %></h3>
         <ul class="mt-4 space-y-2.5 text-sm text-stone-400">
-          <li><a href="#" class="transition hover:text-brand-400">Sobre nós</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">Como anunciar</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">Planos e destaques</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">Dicas de segurança</a></li>
+          <% %i[about how_to_advertise plans safety].each do |key| %>
+            <li><a href="#" class="transition hover:text-brand-400"><%= t("layout.footer.institutional.#{key}") %></a></li>
+          <% end %>
         </ul>
       </div>
 
       <div>
-        <h3 class="text-sm font-bold uppercase tracking-wide text-white">Contato</h3>
+        <h3 class="text-sm font-bold uppercase tracking-wide text-white"><%= t("layout.footer.headings.contact") %></h3>
         <ul class="mt-4 space-y-2.5 text-sm text-stone-400">
-          <li><a href="#" class="transition hover:text-brand-400">contato@offroadclassificados.com.br</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">(41) 4002-8922</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">Central de ajuda</a></li>
-          <li><a href="#" class="transition hover:text-brand-400">Trabalhe conosco</a></li>
+          <% %i[email phone help_center careers].each do |key| %>
+            <li><a href="#" class="transition hover:text-brand-400"><%= t("layout.footer.contact.#{key}") %></a></li>
+          <% end %>
         </ul>
       </div>
     </div>
 
     <div class="mt-10 flex flex-col gap-4 border-t border-stone-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
       <p class="text-xs text-stone-500">
-        &copy; <%= Time.current.year %> OffRoad Classificados. Todos os direitos reservados.
+        &copy; <%= Time.current.year %> OffRoad Classificados. <%= t("layout.footer.legal.rights") %>
       </p>
       <div class="flex gap-5 text-xs text-stone-500">
-        <a href="#" class="transition hover:text-brand-400">Termos de uso</a>
-        <a href="#" class="transition hover:text-brand-400">Privacidade</a>
-        <a href="#" class="transition hover:text-brand-400">Cookies</a>
+        <% %i[terms privacy cookies].each do |key| %>
+          <a href="#" class="transition hover:text-brand-400"><%= t("layout.footer.legal.#{key}") %></a>
+        <% end %>
       </div>
     </div>
   </div>

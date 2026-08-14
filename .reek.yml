@@ -1,0 +1,25 @@
+### Detectores de code smell.
+### Rodar com: docker compose exec web bundle exec reek app lib
+### Sem paths explícitos o reek lê da STDIN e não analisa nada.
+
+exclude_paths:
+  - db
+  - log
+  - node_modules
+  - storage
+  - tmp
+  - vendor
+
+detectors:
+  # Reek exige comentário de documentação em toda classe/módulo; este projeto
+  # documenta o que não é óbvio, não tudo.
+  IrresponsibleModule:
+    enabled: false
+
+  # Detector mantido ligado; estas duas são exceções conscientes — resolver
+  # locale e montar default_url_options são funções puras por natureza, e
+  # transformá-las em estado de instância só pioraria o controller.
+  UtilityFunction:
+    exclude:
+      - "ApplicationController#supported_locale"
+      - "ApplicationController#default_url_options"

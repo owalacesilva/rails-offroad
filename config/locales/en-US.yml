@@ -1,0 +1,72 @@
+# Interface copy in US English. Missing keys fall back to pt-BR (see config/application.rb).
+en-US:
+  layout:
+    header:
+      search_label: "Search listings"
+      search_placeholder: "Search by model, brand or part..."
+      search_submit: "Search"
+      sign_in: "Sign in"
+      new_listing: "Post a listing"
+    footer:
+      tagline: "Classifieds for people who live off the pavement. Buy and sell 4x4s, trail bikes, UTVs and parts with folks who know the terrain."
+      headings:
+        categories: "Categories"
+        institutional: "Company"
+        contact: "Contact"
+      institutional:
+        about: "About us"
+        how_to_advertise: "How to advertise"
+        plans: "Plans and featured spots"
+        safety: "Safety tips"
+      contact:
+        email: "contato@offroadclassificados.com.br"
+        phone: "+55 (41) 4002-8922"
+        help_center: "Help center"
+        careers: "Careers"
+      legal:
+        rights: "All rights reserved."
+        terms: "Terms of use"
+        privacy: "Privacy"
+        cookies: "Cookies"
+
+  categories:
+    veiculos-4x4:
+      name: "4x4 Vehicles"
+      description: "Jeeps, pickups and utility rigs ready for the trail."
+    motos-quadriciclos:
+      name: "Bikes and ATVs"
+      description: "Trail, enduro, quads and UTVs in every displacement."
+    pecas-acessorios:
+      name: "Parts & Accessories"
+      description: "Suspension, tires, winches, snorkels and build gear."
+    utvs:
+      name: "UTVs and Side by Side"
+      description: "Buggies and side by sides for sand, mud and speed."
+
+  home:
+    hero:
+      badge: "100% off-road classifieds"
+      title_lead: "Find or sell your"
+      title_highlight: "trail machine"
+      subtitle: "Jeeps, 4x4 pickups, enduro bikes, quads, UTVs and everything in parts and builds — listed by people who actually get muddy."
+      cta_primary: "Post for free"
+      cta_secondary: "Browse listings"
+      stats:
+        listings: "Active listings"
+        sellers: "Sellers"
+        states: "States"
+    categories:
+      title: "Browse by category"
+      subtitle: "Pick your terrain and see what is out there right now."
+      see_all: "See all"
+      count:
+        one: "%{formatted} listing"
+        other: "%{formatted} listings"
+    listings:
+      title: "Recent Listings"
+      subtitle: "The latest vehicles and parts published on the portal."
+      see_all: "See all"
+      badges:
+        prepared: "Built"
+        featured: "Featured"
+        new: "New"
