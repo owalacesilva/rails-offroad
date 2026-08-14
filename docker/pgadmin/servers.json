@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "OffRoad Classificados (dev)",
+      "Group": "Servers",
+      "Host": "db",
+      "Port": 5432,
+      "MaintenanceDB": "postgres",
+      "Username": "postgres",
+      "SSLMode": "prefer",
+      "Comment": "Registrado automaticamente pelo compose. A senha e pedida no primeiro acesso."
+    }
+  }
+}

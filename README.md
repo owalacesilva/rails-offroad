@@ -17,14 +17,33 @@ container continuam seus e editáveis normalmente.
 ### Primeira execução
 
 ```bash
+cp .env-example .env                         # opcional: há default para tudo
 docker compose build
 docker compose run --rm web bundle install   # popula o volume de gems
 docker compose run --rm web bin/rails db:create
 docker compose up
 ```
 
-A aplicação sobe em <http://localhost:3000> via `bin/dev` (foreman: servidor Rails +
-`tailwindcss:watch`). O PostgreSQL fica exposto em `localhost:5432` (usuário/senha `postgres`).
+### Serviços
+
+| Serviço     | URL                                            | Credenciais            |
+| ----------- | ---------------------------------------------- | ---------------------- |
+| Aplicação   | <http://localhost:3000>                        | —                      |
+| PostgreSQL  | `localhost:5432`                               | `postgres` / `postgres`|
+| pgAdmin     | <http://localhost:5050>                        | modo desktop, sem login|
+| MinIO API   | <http://localhost:9000>                        | `offroad` / `offroad123`|
+| MinIO console | <http://localhost:9001>                      | `offroad` / `offroad123`|
+| MailHog     | <http://localhost:8025>                        | —                      |
+
+A aplicação sobe via `bin/dev` (foreman: servidor Rails + `tailwindcss:watch`).
+
+O pgAdmin já vem com a conexão do banco pré-registrada (`docker/pgadmin/servers.json`);
+a senha é pedida no primeiro acesso.
+
+O bucket do MinIO é criado automaticamente pelo serviço one-shot `minio_setup`, que também
+libera leitura anônima — conveniência de desenvolvimento, não replicar em produção.
+
+Em desenvolvimento **nenhum e-mail sai para destinatário real**: tudo é capturado pelo MailHog.
 
 ### Comandos do dia a dia
 
@@ -37,10 +56,20 @@ docker compose run --rm web bin/rails generate model Listing
 docker compose down                            # para tudo
 ```
 
+### Variáveis de ambiente
+
+`.env-example` é o template versionado; `cp .env-example .env` para customizar. Todas as
+variáveis têm default no `compose.yaml`, então o ambiente sobe sem `.env`.
+
+Os endereços internos (`DB_HOST=db`, `MINIO_ENDPOINT=http://minio:9000`, `SMTP_ADDRESS=mailhog`)
+ficam fixos no `compose.yaml`, fora do `.env`, de propósito: dentro da rede do Compose valem os
+nomes dos serviços, enquanto no host valeria `localhost`. Colocá-los no `.env` quebraria um dos dois.
+
 ### Rodando sem Docker
 
 `config/database.yml` lê `DB_HOST`, `DB_PORT`, `DB_USERNAME` e `DB_PASSWORD`, com padrão
-`localhost:5432` / `postgres`. Com Ruby 3.4 e um PostgreSQL local, `bin/setup` e `bin/dev`
+`localhost:5432` / `postgres`. `config/storage.yml` e o Action Mailer seguem a mesma lógica,
+com default em `localhost`. Com Ruby 3.4 e os serviços locais, `bin/setup` e `bin/dev`
 funcionam normalmente.
 
 ## Estado atual

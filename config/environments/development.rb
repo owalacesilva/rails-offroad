@@ -28,11 +28,24 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :memory_store
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Arquivos vão para o MinIO; o bucket é criado pelo serviço minio_setup do compose.
+  config.active_storage.service = :minio
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # Dentro do Compose o endpoint é http://minio:9000, que o navegador do host não
+  # resolve. Servindo pelo proxy do Rails, as URLs saem em localhost:3000.
+  config.active_storage.resolve_model_to_route = :rails_storage_proxy
+
+  # Todo e-mail de desenvolvimento é capturado pelo MailHog (http://localhost:8025);
+  # nada sai para destinatário real.
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch("SMTP_ADDRESS", "localhost"),
+    port: ENV.fetch("SMTP_PORT", 1025).to_i
+  }
+  config.action_mailer.perform_deliveries = true
+
+  # Com o MailHog no ar, falha de entrega é erro de configuração: melhor estourar.
+  config.action_mailer.raise_delivery_errors = true
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false

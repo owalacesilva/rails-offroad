@@ -1,20 +1,90 @@
 name: offroad_classifieds
 
+# Variáveis vêm do .env (veja .env-example). Todas têm default, então o ambiente
+# sobe sem .env. Endereços internos (db/minio/mailhog) são fixos aqui de propósito:
+# valem dentro da rede do Compose e não podem ser sobrescritos pelo host.
+
 services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}" ]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@offroadclassificados.com.br}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      # Modo desktop: sem tela de login nem master password. Só para desenvolvimento.
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      # Sem isto o pgAdmin recusa e-mails em TLDs de uso especial (.test, .local).
+      PGADMIN_CONFIG_ALLOW_SPECIAL_EMAIL_DOMAINS: "['test', 'local', 'localhost', 'invalid', 'example']"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      # Pré-registra a conexão com o serviço db.
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-offroad}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-offroad123}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  # One-shot: cria o bucket e libera leitura anônima para as URLs de imagem
+  # funcionarem direto no navegador em desenvolvimento. Sai assim que termina.
+  minio_setup:
+    image: minio/mc:latest
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-offroad}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-offroad123}
+      MINIO_BUCKET: ${MINIO_BUCKET:-offroad-classifieds-dev}
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - |
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
+        mc mb --ignore-existing local/"$$MINIO_BUCKET" &&
+        mc anonymous set download local/"$$MINIO_BUCKET"
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "${MAILHOG_SMTP_PORT:-1025}:1025"
+      - "${MAILHOG_WEB_PORT:-8025}:8025"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
 
   web:
     build:
@@ -23,22 +93,36 @@ services:
     command: bin/dev
     environment:
       DB_HOST: db
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-offroad}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-offroad123}
+      MINIO_BUCKET: ${MINIO_BUCKET:-offroad-classifieds-dev}
+      SMTP_ADDRESS: mailhog
+      SMTP_PORT: 1025
+      RAILS_MAX_THREADS: ${RAILS_MAX_THREADS:-5}
       BINDING: "0.0.0.0"
     volumes:
       - .:/app
       - bundle:/bundle
     ports:
-      - "3000:3000"
+      - "${WEB_PORT:-3000}:3000"
     depends_on:
       db:
         condition: service_healthy
+      minio_setup:
+        condition: service_completed_successfully
+      mailhog:
+        condition: service_started
     stdin_open: true
     tty: true
 
 volumes:
   pg_data:
+  pgadmin_data:
+  minio_data:
   # Gems ficam num volume, fora do bind mount do projeto.
   # Em um clone novo, rode uma vez: docker compose run --rm web bundle install
   bundle:
