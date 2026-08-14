@@ -1,0 +1,70 @@
+<% content_for :title, "#{t('dashboard.proposals_index.title')} — OffRoad Classificados" %>
+
+<section class="min-h-full bg-stone-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="mx-auto max-w-7xl">
+    <nav class="flex items-center gap-2 text-xs font-semibold text-stone-500" aria-label="Breadcrumb">
+      <%= link_to t("dashboard.breadcrumb_home"), root_path, class: "hover:text-brand-600" %>
+      <span>&gt;</span>
+      <%= link_to t("dashboard.breadcrumb_account"), account_path, class: "hover:text-brand-600" %>
+      <span>&gt;</span>
+      <span class="text-brand-600"><%= t("dashboard.nav.proposals") %></span>
+    </nav>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-12">
+      <%= render "dashboard/dashboard/sidebar", active: :proposals %>
+
+      <div class="lg:col-span-9">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("dashboard.proposals_index.title") %></h1>
+          <p class="text-sm text-stone-500"><%= t("dashboard.proposals_index.count", count: @proposals.size) %></p>
+        </div>
+        <p class="mt-1 text-sm text-stone-500"><%= t("dashboard.proposals_index.subtitle") %></p>
+
+        <% if @proposals.any? %>
+          <div class="mt-6 space-y-4">
+            <% @proposals.each do |proposal| %>
+              <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <%= link_to proposal.listing.title, listing_path(proposal.listing),
+                          class: "text-sm font-bold text-stone-900 hover:text-brand-600" %>
+                    <p class="mt-0.5 text-xs text-stone-500">
+                      <%= t("dashboard.proposals_index.received_at", date: l(proposal.created_at, format: :long)) %>
+                    </p>
+                  </div>
+                  <p class="text-lg font-extrabold text-emerald-600"><%= listing_price(proposal.amount) %></p>
+                </div>
+
+                <div class="mt-4 grid gap-3 border-t border-stone-100 pt-4 sm:grid-cols-2">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-stone-400"><%= t("dashboard.proposals_index.contact") %></p>
+                    <p class="mt-1 text-sm font-semibold text-stone-800"><%= proposal.name %></p>
+                    <p class="text-sm text-stone-500"><%= mail_to proposal.email, proposal.email, class: "hover:text-brand-600" %></p>
+                    <% if proposal.phone.present? %>
+                      <p class="text-sm text-stone-500"><%= proposal.phone %></p>
+                    <% end %>
+                  </div>
+
+                  <% if proposal.message.present? %>
+                    <div>
+                      <p class="text-xs font-semibold uppercase tracking-wide text-stone-400"><%= t("dashboard.proposals_index.message") %></p>
+                      <p class="mt-1 whitespace-pre-line text-sm text-stone-600"><%= proposal.message %></p>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-16 text-center">
+            <svg class="mx-auto h-10 w-10 text-stone-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+            </svg>
+            <h3 class="mt-4 text-lg font-bold text-stone-800"><%= t("dashboard.proposals_index.empty.title") %></h3>
+            <p class="mt-2 text-sm text-stone-500"><%= t("dashboard.proposals_index.empty.subtitle") %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>

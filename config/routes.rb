@@ -22,7 +22,12 @@ Rails.application.routes.draw do
   end
 
   # Painel do anunciante autenticado.
-  get "minha-conta", to: "dashboard#index", as: :account
+  scope module: "dashboard" do
+    get   "minha-conta",          to: "dashboard#index",   as: :account
+    get   "minha-conta/perfil",   to: "profiles#edit",     as: :edit_profile
+    patch "minha-conta/perfil",   to: "profiles#update",   as: :profile
+    get   "minha-conta/propostas", to: "proposals#index",  as: :proposals
+  end
 
   # Defines the root path route ("/")
   root "home#index"

@@ -52,6 +52,8 @@ en-US:
     member: "User"
     nav:
       dashboard: "Dashboard"
+      proposals: "Proposals"
+      profile: "My Profile"
       sign_out: "Sign out"
     stats:
       listings: "Listings"
@@ -63,6 +65,32 @@ en-US:
       proportion: "Proportion"
       no_listings: "No listings published yet"
       no_data: "No data"
+    proposals_index:
+      title: "Proposals Received"
+      subtitle: "People who sent a proposal through your listings."
+      count:
+        one: "1 proposal"
+        other: "%{count} proposals"
+      received_at: "Received on %{date}"
+      contact: "Contact"
+      message: "Message"
+      empty:
+        title: "No proposals yet"
+        subtitle: "When someone sends a proposal through your listings, it shows up here."
+
+  profiles:
+    edit:
+      title: "My Profile"
+      subtitle: "Update your contact and sign-in details."
+      phone_hint: "Used for the WhatsApp button on your listings."
+      password_section: "Change password"
+      password_hint: "Leave blank to keep your current password."
+      submit: "Save changes"
+      errors:
+        one: "We found 1 error:"
+        other: "We found %{count} errors:"
+    update:
+      success: "Profile updated successfully."
 
   home:
     hero:

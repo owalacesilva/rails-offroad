@@ -53,6 +53,8 @@ pt-BR:
     member: "Usuário"
     nav:
       dashboard: "Dashboard"
+      proposals: "Propostas"
+      profile: "Meu Perfil"
       sign_out: "Sair"
     stats:
       listings: "Anúncios"
@@ -64,6 +66,32 @@ pt-BR:
       proportion: "Proporção"
       no_listings: "Nenhum anúncio publicado"
       no_data: "Sem dados"
+    proposals_index:
+      title: "Propostas Recebidas"
+      subtitle: "Interessados que enviaram uma proposta pelos seus anúncios."
+      count:
+        one: "1 proposta"
+        other: "%{count} propostas"
+      received_at: "Recebida em %{date}"
+      contact: "Contato"
+      message: "Mensagem"
+      empty:
+        title: "Nenhuma proposta ainda"
+        subtitle: "Quando alguém enviar uma proposta pelos seus anúncios, ela aparece aqui."
+
+  profiles:
+    edit:
+      title: "Meu Perfil"
+      subtitle: "Atualize seus dados de contato e de acesso."
+      phone_hint: "Usado no botão de WhatsApp dos seus anúncios."
+      password_section: "Alterar senha"
+      password_hint: "Deixe em branco para manter a senha atual."
+      submit: "Salvar alterações"
+      errors:
+        one: "Encontramos 1 erro:"
+        other: "Encontramos %{count} erros:"
+    update:
+      success: "Perfil atualizado com sucesso."
 
   home:
     hero:
