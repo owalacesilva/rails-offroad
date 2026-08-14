@@ -45,6 +45,25 @@ en-US:
       name: "UTVs and Side by Side"
       description: "Buggies and side by sides for sand, mud and speed."
 
+  dashboard:
+    title: "Dashboard"
+    breadcrumb_home: "Home"
+    breadcrumb_account: "My Account"
+    member: "User"
+    nav:
+      dashboard: "Dashboard"
+      sign_out: "Sign out"
+    stats:
+      listings: "Listings"
+      proposals: "Proposals"
+      categories: "Active categories"
+    by_category: "Listings by category"
+    charts:
+      distribution: "Distribution by category"
+      proportion: "Proportion"
+      no_listings: "No listings published yet"
+      no_data: "No data"
+
   home:
     hero:
       badge: "100% off-road classifieds"

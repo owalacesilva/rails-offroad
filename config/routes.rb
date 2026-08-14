@@ -21,6 +21,9 @@ Rails.application.routes.draw do
     resources :proposals, only: :create, path: "propostas"
   end
 
+  # Painel do anunciante autenticado.
+  get "minha-conta", to: "dashboard#index", as: :account
+
   # Defines the root path route ("/")
   root "home#index"
 end

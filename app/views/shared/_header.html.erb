@@ -32,9 +32,9 @@
       <%# Ações %>
       <div class="ml-auto flex items-center gap-2 sm:gap-3">
         <% if authenticated? %>
-          <span class="hidden text-sm font-semibold text-stone-300 sm:inline-block">
+          <%= link_to account_path, class: "hidden text-sm font-semibold text-stone-300 transition hover:text-brand-300 sm:inline-block" do %>
             <%= t("layout.header.greeting", name: current_advertiser.name) %>
-          </span>
+          <% end %>
           <%= button_to t("layout.header.sign_out"), logout_path, method: :delete,
                 class: "cursor-pointer rounded-full border border-stone-700 px-4 py-2 text-sm font-semibold text-stone-300 transition hover:border-brand-500 hover:text-brand-300" %>
         <% else %>

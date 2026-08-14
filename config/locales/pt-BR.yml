@@ -46,6 +46,25 @@ pt-BR:
       name: "UTVs e Side by Side"
       description: "Buggies e side by side para areia, lama e velocidade."
 
+  dashboard:
+    title: "Dashboard"
+    breadcrumb_home: "Início"
+    breadcrumb_account: "Minha Conta"
+    member: "Usuário"
+    nav:
+      dashboard: "Dashboard"
+      sign_out: "Sair"
+    stats:
+      listings: "Anúncios"
+      proposals: "Propostas"
+      categories: "Categorias ativas"
+    by_category: "Anúncios por categoria"
+    charts:
+      distribution: "Distribuição por categoria"
+      proportion: "Proporção"
+      no_listings: "Nenhum anúncio publicado"
+      no_data: "Sem dados"
+
   home:
     hero:
       badge: "Classificados 100% off-road"
