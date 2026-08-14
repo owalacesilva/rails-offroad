@@ -1,0 +1,160 @@
+<%# Home — mockup estático. O Header fica no layout (app/views/layouts/application.html.erb). %>
+
+<%# ---------------------------------------------------------------- Hero %>
+<section class="relative overflow-hidden border-b border-stone-800 bg-stone-900">
+  <!-- Espaço para a imagem temática: troque o gradiente abaixo por image_tag "hero-trilha.jpg", class: "absolute inset-0 h-full w-full object-cover" -->
+  <div class="absolute inset-0"
+       style="background-image:
+         radial-gradient(circle at 15% 20%, rgba(249, 128, 7, 0.28), transparent 55%),
+         radial-gradient(circle at 85% 10%, rgba(183, 60, 6, 0.22), transparent 50%),
+         linear-gradient(160deg, #1c1917 0%, #0c0a09 100%);"></div>
+  <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent"></div>
+
+  <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <div class="max-w-3xl">
+      <span class="inline-flex items-center gap-2 rounded-full border border-brand-500/40 bg-brand-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-300">
+        <span class="h-1.5 w-1.5 rounded-full bg-brand-400"></span>
+        Classificados 100% off-road
+      </span>
+
+      <h1 class="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+        Encontre ou venda sua
+        <span class="text-brand-400">máquina de trilha</span>
+      </h1>
+
+      <p class="mt-5 max-w-2xl text-base leading-relaxed text-stone-300 sm:text-lg">
+        Jipes, picapes 4x4, motos de enduro, quadriciclos, UTVs e tudo em peças e preparação —
+        anunciados por quem realmente enfia o pé na lama.
+      </p>
+
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+        <a href="#" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-stone-950 shadow-lg shadow-brand-900/40 transition hover:bg-brand-400">
+          Anunciar grátis
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          </svg>
+        </a>
+        <a href="#" class="inline-flex items-center justify-center rounded-full border border-stone-600 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300">
+          Explorar anúncios
+        </a>
+      </div>
+
+      <dl class="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-stone-700/60 pt-8">
+        <div>
+          <dt class="text-2xl font-extrabold text-white sm:text-3xl">5.600+</dt>
+          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400">Anúncios ativos</dd>
+        </div>
+        <div>
+          <dt class="text-2xl font-extrabold text-white sm:text-3xl">1.240</dt>
+          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400">Vendedores</dd>
+        </div>
+        <div>
+          <dt class="text-2xl font-extrabold text-white sm:text-3xl">27</dt>
+          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400">Estados</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<%# -------------------------------------------------------- Categorias %>
+<section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+  <div class="max-w-2xl">
+    <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Navegue por categoria</h2>
+    <p class="mt-2 text-sm text-stone-400">Escolha o terreno e veja o que está rolando agora.</p>
+  </div>
+
+  <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <% @categories.each do |category| %>
+      <a href="#" class="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-800 bg-stone-900 p-7 transition hover:-translate-y-1 hover:border-brand-500/60 hover:bg-stone-800/60">
+        <span class="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/25 transition group-hover:bg-brand-500 group-hover:text-stone-950">
+          <%= category_icon(category[:icon], css_class: "h-7 w-7") %>
+        </span>
+
+        <h3 class="mt-6 text-lg font-bold text-white"><%= category[:name] %></h3>
+        <p class="mt-2 flex-1 text-sm leading-relaxed text-stone-400"><%= category[:description] %></p>
+
+        <div class="mt-6 flex items-center justify-between border-t border-stone-800 pt-4">
+          <span class="text-xs font-semibold uppercase tracking-wide text-stone-500">
+            <%= number_with_delimiter(category[:count], delimiter: ".") %> anúncios
+          </span>
+          <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-400">
+            Ver todos
+            <svg class="h-4 w-4 transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </span>
+        </div>
+      </a>
+    <% end %>
+  </div>
+</section>
+
+<%# --------------------------------------------------- Anúncios Recentes %>
+<section class="border-t border-stone-800 bg-stone-900/40">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Anúncios Recentes</h2>
+        <p class="mt-2 text-sm text-stone-400">Os últimos veículos e peças publicados no portal.</p>
+      </div>
+      <a href="#" class="inline-flex items-center gap-1.5 rounded-full border border-stone-700 px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300">
+        Ver todos
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <% @listings.each do |listing| %>
+        <article class="group flex flex-col overflow-hidden rounded-2xl border border-stone-800 bg-stone-900 transition hover:-translate-y-1 hover:border-brand-500/60">
+          <%# Espaço de imagem do anúncio %>
+          <div class="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-stone-700 via-stone-800 to-stone-900">
+            <!-- Espaço de imagem: troque por image_tag listing.cover, class: "h-full w-full object-cover" -->
+            <div class="flex h-full w-full items-center justify-center">
+              <svg class="h-10 w-10 text-stone-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
+              </svg>
+            </div>
+
+            <span class="absolute left-3 top-3 rounded-full bg-stone-950/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-200 backdrop-blur">
+              <%= listing[:category] %>
+            </span>
+
+            <% if listing[:badge].present? %>
+              <span class="absolute right-3 top-3 rounded-full bg-brand-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-950">
+                <%= listing[:badge] %>
+              </span>
+            <% end %>
+          </div>
+
+          <div class="flex flex-1 flex-col p-5">
+            <h3 class="text-sm font-bold leading-snug text-white transition group-hover:text-brand-300">
+              <a href="#"><%= listing[:title] %></a>
+            </h3>
+
+            <p class="mt-2 flex items-center gap-1.5 text-xs text-stone-400">
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+              </svg>
+              <%= listing[:year] %>
+            </p>
+
+            <p class="mt-4 text-xl font-extrabold tracking-tight text-white">
+              <%= listing_price(listing[:price]) %>
+            </p>
+
+            <p class="mt-auto flex items-center gap-1.5 pt-4 text-xs text-stone-400">
+              <svg class="h-3.5 w-3.5 shrink-0 text-brand-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              </svg>
+              <%= listing[:location] %>
+            </p>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  </div>
+</section>

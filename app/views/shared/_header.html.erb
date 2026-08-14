@@ -1,0 +1,59 @@
+<%# Header global: fixo no topo (sticky) em todas as páginas. %>
+<header class="sticky top-0 z-50 border-b border-stone-800 bg-stone-950/95 backdrop-blur">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center gap-3 sm:gap-6">
+      <%= link_to root_path, class: "flex shrink-0 items-center gap-2.5" do %>
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-stone-950">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17.25 8.25 9l3.75 5.25L15.75 6l5.25 11.25H3Z" />
+          </svg>
+        </span>
+        <span class="text-base font-extrabold uppercase leading-none tracking-tight text-white sm:text-lg">
+          OffRoad<span class="text-brand-400"> Classificados</span>
+        </span>
+      <% end %>
+
+      <%# Busca central (desktop) %>
+      <form action="#" method="get" role="search" class="hidden flex-1 md:block">
+        <label for="header-search" class="sr-only">Buscar anúncios</label>
+        <div class="relative">
+          <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+          <input id="header-search" type="search" name="q" autocomplete="off"
+                 placeholder="Busque por modelo, marca ou peça..."
+                 class="w-full rounded-full border border-stone-700 bg-stone-900 py-2.5 pl-11 pr-28 text-sm text-stone-100 placeholder:text-stone-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+          <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-brand-500 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400">
+            Buscar
+          </button>
+        </div>
+      </form>
+
+      <%# Ações %>
+      <div class="ml-auto flex items-center gap-2 sm:gap-3">
+        <a href="#" class="hidden rounded-full px-3 py-2 text-sm font-semibold text-stone-300 transition hover:text-white sm:inline-block">
+          Entrar
+        </a>
+        <a href="#" class="inline-flex items-center gap-1.5 rounded-full bg-brand-500 px-4 py-2 text-sm font-bold text-stone-950 shadow-lg shadow-brand-900/30 transition hover:bg-brand-400">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Anunciar
+        </a>
+      </div>
+    </div>
+
+    <%# Busca (mobile) %>
+    <form action="#" method="get" role="search" class="pb-3 md:hidden">
+      <label for="header-search-mobile" class="sr-only">Buscar anúncios</label>
+      <div class="relative">
+        <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+        <input id="header-search-mobile" type="search" name="q" autocomplete="off"
+               placeholder="Busque por modelo, marca ou peça..."
+               class="w-full rounded-full border border-stone-700 bg-stone-900 py-2.5 pl-11 pr-4 text-sm text-stone-100 placeholder:text-stone-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+      </div>
+    </form>
+  </div>
+</header>

@@ -1,0 +1,35 @@
+# Imagem de desenvolvimento. A imagem de produção é o `Dockerfile` gerado pelo Rails.
+FROM ruby:3.4-slim-bookworm
+
+# Dependências de build (pg compila extensão nativa) e utilitários de runtime.
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+      build-essential \
+      libpq-dev \
+      postgresql-client \
+      pkg-config \
+      git \
+      curl \
+      tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV LANG=C.UTF-8 \
+    TZ=America/Sao_Paulo \
+    BUNDLE_PATH=/bundle \
+    BINDING=0.0.0.0
+
+# foreman fica na imagem para o bin/dev não reinstalá-lo a cada start do container.
+RUN gem install "rails:~> 8.0" foreman --no-document
+
+# uid/gid 1000 espelham o usuário do host: arquivos gerados pelo container
+# continuam pertencendo a você e editáveis fora do Docker.
+RUN groupadd -g 1000 app && \
+    useradd -u 1000 -g 1000 -m -s /bin/bash app && \
+    mkdir -p /bundle /app && \
+    chown -R 1000:1000 /bundle /app /usr/local/bundle
+
+USER 1000:1000
+WORKDIR /app
+EXPOSE 3000
+
+CMD ["bin/dev"]
