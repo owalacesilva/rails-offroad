@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Vitrine de anúncios com filtros. Rota em português, código em inglês.
+  resources :listings, only: :index, path: "anuncios"
+
   # Defines the root path route ("/")
   root "home#index"
 end

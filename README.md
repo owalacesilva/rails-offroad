@@ -20,9 +20,12 @@ container continuam seus e editáveis normalmente.
 cp .env-example .env                         # opcional: há default para tudo
 docker compose build
 docker compose run --rm web bundle install   # popula o volume de gems
-docker compose run --rm web bin/rails db:create
+docker compose run --rm web bin/rails db:prepare
+docker compose run --rm web bin/rails db:seed    # 4 categorias e 36 anúncios
 docker compose up
 ```
+
+O seed é idempotente: rodar de novo não duplica registros.
 
 ### Serviços
 
@@ -88,6 +91,11 @@ você vai querer manter só um.
 da gem `rails-i18n`; os textos da interface ficam em `config/locales/pt-BR.yml` e
 `config/locales/en-US.yml`. Chave ausente em `en-US` cai para `pt-BR`.
 
+`I18n.available_locales` inclui um terceiro locale, `:en`, que **não** é oferecido ao
+usuário: ele existe como base de fallback (`en-US` decompõe para `en`) e é onde
+`rails-i18n` e `faker` guardam seus dados. Os idiomas escolhíveis são
+`ApplicationController::SUPPORTED_LOCALES`, então `?locale=en` cai no padrão.
+
 A troca acontece em `ApplicationController#set_locale`, nesta ordem: `?locale=` na URL,
 depois o `Accept-Language` do navegador, senão o padrão.
 
@@ -115,16 +123,42 @@ nomes dos serviços, enquanto no host valeria `localhost`. Colocá-los no `.env`
 com default em `localhost`. Com Ruby 3.4 e os serviços locais, `bin/setup` e `bin/dev`
 funcionam normalmente.
 
-## Estado atual
+## Domínio
 
-Mockup estático da home, sem models nem persistência:
+Dois models, sem autenticação nem cadastro ainda:
+
+- `Category` — só `slug` e `position`. Nome e descrição são taxonomia traduzível e
+  vivem em `config/locales`, indexados pelo slug. `to_param` devolve o slug, então
+  as URLs de filtro são legíveis.
+- `Listing` — preço em `price_cents` (inteiro, com check constraint no banco),
+  `state` (UF) e `city` como colunas, e `badge` como enum. O badge de novidade se
+  chama `new_arrival` porque `new` colidiria com `Listing.new`.
+
+## Página de anúncios
+
+`/anuncios` (`ListingsController#index`) lista o acervo com filtro por categoria,
+estado, cidade e ordenação.
+
+- `app/queries/listing_filter.rb` traduz os parâmetros da URL em um scope. Valor
+  desconhecido é ignorado, nunca interpolado — `sort` só aceita as chaves de `SORTS`.
+- Cidade que não pertence ao estado escolhido é **descartada**, em vez de produzir
+  uma lista vazia sem explicação.
+- Ordenar por ano usa `NULLS LAST`: peça não tem ano e o Postgres jogaria os nulos
+  na frente no `DESC`.
+- `app/queries/pagination.rb` pagina por offset, sem gem. Página fora do intervalo
+  é corrigida para a borda mais próxima (`?page=999` cai na última).
+- O painel de filtros recolhe via `app/javascript/controllers/filters_controller.js`:
+  fechado no mobile, aberto a partir de `lg`. O HTML renderiza **aberto**, então
+  sem JavaScript o filtro continua funcionando.
+
+## Estado atual
 
 - `app/views/layouts/application.html.erb` — layout base com header fixo e footer
 - `app/views/shared/_header.html.erb` — logo, busca central e CTA "Anunciar"
 - `app/views/shared/_footer.html.erb` — links institucionais, contato e redes sociais
 - `app/views/home/index.html.erb` — hero, grid de categorias e vitrine "Anúncios Recentes"
-- `app/controllers/home_controller.rb` — dados mockados em `CATEGORIES` e `RECENT_LISTINGS`
+- `app/views/listings/_card.html.erb` — card de anúncio, compartilhado pelas duas telas
 - `app/assets/tailwind/application.css` — paleta da marca (`brand-50` a `brand-950`)
-- `spec/` — 15 exemplos cobrindo a home, os helpers e o isolamento de rede
+- `spec/` — 84 exemplos cobrindo models, filtros, paginação, requests e helpers
 
-`spec/factories/` está vazio de propósito: não há models ainda.
+A busca do header e os links de "Anunciar"/"Entrar" ainda são estáticos.

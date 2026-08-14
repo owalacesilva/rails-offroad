@@ -1,4 +1,4 @@
-module HomeHelper
+module CategoriesHelper
   # Traços dos ícones de categoria, renderizados inline para não depender de assets externos.
   CATEGORY_ICON_PATHS = {
     truck: [
@@ -12,6 +12,14 @@ module HomeHelper
     wrench: [
       "M21.75 6.75a4.5 4.5 0 0 1-4.884 4.484c-1.076-.091-2.264.071-2.95.904l-7.152 8.684a2.548 2.548 0 1 1-3.586-3.586l8.684-7.152c.833-.686.995-1.874.904-2.95a4.5 4.5 0 0 1 6.336-4.486l-3.276 3.276a3.004 3.004 0 0 0 2.25 2.25l3.276-3.276c.256.565.398 1.192.398 1.852Z"
     ]
+  }.freeze
+
+  # Slug da categoria -> ícone. Categoria sem ícone próprio cai no genérico.
+  CATEGORY_ICONS = {
+    "veiculos-4x4" => :truck,
+    "motos-quadriciclos" => :bike,
+    "utvs" => :truck,
+    "pecas-acessorios" => :wrench
   }.freeze
 
   def category_icon(name, css_class: "h-6 w-6")
@@ -28,19 +36,7 @@ module HomeHelper
     )
   end
 
-  # Preços mockados são inteiros em reais; sem centavos na vitrine.
-  # A unidade é fixa (o portal negocia em BRL em qualquer idioma), mas separadores
-  # e espaçamento seguem o locale via rails-i18n — daí "R$" sem espaço à direita:
-  # o format do pt-BR ("%u %n") já insere o separador.
-  def listing_price(amount)
-    number_to_currency(amount, unit: "R$", precision: 0)
-  end
-
-  def category_name(slug)
-    t("categories.#{slug}.name")
-  end
-
-  def category_description(slug)
-    t("categories.#{slug}.description")
+  def category_icon_for(slug, css_class: "h-6 w-6")
+    category_icon(CATEGORY_ICONS.fetch(slug, :wrench), css_class: css_class)
   end
 end

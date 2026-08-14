@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe HomeHelper, type: :helper do
+RSpec.describe ListingsHelper, type: :helper do
   describe "#listing_price" do
     it "formata em reais sem centavos usando os separadores do pt-BR" do
       expect(helper.listing_price(389_900)).to eq("R$ 389.900")
@@ -22,19 +22,17 @@ RSpec.describe HomeHelper, type: :helper do
     end
   end
 
-  describe "#category_name" do
-    it "traduz o slug da categoria" do
-      expect(helper.category_name("veiculos-4x4")).to eq("Veículos 4x4")
-    end
-  end
+  describe "#paginated_page_numbers" do
+    it "numera todas as páginas quando são poucas" do
+      pagination = stub(total_pages: 4)
 
-  describe "#category_icon" do
-    it "monta um svg inline" do
-      expect(helper.category_icon(:truck)).to start_with("<svg").and include("<path")
+      expect(helper.paginated_page_numbers(pagination)).to eq([ 1, 2, 3, 4 ])
     end
 
-    it "estoura para um ícone desconhecido" do
-      expect { helper.category_icon(:foguete) }.to raise_error(KeyError)
+    it "some com a régua numerada quando são muitas" do
+      pagination = stub(total_pages: ListingsHelper::MAX_NUMBERED_PAGES + 1)
+
+      expect(helper.paginated_page_numbers(pagination)).to be_empty
     end
   end
 end

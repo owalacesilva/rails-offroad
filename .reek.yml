@@ -16,10 +16,23 @@ detectors:
   IrresponsibleModule:
     enabled: false
 
-  # Detector mantido ligado; estas duas são exceções conscientes — resolver
-  # locale e montar default_url_options são funções puras por natureza, e
-  # transformá-las em estado de instância só pioraria o controller.
+  # Incompatível com o modelo do Rails: toda action popula as ivars que a view
+  # consome, e o detector lê isso como estado assumido. Sempre falso positivo aqui.
+  InstanceVariableAssumption:
+    enabled: false
+
+  # Detector mantido ligado para models e futuros service objects. As exceções
+  # abaixo são contêineres de função pura por natureza — helper de view, query
+  # object e resolução de locale não têm estado de instância para usar, e forçar
+  # isso só pioraria o desenho.
   UtilityFunction:
     exclude:
       - "ApplicationController#supported_locale"
       - "ApplicationController#default_url_options"
+      - "ListingFilter"
+      - "ListingsHelper"
+
+  # Quatro critérios de filtro mais o scope: 5 ivars é o mínimo desta classe.
+  TooManyInstanceVariables:
+    exclude:
+      - "ListingFilter"

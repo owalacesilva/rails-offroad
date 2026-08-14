@@ -43,8 +43,13 @@
       <div>
         <h3 class="text-sm font-bold uppercase tracking-wide text-white"><%= t("layout.footer.headings.categories") %></h3>
         <ul class="mt-4 space-y-2.5 text-sm text-stone-400">
+          <%# Slugs literais de propósito: o footer está no layout e roda em toda página,
+              inclusive nas de erro — não vale uma consulta ao banco por render. %>
           <% %w[veiculos-4x4 motos-quadriciclos utvs pecas-acessorios].each do |slug| %>
-            <li><a href="#" class="transition hover:text-brand-400"><%= category_name(slug) %></a></li>
+            <li>
+              <%= link_to t("categories.#{slug}.name"), listings_path(category: slug),
+                    class: "transition hover:text-brand-400" %>
+            </li>
           <% end %>
         </ul>
       </div>

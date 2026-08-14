@@ -70,4 +70,40 @@ pt-BR:
       badges:
         prepared: "Preparado"
         featured: "Destaque"
-        new: "Novo"
+        new_arrival: "Novo"
+
+  listings:
+    title: "Anúncios"
+    subtitle: "Todo o acervo do portal, com filtro por categoria, estado e cidade."
+    filters:
+      title: "Filtros"
+      show: "Mostrar filtros"
+      hide: "Ocultar filtros"
+      category: "Categoria"
+      state: "Estado"
+      city: "Cidade"
+      sort: "Ordenar por"
+      any_category: "Todas as categorias"
+      any_state: "Todos os estados"
+      any_city: "Todas as cidades"
+      apply: "Aplicar filtros"
+      clear: "Limpar"
+      applied:
+        one: "%{count} filtro ativo"
+        other: "%{count} filtros ativos"
+    sorts:
+      recent: "Mais recentes"
+      price_asc: "Menor preço"
+      price_desc: "Maior preço"
+      year_desc: "Ano mais novo"
+    results:
+      zero: "Nenhum anúncio encontrado"
+      one: "%{formatted} anúncio encontrado"
+      other: "%{formatted} anúncios encontrados"
+    empty:
+      title: "Nenhum anúncio por aqui"
+      subtitle: "Tente remover um filtro ou ampliar a busca para outra cidade."
+    pagination:
+      showing: "Mostrando %{from}–%{to} de %{total}"
+      previous: "Anterior"
+      next: "Próxima"

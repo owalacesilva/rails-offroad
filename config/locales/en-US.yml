@@ -69,4 +69,40 @@ en-US:
       badges:
         prepared: "Built"
         featured: "Featured"
-        new: "New"
+        new_arrival: "New"
+
+  listings:
+    title: "Listings"
+    subtitle: "The full catalog, filtered by category, state and city."
+    filters:
+      title: "Filters"
+      show: "Show filters"
+      hide: "Hide filters"
+      category: "Category"
+      state: "State"
+      city: "City"
+      sort: "Sort by"
+      any_category: "All categories"
+      any_state: "All states"
+      any_city: "All cities"
+      apply: "Apply filters"
+      clear: "Clear"
+      applied:
+        one: "%{count} active filter"
+        other: "%{count} active filters"
+    sorts:
+      recent: "Most recent"
+      price_asc: "Lowest price"
+      price_desc: "Highest price"
+      year_desc: "Newest year"
+    results:
+      zero: "No listings found"
+      one: "%{formatted} listing found"
+      other: "%{formatted} listings found"
+    empty:
+      title: "Nothing here yet"
+      subtitle: "Try removing a filter or widening the search to another city."
+    pagination:
+      showing: "Showing %{from}–%{to} of %{total}"
+      previous: "Previous"
+      next: "Next"

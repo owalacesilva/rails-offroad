@@ -22,6 +22,13 @@ AllCops:
 RSpec/ExampleWording:
   Enabled: false
 
+# Mesmo motivo: os prefixos de context seguem a língua dos specs.
+RSpec/ContextWording:
+  Prefixes:
+    - com
+    - sem
+    - quando
+
 # Specs de request/helper deste projeto agrupam por cenário, não por classe.
 RSpec/DescribeClass:
   Enabled: false

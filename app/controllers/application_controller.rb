@@ -5,6 +5,10 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
+  # Idiomas oferecidos ao usuário. Menor que I18n.available_locales de propósito:
+  # :en existe só como base de fallback de en-US, não é escolhível.
+  SUPPORTED_LOCALES = %w[pt-BR en-US].freeze
+
   before_action :set_locale
 
   private
@@ -30,7 +34,7 @@ class ApplicationController < ActionController::Base
     def supported_locale(tag)
       return if tag.blank?
 
-      I18n.available_locales.find { |locale| locale.to_s.casecmp?(tag.to_s) }
+      SUPPORTED_LOCALES.find { |locale| locale.casecmp?(tag.to_s) }&.to_sym
     end
 
     # Mantém o locale escolhido nos links gerados, menos quando é o padrão.

@@ -28,7 +28,11 @@ module OffroadClassifieds
     # Localização: pt-BR é o padrão do portal, en-US disponível.
     # As traduções de Rails/Active Record vêm da gem rails-i18n.
     config.i18n.default_locale = :"pt-BR"
-    config.i18n.available_locales = [ :"pt-BR", :"en-US" ]
+
+    # :en entra como locale-base, não como idioma oferecido: en-US decompõe para
+    # ele na cadeia de fallback, e rails-i18n e faker guardam seus dados lá.
+    # Os idiomas que o usuário pode escolher são ApplicationController::SUPPORTED_LOCALES.
+    config.i18n.available_locales = [ :"pt-BR", :"en-US", :en ]
 
     # Chave ausente em en-US cai para pt-BR em vez de estourar erro.
     config.i18n.fallbacks = true
