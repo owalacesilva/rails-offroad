@@ -3,6 +3,6 @@ class ApplicationMailer < ActionMailer::Base
   layout "mailer"
 
   # Mailer não herda os helpers da aplicação como os controllers herdam;
-  # sem isto, listing_price não existe no template do e-mail.
-  helper ListingsHelper
+  # sem isto, ad_price não existe no template do e-mail.
+  helper AdsHelper
 end

@@ -1,9 +1,9 @@
-<%= t(".greeting", name: @advertiser.name) %>
+<%= t(".greeting", name: @user.name) %>
 
-<%= t(".intro", title: @listing.title) %>
-<%= listing_url(@listing) %>
+<%= t(".intro", title: @ad.title) %>
+<%= ad_url(@ad) %>
 
-<%= Proposal.human_attribute_name(:amount_cents) %>: <%= listing_price(@proposal.amount) %>
+<%= Proposal.human_attribute_name(:offered_value) %>: <%= ad_price(@proposal.offered_value) %>
 <%= Proposal.human_attribute_name(:name) %>: <%= @proposal.name %>
 <%= Proposal.human_attribute_name(:email) %>: <%= @proposal.email %>
 <% if @proposal.phone.present? -%>

@@ -1,14 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "Propostas", type: :request do
-  let(:listing) { create(:listing, title: "Jeep Wrangler Rubicon") }
+  let(:ad) { create(:ad, title: "Jeep Wrangler Rubicon") }
   let(:valid_attributes) do
     { name: "Walace Silva", email: "walace@exemplo.com.br", phone: "41999887766",
-      amount: "350000", message: "Aceita troca?" }
+      offered_value: "350000", message: "Aceita troca?" }
   end
 
   def submit(attributes)
-    post listing_proposals_path(listing), params: { proposal: attributes }
+    post ad_proposals_path(ad), params: { proposal: attributes }
   end
 
   describe "com dados válidos" do
@@ -16,22 +16,22 @@ RSpec.describe "Propostas", type: :request do
       expect { submit(valid_attributes) }.to change(Proposal, :count).by(1)
     end
 
-    it "converte o valor de reais para centavos" do
+    it "grava o valor em reais" do
       submit(valid_attributes)
 
-      expect(Proposal.last.amount_cents).to eq(35_000_000)
+      expect(Proposal.last.offered_value).to eq(350_000)
     end
 
     it "prende a proposta ao anúncio" do
       submit(valid_attributes)
 
-      expect(Proposal.last.listing).to eq(listing)
+      expect(Proposal.last.ad).to eq(ad)
     end
 
     it "volta para a página do anúncio" do
       submit(valid_attributes)
 
-      expect(response).to redirect_to(listing_path(listing))
+      expect(response).to redirect_to(ad_path(ad))
     end
 
     it "confirma o envio na tela" do
@@ -79,7 +79,7 @@ RSpec.describe "Propostas", type: :request do
     it "mantém a página do anúncio utilizável" do
       submit(invalid_attributes)
 
-      expect(response.body).to include(listing.title)
+      expect(response.body).to include(ad.title)
     end
   end
 end

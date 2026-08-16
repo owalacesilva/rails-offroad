@@ -1,75 +1,48 @@
 <% content_for :title, "#{t('dashboard.title')} — OffRoad Classificados" %>
 
-<section class="min-h-full bg-stone-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-  <div class="mx-auto max-w-7xl">
-    <nav class="flex items-center gap-2 text-xs font-semibold text-stone-500" aria-label="Breadcrumb">
-      <%= link_to t("dashboard.breadcrumb_home"), root_path, class: "hover:text-brand-600" %>
-      <span>&gt;</span>
-      <span class="text-brand-600"><%= t("dashboard.breadcrumb_account") %></span>
-    </nav>
+<div class="flex flex-wrap items-baseline justify-between gap-2">
+  <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("dashboard.title") %></h1>
+  <p class="text-sm text-stone-500"><%= l(Date.current, format: :long) %></p>
+</div>
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-12">
-      <%= render "dashboard/dashboard/sidebar", active: :dashboard %>
+<%# Três números, sem preenchimento colorido: o valor é o dado, não o card. %>
+<div class="mt-6 grid gap-4 sm:grid-cols-3">
+  <%= link_to account_ads_path, class: "rounded-xl border border-stone-200 bg-white p-5 transition hover:border-stone-400" do %>
+    <p class="text-3xl font-extrabold tabular-nums text-stone-900"><%= @ads.size %></p>
+    <p class="mt-1 text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.stats.ads") %></p>
+  <% end %>
 
-      <%# --------------------------------------------------------- Main %>
-      <div class="lg:col-span-9">
-        <div class="flex flex-wrap items-baseline justify-between gap-2">
-          <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("dashboard.title") %></h1>
-          <p class="text-sm text-stone-500"><%= l(Date.current, format: :long) %></p>
-        </div>
+  <%= link_to proposals_path, class: "rounded-xl border border-stone-200 bg-white p-5 transition hover:border-stone-400" do %>
+    <p class="text-3xl font-extrabold tabular-nums text-stone-900"><%= @proposals_count %></p>
+    <p class="mt-1 text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.stats.proposals") %></p>
+  <% end %>
 
-        <%# Cards de estatísticas %>
-        <div class="mt-6 grid gap-4 sm:grid-cols-3">
-          <div class="rounded-2xl bg-indigo-500 p-5 text-white shadow-sm">
-            <p class="text-3xl font-extrabold"><%= @listings.size %></p>
-            <p class="mt-1 text-xs font-bold uppercase tracking-wide text-indigo-100"><%= t("dashboard.stats.listings") %></p>
-          </div>
-
-          <%= link_to proposals_path, class: "rounded-2xl bg-orange-500 p-5 text-white shadow-sm transition hover:bg-orange-400" do %>
-            <p class="text-3xl font-extrabold"><%= @proposals_count %></p>
-            <p class="mt-1 text-xs font-bold uppercase tracking-wide text-orange-100"><%= t("dashboard.stats.proposals") %></p>
-          <% end %>
-
-          <div class="rounded-2xl bg-emerald-500 p-5 text-white shadow-sm">
-            <p class="text-3xl font-extrabold"><%= @listings_by_category.size %></p>
-            <p class="mt-1 text-xs font-bold uppercase tracking-wide text-emerald-100"><%= t("dashboard.stats.categories") %></p>
-          </div>
-        </div>
-
-        <%# Anúncios por categoria %>
-        <h2 class="mt-8 text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.by_category") %></h2>
-        <div class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <% @categories.each do |category| %>
-            <div class="rounded-2xl border border-stone-200 bg-white p-5 text-center shadow-sm">
-              <p class="text-2xl font-extrabold text-stone-900"><%= @listings_by_category[category.slug].to_i %></p>
-              <p class="mt-1 truncate text-xs font-semibold uppercase tracking-wide text-stone-500"><%= category.name %></p>
-            </div>
-          <% end %>
-        </div>
-
-        <%# Gráficos %>
-        <div class="mt-6 grid gap-6 lg:grid-cols-2">
-          <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 class="text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.charts.distribution") %></h3>
-            <div class="mt-10 flex flex-col items-center justify-center py-10 text-stone-300">
-              <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-19.5 0v6a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25v-6m-19.5 0 4.72-4.72a1.5 1.5 0 0 1 2.122 0l2.318 2.318a1.5 1.5 0 0 0 2.122 0L18 9" />
-              </svg>
-              <p class="mt-3 text-sm font-semibold text-stone-400"><%= t("dashboard.charts.no_listings") %></p>
-            </div>
-          </div>
-
-          <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 class="text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.charts.proportion") %></h3>
-            <div class="mt-10 flex flex-col items-center justify-center py-10 text-stone-300">
-              <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-19.5 0v6a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25v-6m-19.5 0 4.72-4.72a1.5 1.5 0 0 1 2.122 0l2.318 2.318a1.5 1.5 0 0 0 2.122 0L18 9" />
-              </svg>
-              <p class="mt-3 text-sm font-semibold text-stone-400"><%= t("dashboard.charts.no_data") %></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="rounded-xl border border-stone-200 bg-white p-5">
+    <p class="text-3xl font-extrabold tabular-nums text-stone-900"><%= @ads_by_category.size %></p>
+    <p class="mt-1 text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.stats.categories") %></p>
   </div>
-</section>
+</div>
+
+<%# Situação na moderação. Só anúncio aprovado aparece no portal, então o
+    anunciante precisa ver o que está parado antes de qualquer outra coisa. %>
+<h2 class="mt-10 text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.by_status") %></h2>
+<div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <% Ad::STATUSES.each_value do |status| %>
+    <%= link_to account_ads_path(status: status),
+          class: "flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-5 py-4 transition hover:border-stone-400" do %>
+      <%= ad_status_badge(status) %>
+      <span class="text-xl font-extrabold tabular-nums text-stone-900"><%= @ads_by_status.fetch(status, 0) %></span>
+    <% end %>
+  <% end %>
+</div>
+
+<%# Anúncios por categoria %>
+<h2 class="mt-10 text-xs font-bold uppercase tracking-wide text-stone-500"><%= t("dashboard.by_category") %></h2>
+<div class="mt-3 overflow-hidden rounded-xl border border-stone-200 bg-white">
+  <% @categories.each_with_index do |category, index| %>
+    <div class="flex items-center justify-between gap-4 px-5 py-3.5 <%= "border-t border-stone-100" unless index.zero? %>">
+      <span class="truncate text-sm font-semibold text-stone-700"><%= category.name %></span>
+      <span class="text-sm font-extrabold tabular-nums text-stone-900"><%= @ads_by_category[category.slug].to_i %></span>
+    </div>
+  <% end %>
+</div>

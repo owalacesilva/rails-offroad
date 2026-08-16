@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Category, type: :model do
   subject { build(:category) }
 
-  it { is_expected.to have_many(:listings).dependent(:restrict_with_error) }
+  it { is_expected.to have_many(:ads).dependent(:restrict_with_error) }
   it { is_expected.to validate_presence_of(:slug) }
   it { is_expected.to validate_uniqueness_of(:slug) }
   it { is_expected.to validate_presence_of(:position) }

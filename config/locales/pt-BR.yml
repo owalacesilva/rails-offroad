@@ -9,7 +9,9 @@ pt-BR:
       sign_in: "Entrar"
       sign_out: "Sair"
       greeting: "Olá, %{name}"
-      new_listing: "Anunciar"
+      new_ad: "Anunciar"
+    account:
+      back_to_portal: "Voltar ao portal"
     footer:
       tagline: "O classificado de quem vive fora do asfalto. Compre e venda 4x4, motos de trilha, UTVs e peças com quem entende do assunto."
       headings:
@@ -53,19 +55,36 @@ pt-BR:
     member: "Usuário"
     nav:
       dashboard: "Dashboard"
+      ads: "Meus Anúncios"
       proposals: "Propostas"
       profile: "Meu Perfil"
       sign_out: "Sair"
     stats:
-      listings: "Anúncios"
+      ads: "Anúncios"
       proposals: "Propostas"
       categories: "Categorias ativas"
+    by_status: "Situação dos anúncios"
     by_category: "Anúncios por categoria"
-    charts:
-      distribution: "Distribuição por categoria"
-      proportion: "Proporção"
-      no_listings: "Nenhum anúncio publicado"
-      no_data: "Sem dados"
+    ads_index:
+      title: "Meus Anúncios"
+      subtitle: "Só anúncio aprovado aparece no portal. Aqui você vê em que pé está cada um."
+      count:
+        one: "1 anúncio"
+        other: "%{count} anúncios"
+      filter_label: "Filtrar por situação"
+      all: "Todos"
+      images:
+        one: "1 foto"
+        other: "%{count} fotos"
+      view: "Ver no portal"
+      not_public: "Fora do ar"
+      hints:
+        pending: "Aguardando avaliação da moderação."
+        rejected: "Rejeitado na moderação. Ajuste o anúncio e envie de novo."
+        draft: "Rascunho: ainda não foi enviado para avaliação."
+      empty:
+        title: "Nenhum anúncio por aqui"
+        subtitle: "Quando você publicar um anúncio, ele aparece nesta lista."
     proposals_index:
       title: "Propostas Recebidas"
       subtitle: "Interessados que enviaram uma proposta pelos seus anúncios."
@@ -102,7 +121,7 @@ pt-BR:
       cta_primary: "Anunciar grátis"
       cta_secondary: "Explorar anúncios"
       stats:
-        listings: "Anúncios ativos"
+        ads: "Anúncios ativos"
         sellers: "Vendedores"
         states: "Estados"
     categories:
@@ -112,7 +131,7 @@ pt-BR:
       count:
         one: "%{formatted} anúncio"
         other: "%{formatted} anúncios"
-    listings:
+    ads:
       title: "Anúncios Recentes"
       subtitle: "Os últimos veículos e peças publicados no portal."
       see_all: "Ver todos"
@@ -121,9 +140,15 @@ pt-BR:
         featured: "Destaque"
         new_arrival: "Novo"
 
-  listings:
+  ads:
     title: "Anúncios"
     subtitle: "Todo o acervo do portal, com filtro por categoria, estado e cidade."
+    # Situação vista pelo anunciante. O moderador vê os rótulos no plural em admin.ads.statuses.
+    statuses:
+      draft: "Rascunho"
+      pending: "Em análise"
+      approved: "Publicado"
+      rejected: "Rejeitado"
     filters:
       title: "Filtros"
       show: "Mostrar filtros"
@@ -193,7 +218,7 @@ pt-BR:
       submit: "Enviar proposta"
       cancel: "Cancelar"
       close: "Fechar"
-      amount_hint: "Valor em reais, sem centavos."
+      amount_hint: "Valor em reais."
       errors:
         one: "1 erro impediu o envio"
         other: "%{count} erros impediram o envio"
@@ -241,20 +266,68 @@ pt-BR:
       intro_html: "Você recebeu uma proposta para o anúncio %{title}."
       footer: "Basta responder este e-mail para falar direto com o interessado."
 
+  admin:
+    title: "Moderação"
+    nav:
+      queue: "Fila"
+      sign_out: "Sair"
+    sessions:
+      required: "Entre como moderador para continuar."
+      new:
+        title: "Área de moderação"
+        subtitle: "Acesso restrito à equipe do portal."
+        submit: "Entrar"
+      create:
+        success: "Bem-vindo, %{name}."
+        failure: "E-mail ou senha incorretos."
+      destroy:
+        success: "Sessão encerrada."
+    ads:
+      statuses:
+        draft: "Rascunhos"
+        pending: "Pendentes"
+        approved: "Aprovados"
+        rejected: "Rejeitados"
+      approve:
+        success: "\"%{title}\" aprovado e publicado."
+        failure: "Não foi possível aprovar: %{errors}"
+      reject:
+        success: "\"%{title}\" rejeitado."
+        failure: "Não foi possível rejeitar: %{errors}"
+      index:
+        title: "Fila de moderação"
+        subtitle: "Anúncios aguardando avaliação antes de aparecer no portal."
+        filter_label: "Filtrar por situação"
+        by: "por %{name}"
+        images:
+          one: "1 foto"
+          other: "%{count} fotos"
+        reviewed_by: "Avaliado por %{name}"
+        view: "Ver"
+        approve: "Aprovar"
+        reject: "Rejeitar"
+        empty:
+          title: "Nada nesta fila"
+          subtitle: "Nenhum anúncio com esta situação no momento."
+
   activerecord:
     models:
       proposal: "Proposta"
-      listing: "Anúncio"
-      advertiser: "Anunciante"
+      ad: "Anúncio"
+      ad_image: "Foto do anúncio"
+      user: "Anunciante"
+      admin: "Moderador"
       category: "Categoria"
+      spec_attribute: "Atributo técnico"
+      technical_spec_value: "Especificação técnica"
     attributes:
       proposal:
         name: "Nome"
         email: "E-mail"
         phone: "Telefone"
-        amount_cents: "Valor da proposta"
+        offered_value: "Valor da proposta"
         message: "Mensagem"
-      advertiser:
+      user:
         name: "Nome ou nome da loja"
         email: "E-mail"
         phone: "WhatsApp"
@@ -262,3 +335,26 @@ pt-BR:
         state: "UF"
         password: "Senha"
         password_confirmation: "Confirmar senha"
+      admin:
+        name: "Nome"
+        email: "E-mail"
+        password: "Senha"
+      ad:
+        title: "Título"
+        price: "Preço"
+        year: "Ano"
+        city: "Cidade"
+        state: "UF"
+        status: "Situação"
+        published_at: "Publicado em"
+        ad_images: "Fotos"
+      spec_attribute:
+        name: "Nome"
+        data_type: "Tipo de dado"
+        is_required: "Obrigatório"
+    errors:
+      models:
+        ad:
+          attributes:
+            ad_images:
+              invalid_count: "devem ser entre %{min} e %{max}"

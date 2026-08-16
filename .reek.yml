@@ -35,8 +35,10 @@ detectors:
     max_statements: 7
 
   # Controller conta ivars de todas as actions somadas, mas cada action usa só
-  # as suas. ListingFilter tem quatro critérios de filtro mais o scope.
+  # as suas. AdFilter tem quatro critérios de filtro mais o scope, e o dashboard
+  # monta um painel inteiro em uma action só.
   TooManyInstanceVariables:
     exclude:
-      - "ListingFilter"
-      - "ListingsController"
+      - "AdFilter"
+      - "AdsController"
+      - "Dashboard::DashboardController"

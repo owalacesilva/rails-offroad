@@ -5,7 +5,7 @@ RSpec.describe "Home", type: :request do
 
   describe "GET /" do
     before do
-      create_list(:listing, 6, category: vehicles)
+      create_list(:ad, 6, category: vehicles)
       get root_path
     end
 
@@ -22,7 +22,7 @@ RSpec.describe "Home", type: :request do
     end
 
     it "leva o card de categoria para a listagem já filtrada" do
-      expect(response.body).to include(listings_path(category: "veiculos-4x4"))
+      expect(response.body).to include(ads_path(category: "veiculos-4x4"))
     end
   end
 
@@ -30,31 +30,31 @@ RSpec.describe "Home", type: :request do
     it "usa pt-BR por padrão" do
       get root_path
 
-      expect(response.body).to include(I18n.t("home.listings.title", locale: :"pt-BR"))
+      expect(response.body).to include(I18n.t("home.ads.title", locale: :"pt-BR"))
     end
 
     it "aceita en-US pelo parâmetro da URL" do
       get root_path(locale: "en-US")
 
-      expect(response.body).to include(I18n.t("home.listings.title", locale: :"en-US"))
+      expect(response.body).to include(I18n.t("home.ads.title", locale: :"en-US"))
     end
 
     it "aceita en-US pelo cabeçalho Accept-Language" do
       get root_path, headers: { "Accept-Language" => "en-US,en;q=0.9" }
 
-      expect(response.body).to include(I18n.t("home.listings.title", locale: :"en-US"))
+      expect(response.body).to include(I18n.t("home.ads.title", locale: :"en-US"))
     end
 
     it "ignora locale não suportado e cai no padrão" do
       get root_path(locale: "xx-YY")
 
-      expect(response.body).to include(I18n.t("home.listings.title", locale: :"pt-BR"))
+      expect(response.body).to include(I18n.t("home.ads.title", locale: :"pt-BR"))
     end
 
     it "não oferece :en, que existe apenas como base de fallback de en-US" do
       get root_path(locale: "en")
 
-      expect(response.body).to include(I18n.t("home.listings.title", locale: :"pt-BR"))
+      expect(response.body).to include(I18n.t("home.ads.title", locale: :"pt-BR"))
     end
   end
 end

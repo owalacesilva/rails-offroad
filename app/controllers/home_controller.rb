@@ -4,9 +4,11 @@ class HomeController < ApplicationController
   RECENT_LIMIT = 4
 
   def index
+    published = Ad.published
+
     @categories = Category.ordered
-    # Uma consulta agregada em vez de category.listings.count por card.
-    @listing_counts = Listing.group(:category_id).count
-    @listings = Listing.includes(:category).recent.limit(RECENT_LIMIT)
+    # Uma consulta agregada em vez de category.ads.count por card.
+    @ad_counts = published.group(:category_id).count
+    @ads = published.includes(:category, :ad_images).recent.limit(RECENT_LIMIT)
   end
 end

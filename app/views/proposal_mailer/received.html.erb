@@ -1,13 +1,13 @@
-<h1><%= t(".greeting", name: @advertiser.name) %></h1>
+<h1><%= t(".greeting", name: @user.name) %></h1>
 
 <%# Chave _html: o I18n marca a tradução como segura e escapa as interpolações
     que não forem html_safe — o link_to já é. %>
-<p><%= t(".intro_html", title: link_to(@listing.title, listing_url(@listing))) %></p>
+<p><%= t(".intro_html", title: link_to(@ad.title, ad_url(@ad))) %></p>
 
 <table cellpadding="6" cellspacing="0" border="0">
   <tr>
-    <td><strong><%= Proposal.human_attribute_name(:amount_cents) %></strong></td>
-    <td><%= listing_price(@proposal.amount) %></td>
+    <td><strong><%= Proposal.human_attribute_name(:offered_value) %></strong></td>
+    <td><%= ad_price(@proposal.offered_value) %></td>
   </tr>
   <tr>
     <td><strong><%= Proposal.human_attribute_name(:name) %></strong></td>

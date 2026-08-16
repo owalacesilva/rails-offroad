@@ -1,0 +1,12 @@
+<%# Footer enxuto: a área do anunciante não precisa do mapa do site inteiro. %>
+<footer class="border-t border-stone-200 bg-white">
+  <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-stone-500 sm:px-6 lg:px-8">
+    <p>&copy; <%= Date.current.year %> OffRoad Classificados. <%= t("layout.footer.legal.rights") %></p>
+
+    <nav class="flex flex-wrap gap-4">
+      <%= link_to t("layout.footer.legal.terms"), "#", class: "transition hover:text-stone-900" %>
+      <%= link_to t("layout.footer.legal.privacy"), "#", class: "transition hover:text-stone-900" %>
+      <%= link_to t("layout.footer.contact.help_center"), "#", class: "transition hover:text-stone-900" %>
+    </nav>
+  </div>
+</footer>

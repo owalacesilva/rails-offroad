@@ -1,7 +1,7 @@
 require "stringio"
 
 # Idempotente: rodar `bin/rails db:seed` mais de uma vez não duplica registros
-# nem reanexa fotos. Preços em reais inteiros; o seed converte para centavos.
+# nem reescreve fotos. Preços em reais (DECIMAL), sem conversão para centavos.
 
 CATEGORIES = [
   { slug: "veiculos-4x4", position: 1 },
@@ -14,7 +14,7 @@ CATEGORIES = [
 # desenvolvimento. Nada disto roda em produção.
 SEED_PASSWORD = "trilha123".freeze
 
-ADVERTISERS = [
+USERS = [
   { name: "Garagem Trilha Livre", email: "contato@trilhalivre.com.br", phone: "5541988770011", city: "Curitiba", state: "PR", member_since: "2019-03-12" },
   { name: "Marcelo Andrade", email: "marcelo.andrade@exemplo.com.br", phone: "5511977660022", city: "São Paulo", state: "SP", member_since: "2021-07-04" },
   { name: "4x4 Sul Veículos", email: "vendas@4x4sul.com.br", phone: "5551966550033", city: "Porto Alegre", state: "RS", member_since: "2017-11-20" },
@@ -53,7 +53,7 @@ DESCRIPTIONS = {
   ]
 }.freeze
 
-LISTINGS = [
+ADS = [
   # Veículos 4x4
   { title: "Jeep Wrangler Rubicon 3.6 V6", year: 2019, price: 389_900, city: "Curitiba", state: "PR", category: "veiculos-4x4", badge: :prepared,
     specs: { "engine" => "3.6 V6 Pentastar", "transmission" => "Automático 8 marchas", "fuel" => "Gasolina", "mileage_km" => 48_000, "color" => "Verde", "doors" => 2 } },
@@ -145,9 +145,34 @@ PALETTES = [
   [ [ 154, 52, 18 ], [ 12, 10, 9 ] ]
 ].freeze
 
-PHOTOS_PER_LISTING = 3
+PHOTOS_PER_AD = 3
 
-# Gerar o PNG é o passo caro; o upload repete os mesmos bytes.
+# Moderadores. Identidade separada da de anunciante.
+ADMINS = [
+  { name: "Equipe OffRoad", email: "moderacao@offroadclassificados.com.br" }
+].freeze
+
+# Lado "Attribute" do EAV. A ordem de exibição é a coluna position — antes era
+# uma constante no modelo, porque jsonb não preservava a ordem das chaves.
+SPEC_ATTRIBUTES = [
+  { name: "condition",    data_type: "STRING", position: 1,  is_required: true },
+  { name: "mileage_km",   data_type: "INT",    position: 2,  is_required: false },
+  { name: "engine",       data_type: "STRING", position: 3,  is_required: false },
+  { name: "power",        data_type: "STRING", position: 4,  is_required: false },
+  { name: "transmission", data_type: "STRING", position: 5,  is_required: false },
+  { name: "traction",     data_type: "STRING", position: 6,  is_required: false },
+  { name: "fuel",         data_type: "STRING", position: 7,  is_required: false },
+  { name: "doors",        data_type: "INT",    position: 8,  is_required: false },
+  { name: "color",        data_type: "STRING", position: 9,  is_required: false },
+  { name: "brand",        data_type: "STRING", position: 10, is_required: false },
+  { name: "material",     data_type: "STRING", position: 11, is_required: false },
+  { name: "warranty",     data_type: "STRING", position: 12, is_required: false }
+].freeze
+
+# ad_images guarda URL, não blob: o PNG vai para public/ e a coluna aponta pra ele.
+SEED_IMAGE_DIR = Rails.root.join("public/seed-images")
+
+# Gerar o PNG é o passo caro; várias fotos repetem os mesmos bytes.
 def photo_bytes(palette_index)
   @photo_cache ||= {}
   @photo_cache[palette_index] ||= begin
@@ -156,10 +181,28 @@ def photo_bytes(palette_index)
   end
 end
 
-advertisers = ADVERTISERS.map do |attributes|
-  advertiser = Advertiser.find_or_initialize_by(email: attributes[:email])
-  advertiser.update!(attributes.merge(password: SEED_PASSWORD))
-  advertiser
+# Escreve o arquivo uma vez e devolve o caminho público.
+def seed_image_url(palette_index, ad_index, photo_index)
+  filename = "ad-#{ad_index}-#{photo_index}.png"
+  path = SEED_IMAGE_DIR.join(filename)
+  File.binwrite(path, photo_bytes(palette_index)) unless path.exist?
+
+  "/seed-images/#{filename}"
+end
+
+FileUtils.mkdir_p(SEED_IMAGE_DIR)
+
+admins = ADMINS.map do |attributes|
+  admin = Admin.find_or_initialize_by(email: attributes[:email])
+  admin.update!(attributes.merge(password: SEED_PASSWORD))
+  admin
+end
+moderator = admins.first
+
+users = USERS.map do |attributes|
+  user = User.find_or_initialize_by(email: attributes[:email])
+  user.update!(attributes.merge(password: SEED_PASSWORD))
+  user
 end
 
 categories = CATEGORIES.each_with_object({}) do |attributes, memo|
@@ -168,45 +211,57 @@ categories = CATEGORIES.each_with_object({}) do |attributes, memo|
   memo[attributes[:slug]] = category
 end
 
-LISTINGS.each_with_index do |attributes, index|
+spec_attributes = SPEC_ATTRIBUTES.each_with_object({}) do |attributes, memo|
+  record = SpecAttribute.find_or_initialize_by(name: attributes[:name])
+  record.update!(attributes)
+  memo[attributes[:name]] = record
+end
+
+ADS.each_with_index do |attributes, index|
   slug = attributes[:category]
   variants = DESCRIPTIONS.fetch(slug)
+  published = index.days.ago
 
-  listing = Listing.find_or_initialize_by(title: attributes[:title])
-  listing.update!(
+  ad = Ad.find_or_initialize_by(title: attributes[:title])
+  ad.assign_attributes(
     year: attributes[:year],
-    price_cents: attributes[:price] * 100,
+    # DECIMAL em reais: o seed não converte mais para centavos.
+    price: attributes[:price],
     city: attributes[:city],
     state: attributes[:state],
     badge: attributes[:badge],
     category: categories.fetch(slug),
-    advertiser: advertisers[index % advertisers.size],
+    user: users[index % users.size],
     description: format(variants[index % variants.size], title: attributes[:title]),
-    specifications: CATEGORY_SPECS.fetch(slug).merge(attributes[:specs]),
+    # Seed nasce moderado: o portal precisa ter o que mostrar.
+    status: :approved,
+    admin: moderator,
+    reviewed_at: published,
     # Escalona a publicação para a ordenação "mais recentes" fazer sentido.
-    published_at: index.days.ago
+    published_at: published
   )
 
-  next if listing.photos.attached?
-
-  listing.photos.attach(
-    Array.new(PHOTOS_PER_LISTING) do |photo_index|
-      {
-        io: StringIO.new(photo_bytes(index + photo_index)),
-        filename: "#{listing.id}-#{photo_index + 1}.png",
-        content_type: "image/png"
-      }
+  # As fotos entram antes do save: anúncio aprovado só é válido com 3 a 10.
+  if ad.ad_images.empty?
+    PHOTOS_PER_AD.times do |photo_index|
+      ad.ad_images.build(
+        file_url: seed_image_url(index + photo_index, index, photo_index),
+        sort_order: photo_index
+      )
     end
-  )
+  end
+
+  ad.save!
+
+  # Lado "Value" do EAV, uma linha por especificação.
+  CATEGORY_SPECS.fetch(slug).merge(attributes[:specs]).each do |name, value|
+    spec_attribute = spec_attributes.fetch(name)
+    record = TechnicalSpecValue.find_or_initialize_by(ad_id: ad.id, attribute_id: spec_attribute.id)
+    record.update!(value: value.to_s)
+  end
 end
 
-# O backfill da migration criou um anunciante placeholder para a coluna virar
-# NOT NULL. Agora que todo anúncio tem dono de verdade, ele sai.
-Advertiser.where(email: "migrar@offroadclassificados.com.br").where.missing(:listings).destroy_all
-
-# Conta só as fotos anexadas aos anúncios: o Active Storage também cria
-# attachment para cada variante materializada, e isso não é dado de seed.
-photos = ActiveStorage::Attachment.where(record_type: "Listing", name: "photos").count
-
-puts "Seed: #{Category.count} categorias, #{Advertiser.count} anunciantes, " \
-     "#{Listing.count} anúncios, #{photos} fotos."
+puts "Seed: #{Category.count} categorias, #{SpecAttribute.count} atributos, " \
+     "#{Admin.count} moderadores, #{User.count} anunciantes, " \
+     "#{Ad.count} anúncios (#{Ad.published.count} aprovados), " \
+     "#{AdImage.count} fotos, #{TechnicalSpecValue.count} especificações."

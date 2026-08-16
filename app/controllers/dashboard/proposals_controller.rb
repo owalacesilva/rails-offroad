@@ -1,8 +1,8 @@
 module Dashboard
-  class ProposalsController < ApplicationController
+  class ProposalsController < BaseController
     def index
-      @proposals = Proposal.where(listing: current_advertiser.listings)
-                            .includes(:listing)
+      @proposals = Proposal.where(ad: current_user.ads)
+                            .includes(:ad)
                             .order(created_at: :desc)
     end
   end

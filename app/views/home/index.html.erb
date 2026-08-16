@@ -33,14 +33,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>
         </a>
-        <%= link_to t("home.hero.cta_secondary"), listings_path,
+        <%= link_to t("home.hero.cta_secondary"), ads_path,
               class: "inline-flex items-center justify-center rounded-full border border-stone-600 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300" %>
       </div>
 
       <dl class="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-stone-700/60 pt-8">
         <div>
           <dt class="text-2xl font-extrabold text-white sm:text-3xl"><%= number_with_delimiter(5_600) %>+</dt>
-          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.listings") %></dd>
+          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.ads") %></dd>
         </div>
         <div>
           <dt class="text-2xl font-extrabold text-white sm:text-3xl"><%= number_with_delimiter(1_240) %></dt>
@@ -64,8 +64,8 @@
 
   <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     <% @categories.each do |category| %>
-      <% count = @listing_counts.fetch(category.id, 0) %>
-      <%= link_to listings_path(category: category.slug), class: "group relative flex flex-col overflow-hidden rounded-2xl border border-stone-800 bg-stone-900 p-7 transition hover:-translate-y-1 hover:border-brand-500/60 hover:bg-stone-800/60" do %>
+      <% count = @ad_counts.fetch(category.id, 0) %>
+      <%= link_to ads_path(category: category.slug), class: "group relative flex flex-col overflow-hidden rounded-2xl border border-stone-800 bg-stone-900 p-7 transition hover:-translate-y-1 hover:border-brand-500/60 hover:bg-stone-800/60" do %>
         <span class="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/25 transition group-hover:bg-brand-500 group-hover:text-stone-950">
           <%= category_icon_for(category.slug, css_class: "h-7 w-7") %>
         </span>
@@ -94,11 +94,11 @@
   <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl"><%= t("home.listings.title") %></h2>
-        <p class="mt-2 text-sm text-stone-400"><%= t("home.listings.subtitle") %></p>
+        <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl"><%= t("home.ads.title") %></h2>
+        <p class="mt-2 text-sm text-stone-400"><%= t("home.ads.subtitle") %></p>
       </div>
-      <%= link_to listings_path, class: "inline-flex items-center gap-1.5 rounded-full border border-stone-700 px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300" do %>
-        <%= t("home.listings.see_all") %>
+      <%= link_to ads_path, class: "inline-flex items-center gap-1.5 rounded-full border border-stone-700 px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300" do %>
+        <%= t("home.ads.see_all") %>
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
         </svg>
@@ -106,7 +106,7 @@
     </div>
 
     <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      <%= render partial: "listings/card", collection: @listings, as: :listing %>
+      <%= render partial: "ads/card", collection: @ads, as: :ad %>
     </div>
   </div>
 </section>

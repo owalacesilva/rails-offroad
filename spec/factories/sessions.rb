@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :session do
-    advertiser { nil }
-    user_agent { "MyString" }
-    ip_address { "MyString" }
+    user
+    user_agent { "RSpec" }
+    ip_address { "127.0.0.1" }
   end
 end

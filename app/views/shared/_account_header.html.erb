@@ -1,0 +1,22 @@
+<%# Header da área do anunciante: claro, enxuto, sem a busca do portal. %>
+<header class="border-b border-stone-200 bg-white">
+  <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+    <%= link_to root_path, class: "flex shrink-0 items-center gap-2.5" do %>
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-stone-950">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 17.25 8.25 9l3.75 5.25L15.75 6l5.25 11.25H3Z" />
+        </svg>
+      </span>
+      <span class="text-sm font-extrabold uppercase leading-none tracking-tight text-stone-900 sm:text-base">
+        OffRoad<span class="text-brand-600"> Classificados</span>
+      </span>
+    <% end %>
+
+    <nav class="ml-auto flex items-center gap-3">
+      <%= link_to t("layout.account.back_to_portal"), root_path,
+            class: "hidden text-sm font-semibold text-stone-500 transition hover:text-stone-900 sm:inline-block" %>
+      <%= link_to t("layout.header.new_ad"), signup_path,
+            class: "rounded-full bg-brand-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+    </nav>
+  </div>
+</header>

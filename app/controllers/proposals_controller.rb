@@ -3,21 +3,25 @@ class ProposalsController < ApplicationController
   allow_unauthenticated_access
 
   def create
-    @listing = Listing.with_attached_photos.includes(:category, :advertiser).find(params[:listing_id])
-    @proposal = @listing.proposals.new(proposal_params)
+    @ad = Ad.published
+            .includes(:category, :user, :ad_images, technical_spec_values: :spec_attribute)
+            .find(params[:ad_id])
+    @proposal = @ad.proposals.new(proposal_params)
+    # Quem já está logado fica ligado à proposta; anônimo segue com user_id nulo.
+    @proposal.user = current_user if authenticated?
 
     if @proposal.save
       ProposalMailer.received(@proposal).deliver_later
-      redirect_to listing_path(@listing), notice: t("proposals.create.success")
+      redirect_to ad_path(@ad), notice: t("proposals.create.success")
     else
       # Reabre a página do anúncio com o modal aberto e os erros no formulário.
-      @related = @listing.related
-      render "listings/show", status: :unprocessable_content
+      @related = @ad.related
+      render "ads/show", status: :unprocessable_content
     end
   end
 
   private
     def proposal_params
-      params.expect(proposal: [ :name, :email, :phone, :amount, :message ])
+      params.expect(proposal: [ :name, :email, :phone, :offered_value, :message ])
     end
 end

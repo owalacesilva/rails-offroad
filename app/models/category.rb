@@ -1,5 +1,5 @@
 class Category < ApplicationRecord
-  has_many :listings, dependent: :restrict_with_error
+  has_many :ads, dependent: :restrict_with_error
 
   validates :slug, presence: true, uniqueness: true
   validates :position, presence: true, numericality: { only_integer: true }

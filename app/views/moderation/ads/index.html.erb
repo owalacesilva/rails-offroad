@@ -1,0 +1,66 @@
+<% content_for :title, "#{t('admin.ads.index.title')} — #{t('admin.title')}" %>
+
+<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+  <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("admin.ads.index.title") %></h1>
+  <p class="mt-1 text-sm text-stone-500"><%= t("admin.ads.index.subtitle") %></p>
+
+  <%# Abas por status: a fila é o motivo de status e admin_id existirem. %>
+  <nav class="mt-6 flex flex-wrap gap-2" aria-label="<%= t("admin.ads.index.filter_label") %>">
+    <% Ad::STATUSES.each_value do |status| %>
+      <% current = status == @status %>
+      <%= link_to admin_ads_path(status: status),
+            "aria-current": current ? "page" : nil,
+            class: "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition #{current ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 bg-white text-stone-600 hover:border-stone-900 hover:text-stone-900'}" do %>
+        <%= t("admin.ads.statuses.#{status}") %>
+        <span class="rounded-full <%= current ? "bg-white/20" : "bg-stone-100" %> px-1.5 py-0.5 text-[10px]">
+          <%= @counts.fetch(status, 0) %>
+        </span>
+      <% end %>
+    <% end %>
+  </nav>
+
+  <% if @ads.any? %>
+    <div class="mt-6 space-y-3">
+      <% @ads.each do |ad| %>
+        <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <h2 class="text-sm font-bold text-stone-900"><%= ad.title %></h2>
+              <p class="mt-1 text-xs text-stone-500">
+                <%= ad.category.name %> &middot; <%= ad.city %>, <%= ad.state %> &middot;
+                <%= t("admin.ads.index.by", name: ad.user.name) %>
+              </p>
+              <p class="mt-2 flex flex-wrap items-center gap-3 text-xs text-stone-500">
+                <span class="font-bold text-stone-900"><%= ad_price(ad.price) %></span>
+                <span><%= t("admin.ads.index.images", count: ad.ad_images.size) %></span>
+                <% if ad.reviewed_at.present? %>
+                  <span><%= t("admin.ads.index.reviewed_by", name: ad.admin&.name || "—") %></span>
+                <% end %>
+              </p>
+            </div>
+
+            <div class="flex shrink-0 flex-wrap items-center gap-2">
+              <%= link_to t("admin.ads.index.view"), ad_path(ad), target: "_blank", rel: "noopener",
+                    class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
+
+              <% unless ad.approved? %>
+                <%= button_to t("admin.ads.index.approve"), approve_admin_ad_path(ad), method: :patch,
+                      class: "cursor-pointer rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-emerald-500" %>
+              <% end %>
+
+              <% unless ad.rejected? %>
+                <%= button_to t("admin.ads.index.reject"), reject_admin_ad_path(ad), method: :patch,
+                      class: "cursor-pointer rounded-full border border-red-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-50" %>
+              <% end %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-16 text-center">
+      <h2 class="text-lg font-bold text-stone-800"><%= t("admin.ads.index.empty.title") %></h2>
+      <p class="mt-2 text-sm text-stone-500"><%= t("admin.ads.index.empty.subtitle") %></p>
+    </div>
+  <% end %>
+</section>

@@ -3,10 +3,10 @@ require "rails_helper"
 RSpec.describe Pagination do
   let(:category) { create(:category) }
 
-  before { create_list(:listing, 5, category: category) }
+  before { create_list(:ad, 5, category: category) }
 
   def paginate(page, per_page: 2)
-    described_class.new(Listing.order(:id), page: page, per_page: per_page)
+    described_class.new(Ad.order(:id), page: page, per_page: per_page)
   end
 
   it "limita os registros ao tamanho da página" do
@@ -42,7 +42,8 @@ RSpec.describe Pagination do
   end
 
   context "com escopo vazio" do
-    before { Listing.delete_all }
+    # destroy_all, não delete_all: ad_images e technical_spec_values têm FK.
+    before { Ad.destroy_all }
 
     it "mantém uma página" do
       expect(paginate(1).total_pages).to eq(1)
@@ -57,7 +58,7 @@ RSpec.describe Pagination do
 
   it "conta corretamente mesmo com o escopo ordenado" do
     # ORDER BY em consulta agregada quebra no Postgres; o objeto remove a ordenação.
-    scope = Listing.order(Arel.sql("listings.year DESC NULLS LAST"))
+    scope = Ad.order(Arel.sql("ads.year DESC NULLS LAST"))
 
     expect(described_class.new(scope, page: 1).total_count).to eq(5)
   end

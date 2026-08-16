@@ -1,5 +1,5 @@
 # Sessão em tabela, com o id guardado em cookie assinado. Mesmo desenho do
-# gerador de autenticação do Rails 8, aplicado ao Advertiser em vez de a um User.
+# gerador de autenticação do Rails 8, aplicado ao User.
 #
 # O padrão é negar: toda controller exige sessão, e quem for público declara
 # `allow_unauthenticated_access`. Controller nova nasce protegida.
@@ -8,7 +8,7 @@ module Authentication
 
   included do
     before_action :require_authentication
-    helper_method :authenticated?, :current_advertiser
+    helper_method :authenticated?, :current_user
   end
 
   class_methods do
@@ -22,8 +22,8 @@ module Authentication
       resume_session.present?
     end
 
-    def current_advertiser
-      Current.advertiser
+    def current_user
+      Current.user
     end
 
     def require_authentication
@@ -52,8 +52,8 @@ module Authentication
       session.delete(:return_to_after_authenticating) || root_url
     end
 
-    def start_new_session_for(advertiser)
-      advertiser.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |record|
+    def start_new_session_for(user)
+      user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |record|
         Current.session = record
         # secure em produção independe de config.force_ssl, que vem comentado no
         # production.rb do Rails — o cookie é credencial e não pode trafegar limpo.

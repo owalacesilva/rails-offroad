@@ -1,0 +1,1000 @@
+git status
+git checkout -b feature/hu53
+git stash push -m "feat: implementation from cursor to hu 53"
+git status
+git stash push --help
+git add .
+git stash push -m "feat(2): implementation from cursor to hu 53"
+git status
+git log
+git stash list
+clear
+git status
+git log
+claude
+git checkout dev
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git stash list
+clear
+git pull origin dev
+git checkout feature/hu53 
+clear
+git rebase dev
+clear
+git stash list
+git stash apply stash@{1}
+git stash apply stash@{0}
+git stash list
+git stash apply stash@{0}
+clear
+git stash list
+git commit -m "feat: implementation from cursor to hu 53"
+clear
+git push --no-verify origin feature/hu53
+git push --no-verify origin feature/hu53 --force
+sudo service nginx stop
+git push --no-verify origin feature/hu53 --force
+sudo service nginx stop
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git push --no-verify origin feature/hu53 
+git checkout dev
+git pull origin dev
+clear
+cd ..
+cd frontend/
+git reset --hard HEAD
+git checkout dev
+git pull origin dev
+rm -rf node_modules/ && npm i && npm run build && npm run dev
+cd ../backend/
+git push --no-verify origin bugfix/hu53 
+clear
+git pull --help
+git pull --rebase origin dev
+git log
+clear
+git checkout sustain
+git pull origin sustain
+git checkout -b hotfix/2473
+git push --no-verify origin hotfix/2473
+git checkout dev
+git pull origin dev
+git branch -b bugfix/os38
+git checkout -b bugfix/os38
+clear
+cd ..
+npm run dev
+cd frontend/
+npm run dev
+cd ../backend/
+git checkout sustain
+clear
+git pull origin sustain
+git checkout -b hotfix/840856
+git push --no-verify origin hotfix/840856
+git log
+git checkout sustain
+clear
+git pull origin sustain
+git checkout hotfix/840856
+git checkout sustain
+git checkout -b hotfix/845724
+git checkout hotfix/840856
+clear
+git push --no-verify origin hotfix/840856 
+clear
+python3 criar_solicitacao/main.py 
+cd criar_solicitacao/
+python3 main.py 
+clear
+python3 main.py 
+clear
+python3 main.py 
+clear
+python3 main.py 
+clear
+python3 main.py 
+clear
+python3 main.py 
+clear
+python3 main.py 
+clear
+python3 main.py 
+exit
+cd PGE/beneficios/frontend/
+npm run dev
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+clear
+git checkout sustain
+git pull origin sustain
+rm -rf node_modules/ && npm i && npm run build && npm run dev
+npm run dev
+clear
+npm run dev
+git status
+npm run dev
+cd PGE/beneficios/backend/
+ls -la
+clear
+cd ..
+ls -la
+mkdir mocks
+mv gen_solicitacoes.py mocks/
+python3
+clear
+cd mocks/
+ls -la
+clear
+claude
+python3 main.py 
+python3 criar_solicitacao/main.py 
+clear
+python3 criar_solicitacao/main.py 
+clear
+python3 criar_solicitacao/main.py 
+clear
+git checkout 840856
+git checkout hotfix/840856
+clear
+git log
+git checkout dev
+clear
+git pull origin dev
+clear
+git checkout hotfix/840856
+clear
+claude
+cd PGE/beneficios/frontend/
+git status
+npm run dev
+cd PGE/beneficios/backend/
+sudo service nginx stop
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+clear
+git status
+git stash push -m "refactor: otimizacao do auto consolidacao da folha"
+clear
+git checkout dev
+clear
+git pull origin dev
+git checkout dev
+git pull origin dev
+clear
+git branch -D bugfix/hu53
+clear
+git checkout -b bugfix/hu53
+clear
+git push --no-verify origin bugfix/hu53
+git log
+git pull --rebase origin dev
+git log
+clear
+git log
+git checkout dev
+git pull origin dev
+git checkout bugfix/hu53
+git rebase
+git rebase dev
+clear
+find "$(git rev-parse --show-toplevel)" -name "*Test.php" -type f -print0 | xargs -0 -I {} composer phpunit -- --testdox {}
+composer phpunit -- --testdox $(find "$(git rev-parse --show-toplevel)" -name "*Test.php" -type f)
+find "$(git rev-parse --show-toplevel)" -name "*Test.php" -type f
+clear
+git log
+git status
+git status --porcelain | grep 'Test\.php$'
+git diff --cached --name-only | grep 'Test\.php$'
+clear
+sh .backup/copy_test_command.sh 
+sudo apt-get install xclip
+clear
+sh .backup/copy_test_command.sh 
+git push --no-verify origin bugfix/hu53
+git checkout sustain
+git pull origin sustain
+git fetch
+git fetch origin
+git checkout main
+git pull origin main
+git checkout otimizacao-autoconsolidar
+clear
+git push --no-verify origin otimizacao-autoconsolidar
+git checkout -b hotfix/840856
+git checkout hotfix/840856
+clear
+git checkout hotfix/840856
+clear
+tail -f -n 100 logs/cli.log 
+clear
+tail -f -n 100 logs/cli.log 
+clear
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git pull origin otimizacao-autoconsolidar 
+clear
+git log
+git pull origin otimizacao-autoconsolidar 
+git log
+make up
+make dev
+git log
+clear
+git log
+git add .
+git commit -m "feat: add value objects, i18n for enums, request timing, k6 tests, and 311-test unit suite
+## Value Objects (src/domain/value_objects/)
+Add 10 new validated value objects covering core domain primitives:
+- Cpf       — 11-digit Brazilian CPF with modulo-11 check-digit algorithm;
+              rejects all-identical-digit sequences
+- Cnpj      — 14-digit Brazilian CNPJ with dual check-digit validation
+- Currency  — integer-cents monetary value; fromDecimal() factory rounds
+              floating-point input; add/subtract/isNegative helpers
+- Username  — 3-50 chars, letters/digits/_/- only, no spaces
+- Name      — firstName + lastName pair, 2-100 chars each, Unicode letters,
+              spaces, hyphens, apostrophes (replaces single-string variant)
+- Protocol  — uppercase alphanumeric identifier (e.g. HTTP, PROT-2024-0001);
+              rejects leading/trailing hyphens
+- AccessToken — JWT-format bearer token (header.payload.signature); max 2 048
+                chars; getPayloadSegment() helper
+- File      — in-memory file buffer with MIME type, size validation (≤ 50 MB),
+              and buffer-length / declared-size consistency check
+- BirthDate — validates past date, age 0–150 years; getAge() computed against
+              today; toISOString() returns YYYY-MM-DD
+- Document  — generic official document with DocumentType discriminator
+              (CPF | CNPJ | PASSPORT | RG); alphanumeric + -./
+## i18n for Enum Validation Errors
+Apply t() to all five domain enum create() factory methods so error
+messages are localised and maintainable:
+- TransactionTypeEnum  → enum.transaction_type.invalid
+- PaginationOrder      → enum.pagination_order.invalid
+- UserStatusEnum       → enum.user_status.invalid
+- RoleEnum             → enum.role.invalid
+- AttachmentFileTypeEnum → enum.attachment_file_type.invalid
+Five corresponding keys added to src/application/i18n/locales/en.ts.
+All messages use {value} interpolation so the invalid input is visible
+in the thrown InvalidDataFormatException message.
+## Request Duration Logging (LoggerInterceptor)
+Instrument every HTTP/RPC request with wall-clock timing via rxjs tap():
+  import { tap } from 'rxjs/operators';
+  const startedAt = Date.now();
+  return next.handle().pipe(
+    tap(() => request.logger.debug({ durationMs: Date.now() - startedAt })),
+  );
+Timing is logged at debug level on the per-request child logger (which
+already carries loggerId), consistent with the project Logger convention.
+## Bug Fix — attachment/get_all.usecase.ts
+IPaginationResponse does not expose totalItems; changed the result-count
+log call from result.totalItems to result.items.length, matching the
+pattern used in all other get_all use cases.
+## Unit Test Suite (311 tests, 23 suites — all passing)
+### Infrastructure
+- jest.config.js: add <rootDir>/../tests to roots so the tests/ tree is
+  discovered by the existing rootDir: 'src' configuration
+- tsconfig.json: add "lib": ["ES2021"] to enable String.prototype.replaceAll
+  (used by the i18n t() helper) under the ES2020 compilation target
+### Domain entity tests (6 files, ~12 tests each)
+  tests/domain/entities/pagination.entity.spec.ts
+    defaults (page=1, pageSize=20, order=ASC), camelCase sort conversion,
+    array sort mapping, nullish-coalescing edge case (page=0 preserved)
+  tests/domain/entities/role.entity.spec.ts
+  tests/domain/entities/user.entity.spec.ts
+  tests/domain/entities/transaction.entity.spec.ts
+  tests/domain/entities/attachment.entity.spec.ts
+  tests/domain/entities/user_status.entity.spec.ts
+    Each: all fields assigned, nullable/optional fields, id optional,
+    instanceof Entity, partial-construction does not throw
+### Domain enum tests (5 files, 15–26 tests each)
+  tests/domain/enums/transaction_type.enum.spec.ts
+  tests/domain/enums/pagination_order.enum.spec.ts
+  tests/domain/enums/user_status.enum.spec.ts
+  tests/domain/enums/role.enum.spec.ts
+  tests/domain/enums/attachment_file_type.enum.spec.ts
+    Each: create() happy path for every member, sad paths for unknown
+    string / uppercase variant / empty string / null / undefined / wrong
+    type (number, object, array); error message contains the bad value;
+    createOrNull() mirrors; AttachmentFileTypeEnum adds fromMimeType()
+    coverage for all 10 MIME categories including fallback to TXT
+### Use case tests (12 files, 11–13 tests each — majority sad paths)
+  tests/application/usecases/transaction/get_all.usecase.spec.ts (rewritten)
+  tests/application/usecases/role/create.usecase.spec.ts
+  tests/application/usecases/role/get_all.usecase.spec.ts
+  tests/application/usecases/role/get_by_id.usecase.spec.ts
+  tests/application/usecases/role/update.usecase.spec.ts
+  tests/application/usecases/role/set_active.usecase.spec.ts
+  tests/application/usecases/user/create.usecase.spec.ts
+  tests/application/usecases/user/get_by_id.usecase.spec.ts
+  tests/application/usecases/user/change_status.usecase.spec.ts
+  tests/application/usecases/attachment/upload.usecase.spec.ts
+  tests/application/usecases/attachment/get_all.usecase.spec.ts
+  tests/application/usecases/attachment/update.usecase.spec.ts
+  Covered for every use case:
+    - Guard clauses: MissingDataException for every required parameter
+      (id, email, username, password, pagination) with falsy values
+      (null, undefined, 0, empty string)
+    - Repository not called after a guard failure
+    - ResourceNotFoundException thrown and message contains the id
+    - Repository errors propagate without wrapping
+    - Repository called with exactly the expected arguments
+    - Logger.debug called the expected number of times
+  Additional per-use-case:
+    CreateUserUseCase: passwordHash passed to repo differs from plaintext;
+      raw password field is absent from the repository call
+    UploadAttachmentUseCase: objectKey includes file extension; null
+      description default; explicit description passed through; extension
+      extracted from compound names (e.g. .tar.gz → gz); no-extension file
+      results in empty string
+    UpdateAttachmentUseCase: query repository called before command
+      repository (call-order assertion via mockImplementation)
+## k6 Testing Configuration (Makefile)
+Add k6 section with eleven targets covering three test categories:
+  API smoke tests (make k6/api, k6/api/health, k6/api/roles,
+                   k6/api/users, k6/api/attachments)
+  Performance tests (make k6/performance/load, stress, spike, soak)
+  UI automation (make k6/ui — Swagger UI via k6 browser module)
+K6_BASE_URL defaults to http://localhost:3000 and can be overridden:
+  make k6/api K6_BASE_URL=https://staging.example.com""
+git log
+git commit -m "feat: add value objects, i18n for enums, request timing, k6 tests, and 311-test unit suite"
+git commit --no-verify -m "feat: add value objects, i18n for enums, request timing, k6 tests, and 311-test unit suite"
+clear
+git log
+cd .projects/organizze/
+ls -la
+cd organizze-nestjs/
+ls -la
+clear
+git log
+sudo service nginx stop
+clear
+cd ../../...
+cd ..
+cd PGE/beneficios/backend/
+ls -la
+cd src/Domain/Attributes/
+la -la
+claude
+git checkout -b feature
+clear
+git status
+git log
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git push origin main
+clear
+npx jest
+clear
+lint:fix:unsafe
+npm run lint:fix:unsafe
+npm run test
+clear
+npm run test
+npm run lint:fix:unsafe
+git checkout main
+git pull origin main
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git pull origin main
+npm run lint
+npm run lint:fix:unsage
+npm run lint:fix:unsafe
+cd PGE/beneficios/frontend/
+git checkout main
+rm -rf node_modules/
+git reset --hard HEAD
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git checkout main
+git pull origin main
+cd ../
+cd backend/
+ls -la
+git fetch
+git pull origin main
+git status
+clear
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git pull origin main
+clear
+sudo service nginx stop
+clear
+cd .projects/organizze/organizze-nestjs/
+git status
+git add .
+git status
+git commit -m "feat: apply refactoring and unit tests"
+clear
+git commit -m "refactoring"
+git commit -n -m "refactoring"
+clear
+git commit --no-verify -m "refactoring"
+git status
+git commit --no-verify -m "refactoring"
+git add .
+git commit --no-verify -m "write first skill"
+clear
+cd ..
+ls -la
+cd organizze-nextjs/
+ls -la
+git status
+git push origin main
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git push origin main
+git log
+git status
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git push origin main
+git remote -v
+git push origin main
+clear
+cd ../
+cd ..
+PGE
+cd PGE/
+ls -la
+claude
+npm run dev
+npm run firebase:login
+npm run firebase:serve
+npm run firebase
+npm run firebase hosting
+npm run firebase hosting --help
+npm run firebase --help
+npm run firebase
+npm run firebase:help
+npx firebase --help
+npx firebase --help deply --only hosting
+npm run deploy
+clear
+npm run dev
+npm run build
+npm run dev
+git status
+git add .
+git commit -m "refactor: refactor layout to tailwind css and adding next to handling javascript"
+clear
+npm run build
+npm run dev
+clear
+git add .
+git commit -m "feat: add i18n to pt-br and en"
+clear
+git push origin main
+git push origin master
+clear
+npm run firebase:serve
+npm run dev
+npm run build
+npm run dev
+npm run build && npm run dev
+npm run dev
+clear
+docker compose up
+make --help
+make up
+docker compose up
+clear
+docker compose up
+clear
+npm run dev
+claude
+clear
+npm run build
+npm run dev
+npm run build
+npm run start
+npm run dev
+npm run build
+npm run dev
+clear
+npm run build
+npm run dev
+npm run build
+npm run dev
+npm run build
+clear
+npm run dev
+npm run build
+npm run dev
+npm run build
+npm run dev
+clear
+claude
+git log
+git status
+clear
+git fetch origin && git checkout issue/4
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git fetch origin && git checkout issue/4
+npm run lint:fix:unsafe
+clear
+git status
+git commit -m "feat: refactor and implement api endpoints, guards and check logs queries."
+git commit --amend
+git push origin issue/4 
+git checkout main
+git pull origin main
+git status
+git push origin feature
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git push origin feature
+clear
+git push -n origin feature
+git push --no-verify origin feature
+clear
+git stash list
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git pull origin main
+git checkout main
+git pull origin main
+git checkout feature
+git pull origin feature
+clear
+git checkout -b issue/2
+make test
+npm i
+make up
+git push origin issue/2 
+clear
+git push origin issue/2 
+git log
+git rebase main
+git rebase --abort
+git checkout main
+git log
+git pull origin feature
+git pull --rebase origin feature
+git log
+clear
+git log
+git push origin main
+git checkout issue/2 
+git rebase main
+git log 
+git push origin main
+git rebase main
+git push origin issue/2 
+git push origin issue/2 --force
+git push
+git push origin main
+git push origin main --force
+git checkout main
+git pull origin main
+clear
+cd .projects/
+ls -la
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git clone git@github.com:owalacesilva/firebase-personal-page.git walacesilva.com.br
+cd walacesilva.com.br/
+git push origin master
+clear
+git push origin master
+clear
+git push origin main
+git push origin master
+clear
+cd ..
+clear
+ls -la
+cd zrobank/
+ls -la
+cd zrobank-
+clear
+cd ../
+ls -la
+git clone git@github.com:owalacesilva/Sistema360.git sistema360
+clear
+ls -la
+rm -rf Sistema360/
+sudo rm -rf Sistema360/
+cd sistema360/
+cp .devcontainer/docker-compose.yml docker-compose.yml
+cp .devcontainer/Dockerfile Dockerfile
+clear
+git checkoit -b issue/68
+git checkout -b issue/68
+git add .
+git commit -m "fix: docker compose and dockerfile"
+git checkout -b issue/69
+clear
+git add .
+git commit -m "fix: docker container build, improve makefile and improve layout style css"
+clear
+git push
+git push origin
+git push origin issue/68
+git push origin issue/69 
+clear
+git log
+git checkout master
+git checkout main
+clear
+git pull origin main
+git checkout issue/69 
+git rebase main
+git push origin issue/69 --force
+git checkout main
+git pull origin main
+clear
+git checkout -b issue/67
+clear
+git add .
+git commit -m "feat: refactor institutional page and network tree"
+clear
+git log
+git status
+clear
+cd ../organizze/organizze-nextjs/
+ls -la
+git pull origin main
+git checkout -b issues/2
+clear
+git checkout main
+git pull origin main
+git checkout -b issues/2
+git checkout issues/2
+clear
+git add .
+git commit -m "feat: create a button to toggle the sidebar, adjust internal spacing (reduce size); make it more compact, add i18n support, create a transactions page, add pagination to tables, add collapse functionality for areas with many filters"
+clear
+git log
+git add .
+git commit -m "feat: create page to import/upload banking statement csv files (only csv extension). create page or modal to view goal details. create page or modal to view budget details. Idealize insight page. Go back border radius. Create a component to display the month's highest expenses."
+git log
+git add .
+git commit -m "feat: On the import page, list all uploads and display their respective statuses."
+git log
+git add .
+git commit -m "feat: expand the insights negine"
+clear
+git log
+git push origin issues/2 
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git push origin issues/2 
+git log
+eval `ssh-agent`
+ssh-add ~/.ssh/github_rsa
+git push origin issues/2 
+git log
+git remote -v
+git remote --help
+git remote -h
+git remote --set-url origin git@github.com:owalacesilva/organizze-nextjs.git
+git remote set-url origin git@github.com:owalacesilva/organizze-nextjs.git
+git push origin main
+git log
+git checkout main
+clear
+git pull origin main
+git push origin issues/2 
+git checkout main
+git pull origin main
+clear
+git checkout -b issue/4
+git add .
+git commit -m "feat: Add NextAuth to the project. Implement authentication across all pages and create a login page that uses email and password. Set up a mock login for testing."
+git add .
+git commit -m "feat: Add NextAuth to the project. Implement authentication across all pages and create a login page that uses email and password. Set up a mock login for testing."
+git status
+clear
+git status
+git log
+git push origin issue/4 
+git status
+git log
+git checkout main
+git pull origin main
+clear
+git checkout -b issue/5
+clear
+git add .
+git commit -m "feat: create quota pages"
+git add .
+git commit -m "feat: improve quotes"
+git commit --no-verify -m "feat"
+clear
+git status
+git log
+clear
+git log
+git add .
+git commit -m "feat: improve global search"
+git push origin issue/5
+git checkout main
+git pull origin main
+git checkout -b issue/3
+clear
+cd ../
+cd ..
+ls -la
+mkdir sistemizedental
+cd sistemizedental/
+git clone git@github.com:owalacesilva/sistemizedental-angular.git
+clear
+git status
+cd sistemizedental-angular/
+git status
+git log\
+git log
+git add .
+git commit -m "feat: refactor and remove at least files"
+git add.
+git cmmoit -m "feat"
+npmrun 
+npm run
+npm build
+git add. 
+git gmmoit.  -m "Better yet: give it your all."
+git log
+git add .
+git commit -m "refactor: improve layout structure and apply new branding"
+git add .
+git commit -m "feat: create calendar, patients, doctors and financial pages"
+git log
+git status
+git add .
+git commit -m "feat: structured layout and apply coloors pallete."
+git push origin master
+git push --no-verify origin master
+clear
+cd ..
+ls -la
+cd ..
+clear
+ls -la
+mkdir confrontos
+cd confrontos/
+ls -la
+clear
+git clone git@github.com:owalacesilva/confrontos-nuxtjs.git
+cd confrontos-nuxtjs/
+clear
+git log
+git checkout -b issue/1
+clear
+docker compose up
+git status
+git add .
+git commit -m "feat: Build first configurations set up"
+git push origin issue/1 && git checkout main
+git pull origin main
+clear
+gh
+docker compose up
+clear
+cd ../
+cd ..
+ls -la
+cd sistemizedental/sistemizedental-angular/
+git log
+git status
+cd ..
+cd organizze/
+ls -la
+cd organizze-nextjs/
+ls -la
+git status
+git log
+clear
+docker compose up
+ls -la
+npm run dev
+cd ..
+cd confrontos/
+cd confrontos-nuxtjs/
+clear
+docker compose up
+pnpm dev
+pnpm install
+npm run dev
+npm install
+pnpm install
+ls -la
+npx get-pnpm
+ls -la
+pnpm -v
+sudo apt install pnpm
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+wget -qO- https://get.pnpm.io/install.sh | sh -
+pnpm -v
+clear
+wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+pnpm -v
+ls -la
+npm install pnpm
+git checkout -b issue/3
+git add .
+git commit -m "feat: create first project structure"
+clear
+docker compose up
+clear
+docker compose up dev
+clear
+docker compose up dev
+cd ../../
+cd organizze/cd organizze/organizze-nextjs/
+cd organizze/organizze-nextjs/
+ls -la
+docker compose up
+npm run dev
+git status
+git log
+git status
+git log
+git add .
+git commit --amend
+clear
+git log
+git push origin issue/3 
+clear
+git checkout main
+git pull origin main
+git pull origin issue/3
+git checkout issue/3
+git rebase main
+git log
+git checkout issue/3
+git status
+git add .
+git commit -m "refactor and resolve conflicts"
+git commit --no-verify -m "refactor and resolve conflicts"
+git push origin issue/3
+git push --no-verify origin issue/3
+cd ..
+cd ../
+cd confrontos/confrontos-nuxtjs/
+git status
+git log
+git add .
+git commit -m "refactor: refactor and restructure profile files"
+git log
+qgit push origin issue/3
+git push origin issue/3
+clear
+cd ..
+clear
+cd organizze/organizze-nextjs/
+git log
+git push origin issue/3 
+git push --no-verify origin issue/3 
+git push --no-verify origin issue/3 --force
+clear
+cd ../../
+git clone git@github.com:owalacesilva/sisdental-rails.git
+make build
+cd sisdental-rails/
+make build
+make up
+git log
+git add .
+git commit -m "build: restructured project files and build configuration files"
+git push origin master
+clear
+make up
+make up-local
+make up
+npm install
+make up
+rm -rf node_modules/
+npm install
+git add .
+git commit -m "feat: create floating sidebar navigation"
+make up
+make down
+make up
+git add .
+git commit -m "feat: add demo user and calendar page"
+git add .
+git commit -m "feat: add feature to switch between light and dark mode "
+clear
+git log
+git add .
+git commit -m "feat: On the frontend, create a customers page featuring a list of registered customers. Include buttons to "create new customer" and "export as CSV." The list should display the avatar and full name. Clicking on a customer should open a modal with three options: edit customer, delete customer, and event history. Each of these three options should open a new modal containing the corresponding content."
+git log
+git commit -m "feat: On the frontend, create a customers page featuring a list of registered customers. Include buttons to \"create new customer\" and \"export as CSV.\" The list should display the avatar and full name. Clicking on a customer should open a modal with three options: edit customer, delete customer, and event history. Each of these three options should open a new modal containing the corresponding content."
+git status
+git log
+git add .
+git commit -m "feat: Add i18n support for the following locales: pt-BR, en-US, and Spanish (for Mexico, Spain, and Paraguay). Update the project name to \"CozyCalendar\". Create a favicon and logo that look like a calendar with a checkmark."
+git push origin master
+git add .
+git commit -m "feat: set up rubocop, breakman, reek and semaphore "
+git status
+git push origin master
+make up-local
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head -a
+git log
+clear
+git pull origin main
+git log
+git push origin main
+git add .
+git commit -m "feat: configure husky"
+git push origin main
+git remote -v
+make up-local
+git fetch origin
+git checkout issue/1
+git add .
+git commit -m "feat: On the frontend, develop a page to manage services"
+git push origin issue/1
+git checkout main
+git pull origin main
+make up-local
+git fetch origin
+clear
+git checkout issue/3
+git add .
+git commit -m "feat: On the frontend, on the account settings page"
+git push origin main
+git push origin issue/3 
+git checkout main
+git pull origin main
+git status
+git pull origin main
+make down
+make down-local
+make up-local
+git log
+git status
+git fetch origin
+git checkout issue/5
+git add .
+git commit -m "feat: Develop the booking page on the frontend"
+make up-local
+git status
+clear
+make up-local
+git status
+git add .
+git commit -m "feat: Develop the booking page on the frontend"
+git push origin main
+clear
+git push origin issue/5
+git checkout main
+git pull origin main
+make up-local
+sudo service docker stop
+sudo service docker start
+make up-local
+git status
+make up-local
+git fetch origin
+git checkout issue/7
+git add .
+git commit -m "feat: On the frontend, we will perform a general refactoring"
+git push origin issue/7
+clear
+git status
+git add .
+git commit -m "feat: improve and enhance on the frontend"
+git log
+make up-local
+git add .
+git commit -m "feat: readjust layout and improve calendar"
+git status
+git push origin issue/7
+git fetch origin
+git checkout issue/9
+git checkout main
+git pull origin main
+git checkout issue/9
+clear
+npm install
+npm run dev
+claude

@@ -1,3 +1,3 @@
 class Session < ApplicationRecord
-  belongs_to :advertiser
+  belongs_to :user
 end

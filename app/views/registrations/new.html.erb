@@ -5,12 +5,12 @@
     <h1 class="text-2xl font-extrabold tracking-tight text-white"><%= t("registrations.new.title") %></h1>
     <p class="mt-2 text-sm text-stone-400"><%= t("registrations.new.subtitle") %></p>
 
-    <%= form_with model: @advertiser, url: signup_path, method: :post, class: "mt-8 space-y-4" do |form| %>
-      <% if @advertiser.errors.any? %>
+    <%= form_with model: @user, url: signup_path, method: :post, class: "mt-8 space-y-4" do |form| %>
+      <% if @user.errors.any? %>
         <div role="alert" class="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
-          <p class="font-bold"><%= t("registrations.new.errors", count: @advertiser.errors.count) %></p>
+          <p class="font-bold"><%= t("registrations.new.errors", count: @user.errors.count) %></p>
           <ul class="mt-2 list-disc space-y-1 pl-5">
-            <% @advertiser.errors.full_messages.each do |message| %>
+            <% @user.errors.full_messages.each do |message| %>
               <li><%= message %></li>
             <% end %>
           </ul>
@@ -47,7 +47,7 @@
 
         <div>
           <%= form.label :state, class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
-          <%= form.select :state, Advertiser::BRAZILIAN_STATES, { include_blank: "—" }, required: true,
+          <%= form.select :state, User::BRAZILIAN_STATES, { include_blank: "—" }, required: true,
                 class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
         </div>
       </div>

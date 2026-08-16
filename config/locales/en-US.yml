@@ -8,7 +8,9 @@ en-US:
       sign_in: "Sign in"
       sign_out: "Sign out"
       greeting: "Hi, %{name}"
-      new_listing: "Post a listing"
+      new_ad: "Post a listing"
+    account:
+      back_to_portal: "Back to portal"
     footer:
       tagline: "Classifieds for people who live off the pavement. Buy and sell 4x4s, trail bikes, UTVs and parts with folks who know the terrain."
       headings:
@@ -52,19 +54,36 @@ en-US:
     member: "User"
     nav:
       dashboard: "Dashboard"
+      ads: "My Listings"
       proposals: "Proposals"
       profile: "My Profile"
       sign_out: "Sign out"
     stats:
-      listings: "Listings"
+      ads: "Listings"
       proposals: "Proposals"
       categories: "Active categories"
+    by_status: "Listing status"
     by_category: "Listings by category"
-    charts:
-      distribution: "Distribution by category"
-      proportion: "Proportion"
-      no_listings: "No listings published yet"
-      no_data: "No data"
+    ads_index:
+      title: "My Listings"
+      subtitle: "Only approved listings appear on the portal. Here is where each one stands."
+      count:
+        one: "1 listing"
+        other: "%{count} listings"
+      filter_label: "Filter by status"
+      all: "All"
+      images:
+        one: "1 photo"
+        other: "%{count} photos"
+      view: "View on portal"
+      not_public: "Not live"
+      hints:
+        pending: "Waiting on moderator review."
+        rejected: "Rejected in moderation. Fix the listing and submit it again."
+        draft: "Draft: not submitted for review yet."
+      empty:
+        title: "No listings yet"
+        subtitle: "Once you publish a listing, it shows up in this list."
     proposals_index:
       title: "Proposals Received"
       subtitle: "People who sent a proposal through your listings."
@@ -101,7 +120,7 @@ en-US:
       cta_primary: "Post for free"
       cta_secondary: "Browse listings"
       stats:
-        listings: "Active listings"
+        ads: "Active listings"
         sellers: "Sellers"
         states: "States"
     categories:
@@ -111,7 +130,7 @@ en-US:
       count:
         one: "%{formatted} listing"
         other: "%{formatted} listings"
-    listings:
+    ads:
       title: "Recent Listings"
       subtitle: "The latest vehicles and parts published on the portal."
       see_all: "See all"
@@ -120,9 +139,15 @@ en-US:
         featured: "Featured"
         new_arrival: "New"
 
-  listings:
+  ads:
     title: "Listings"
     subtitle: "The full catalog, filtered by category, state and city."
+    # Status as the advertiser sees it. Moderators get the plural labels in admin.ads.statuses.
+    statuses:
+      draft: "Draft"
+      pending: "In review"
+      approved: "Live"
+      rejected: "Rejected"
     filters:
       title: "Filters"
       show: "Show filters"
@@ -192,7 +217,7 @@ en-US:
       submit: "Send offer"
       cancel: "Cancel"
       close: "Close"
-      amount_hint: "Amount in BRL, no cents."
+      amount_hint: "Amount in BRL."
       errors:
         one: "1 error kept this from being sent"
         other: "%{count} errors kept this from being sent"
@@ -240,20 +265,68 @@ en-US:
       intro_html: "You received an offer for the listing %{title}."
       footer: "Just reply to this email to talk to the buyer directly."
 
+  admin:
+    title: "Moderation"
+    nav:
+      queue: "Queue"
+      sign_out: "Sign out"
+    sessions:
+      required: "Sign in as a moderator to continue."
+      new:
+        title: "Moderation area"
+        subtitle: "Restricted to the portal team."
+        submit: "Sign in"
+      create:
+        success: "Welcome, %{name}."
+        failure: "Wrong email or password."
+      destroy:
+        success: "Signed out."
+    ads:
+      statuses:
+        draft: "Drafts"
+        pending: "Pending"
+        approved: "Approved"
+        rejected: "Rejected"
+      approve:
+        success: "\"%{title}\" approved and published."
+        failure: "Could not approve: %{errors}"
+      reject:
+        success: "\"%{title}\" rejected."
+        failure: "Could not reject: %{errors}"
+      index:
+        title: "Moderation queue"
+        subtitle: "Listings awaiting review before they appear on the portal."
+        filter_label: "Filter by status"
+        by: "by %{name}"
+        images:
+          one: "1 photo"
+          other: "%{count} photos"
+        reviewed_by: "Reviewed by %{name}"
+        view: "View"
+        approve: "Approve"
+        reject: "Reject"
+        empty:
+          title: "Nothing in this queue"
+          subtitle: "No listings with this status right now."
+
   activerecord:
     models:
       proposal: "Offer"
-      listing: "Listing"
-      advertiser: "Advertiser"
+      ad: "Listing"
+      ad_image: "Listing photo"
+      user: "Advertiser"
+      admin: "Moderator"
       category: "Category"
+      spec_attribute: "Technical attribute"
+      technical_spec_value: "Technical specification"
     attributes:
       proposal:
         name: "Name"
         email: "Email"
         phone: "Phone"
-        amount_cents: "Offer amount"
+        offered_value: "Offer amount"
         message: "Message"
-      advertiser:
+      user:
         name: "Name or shop name"
         email: "Email"
         phone: "WhatsApp"
@@ -261,3 +334,26 @@ en-US:
         state: "State"
         password: "Password"
         password_confirmation: "Confirm password"
+      admin:
+        name: "Name"
+        email: "Email"
+        password: "Password"
+      ad:
+        title: "Title"
+        price: "Price"
+        year: "Year"
+        city: "City"
+        state: "State"
+        status: "Status"
+        published_at: "Published at"
+        ad_images: "Photos"
+      spec_attribute:
+        name: "Name"
+        data_type: "Data type"
+        is_required: "Required"
+    errors:
+      models:
+        ad:
+          attributes:
+            ad_images:
+              invalid_count: "must be between %{min} and %{max}"

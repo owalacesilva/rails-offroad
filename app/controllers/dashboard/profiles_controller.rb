@@ -1,24 +1,36 @@
 module Dashboard
-  class ProfilesController < ApplicationController
+  class ProfilesController < BaseController
+    PROFILE_FIELDS = %i[name email phone city state password password_confirmation].freeze
+    PASSWORD_FIELDS = %i[password password_confirmation].freeze
+
     def edit
-      @advertiser = current_advertiser
+      @user = current_user
     end
 
     def update
-      @advertiser = current_advertiser
+      @user = current_user
 
-      if @advertiser.update(profile_params)
-        redirect_to account_path, notice: t(".success")
+      if @user.update(profile_params)
+        # Chave explícita: a controller vive em Dashboard::, então o lookup
+        # preguiçoso procuraria dashboard.profiles.update.success.
+        redirect_to account_path, notice: t("profiles.update.success")
       else
         render :edit, status: :unprocessable_content
       end
     end
 
     private
-      # Senha só entra na atualização se o anunciante preencheu um valor novo.
+      # Senha só entra na atualização se o usuário preencheu um valor novo.
       def profile_params
-        permitted = params.expect(advertiser: [ :name, :email, :phone, :city, :state, :password, :password_confirmation ])
-        permitted[:password].present? ? permitted : permitted.except(:password, :password_confirmation)
+        changing_password? ? permitted_params : permitted_params.except(*PASSWORD_FIELDS)
+      end
+
+      def changing_password?
+        permitted_params[:password].present?
+      end
+
+      def permitted_params
+        @permitted_params ||= params.expect(user: PROFILE_FIELDS)
       end
   end
 end

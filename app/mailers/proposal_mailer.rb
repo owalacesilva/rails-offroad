@@ -1,13 +1,13 @@
 class ProposalMailer < ApplicationMailer
   def received(proposal)
     @proposal = proposal
-    @listing = proposal.listing
-    @advertiser = @listing.advertiser
+    @ad = proposal.ad
+    @user = @ad.user
 
     mail(
-      to: @advertiser.email,
+      to: @user.email,
       reply_to: proposal.email,
-      subject: t("proposal_mailer.received.subject", title: @listing.title)
+      subject: t("proposal_mailer.received.subject", title: @ad.title)
     )
   end
 end

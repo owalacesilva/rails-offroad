@@ -31,6 +31,10 @@
 
 /public/assets
 
+# PNGs de placeholder gerados por db/seeds.rb para o file_url de ad_images.
+# São derivados: `bin/rails db:seed` reconstrói todos.
+/public/seed-images
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 

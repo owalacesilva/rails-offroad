@@ -4,16 +4,16 @@ class RegistrationsController < ApplicationController
   before_action :redirect_if_authenticated
 
   def new
-    @advertiser = Advertiser.new
+    @user = User.new
   end
 
   def create
-    @advertiser = Advertiser.new(registration_params)
-    @advertiser.member_since = Date.current
+    @user = User.new(registration_params)
+    @user.member_since = Date.current
 
-    if @advertiser.save
-      start_new_session_for @advertiser
-      redirect_to root_path, notice: t(".success", name: @advertiser.name)
+    if @user.save
+      start_new_session_for @user
+      redirect_to root_path, notice: t(".success", name: @user.name)
     else
       render :new, status: :unprocessable_content
     end
@@ -21,6 +21,6 @@ class RegistrationsController < ApplicationController
 
   private
     def registration_params
-      params.expect(advertiser: [ :name, :email, :phone, :city, :state, :password, :password_confirmation ])
+      params.expect(user: [ :name, :email, :phone, :city, :state, :password, :password_confirmation ])
     end
 end

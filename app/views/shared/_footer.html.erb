@@ -47,7 +47,7 @@
               inclusive nas de erro — não vale uma consulta ao banco por render. %>
           <% %w[veiculos-4x4 motos-quadriciclos utvs pecas-acessorios].each do |slug| %>
             <li>
-              <%= link_to t("categories.#{slug}.name"), listings_path(category: slug),
+              <%= link_to t("categories.#{slug}.name"), ads_path(category: slug),
                     class: "transition hover:text-brand-400" %>
             </li>
           <% end %>
