@@ -2,11 +2,11 @@ class CreateAds < ActiveRecord::Migration[8.1]
   STATUSES = %w[draft pending approved rejected].freeze
 
   def change
-    create_table :ads, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
-      t.references :user, type: :uuid, null: false, foreign_key: true
-      t.references :category, type: :uuid, null: false, foreign_key: true
+    create_table :ads, id: :string, limit: 36 do |t|
+      t.references :user, type: :string, limit: 36, null: false, foreign_key: true
+      t.references :category, type: :string, limit: 36, null: false, foreign_key: true
       # Quem avaliou. Nulo enquanto o anúncio não passou por moderação.
-      t.references :admin, type: :uuid, null: true, foreign_key: true
+      t.references :admin, type: :string, limit: 36, null: true, foreign_key: true
 
       t.string :title, null: false
       t.text :description

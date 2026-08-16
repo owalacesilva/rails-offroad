@@ -6,36 +6,33 @@ name: offroad_classifieds
 
 services:
   db:
-    image: postgres:16-alpine
+    image: mysql:8.4
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT:-3306}:3306"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}" ]
+      # $$ vira $ no container: a senha é lida do ambiente do mysql, não
+      # interpolada pelo Compose.
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent" ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 20
 
-  pgadmin:
-    image: dpage/pgadmin4:8
+  phpmyadmin:
+    image: phpmyadmin:5
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@offroadclassificados.com.br}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-      # Modo desktop: sem tela de login nem master password. Só para desenvolvimento.
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-      # Sem isto o pgAdmin recusa e-mails em TLDs de uso especial (.test, .local).
-      PGADMIN_CONFIG_ALLOW_SPECIAL_EMAIL_DOMAINS: "['test', 'local', 'localhost', 'invalid', 'example']"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-      # Pré-registra a conexão com o serviço db.
-      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+      PMA_HOST: db
+      PMA_PORT: 3306
+      # Com usuário e senha definidos o phpMyAdmin usa auth_type "config":
+      # entra direto, sem tela de login. Só para desenvolvimento.
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      UPLOAD_LIMIT: 256M
     ports:
-      - "${PGADMIN_PORT:-5050}:80"
+      - "${PHPMYADMIN_PORT:-5050}:80"
     depends_on:
       db:
         condition: service_healthy
@@ -93,9 +90,9 @@ services:
     command: bin/dev
     environment:
       DB_HOST: db
-      DB_PORT: 5432
-      DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-offroad}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-offroad123}
@@ -120,8 +117,7 @@ services:
     tty: true
 
 volumes:
-  pg_data:
-  pgadmin_data:
+  mysql_data:
   minio_data:
   # Gems ficam num volume, fora do bind mount do projeto.
   # Em um clone novo, rode uma vez: docker compose run --rm web bundle install

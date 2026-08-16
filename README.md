@@ -3,11 +3,11 @@
 Portal de classificados de nicho para o universo off-road: veículos 4x4, motos de trilha,
 quadriciclos, UTVs e peças & acessórios.
 
-- Rails 8.1 · Ruby 3.4 · PostgreSQL 16 · TailwindCSS 4 · Propshaft + Importmap
+- Rails 8.1 · Ruby 3.4 · MySQL 8.4 · TailwindCSS 4 · Propshaft + Importmap
 
 ## Ambiente de desenvolvimento (Docker)
 
-Esta máquina não tem Ruby nem PostgreSQL instalados nativamente, então o ambiente roda em
+Esta máquina não tem Ruby nem MySQL instalados nativamente, então o ambiente roda em
 containers. `Dockerfile.dev` é a imagem de desenvolvimento; o `Dockerfile` na raiz é o de
 produção, gerado pelo Rails (usado pelo Kamal).
 
@@ -32,16 +32,16 @@ O seed é idempotente: rodar de novo não duplica registros.
 | Serviço     | URL                                            | Credenciais            |
 | ----------- | ---------------------------------------------- | ---------------------- |
 | Aplicação   | <http://localhost:3000>                        | —                      |
-| PostgreSQL  | `localhost:5432`                               | `postgres` / `postgres`|
-| pgAdmin     | <http://localhost:5050>                        | modo desktop, sem login|
+| MySQL       | `localhost:3306`                               | `root` / `root`        |
+| phpMyAdmin  | <http://localhost:5050>                        | entra direto, sem login|
 | MinIO API   | <http://localhost:9000>                        | `offroad` / `offroad123`|
 | MinIO console | <http://localhost:9001>                      | `offroad` / `offroad123`|
 | MailHog     | <http://localhost:8025>                        | —                      |
 
 A aplicação sobe via `bin/dev` (foreman: servidor Rails + `tailwindcss:watch`).
 
-O pgAdmin já vem com a conexão do banco pré-registrada (`docker/pgadmin/servers.json`);
-a senha é pedida no primeiro acesso.
+O phpMyAdmin recebe host, usuário e senha por variável de ambiente (`PMA_*`), então abre
+já conectado ao serviço `db`, sem tela de login. Conveniência de desenvolvimento.
 
 O bucket do MinIO é criado automaticamente pelo serviço one-shot `minio_setup`, que também
 libera leitura anônima — conveniência de desenvolvimento, não replicar em produção.
@@ -119,7 +119,7 @@ nomes dos serviços, enquanto no host valeria `localhost`. Colocá-los no `.env`
 ### Rodando sem Docker
 
 `config/database.yml` lê `DB_HOST`, `DB_PORT`, `DB_USERNAME` e `DB_PASSWORD`, com padrão
-`localhost:5432` / `postgres`. `config/storage.yml` e o Action Mailer seguem a mesma lógica,
+`localhost:3306` / `root`. `config/storage.yml` e o Action Mailer seguem a mesma lógica,
 com default em `localhost`. Com Ruby 3.4 e os serviços locais, `bin/setup` e `bin/dev`
 funcionam normalmente.
 
@@ -153,8 +153,8 @@ estado, cidade e ordenação.
   desconhecido é ignorado, nunca interpolado — `sort` só aceita as chaves de `SORTS`.
 - Cidade que não pertence ao estado escolhido é **descartada**, em vez de produzir
   uma lista vazia sem explicação.
-- Ordenar por ano usa `NULLS LAST`: peça não tem ano e o Postgres jogaria os nulos
-  na frente no `DESC`.
+- Ordenar por ano não precisa de cláusula para os nulos: peça não tem ano, e o MySQL
+  ordena `NULL` como o menor valor, então o `DESC` já o joga para o fim.
 - `app/queries/pagination.rb` pagina por offset, sem gem. Página fora do intervalo
   é corrigida para a borda mais próxima (`?page=999` cai na última).
 - O painel de filtros recolhe via `app/javascript/controllers/filters_controller.js`:

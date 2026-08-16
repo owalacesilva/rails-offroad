@@ -8,7 +8,9 @@ class SpecAttribute < ApplicationRecord
   has_many :technical_spec_values, foreign_key: :attribute_id,
                                    inverse_of: :spec_attribute, dependent: :destroy
 
-  validates :name, presence: true, uniqueness: true
+  # case_sensitive: false pelo mesmo motivo de Category#slug: a collation padrão
+  # do MySQL ignora caixa, e o índice único da coluna também.
+  validates :name, presence: true, uniqueness: { case_sensitive: false }
   validates :data_type, presence: true, inclusion: { in: DATA_TYPES }
   validates :position, presence: true, numericality: { only_integer: true }
 

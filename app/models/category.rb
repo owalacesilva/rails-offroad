@@ -1,7 +1,11 @@
 class Category < ApplicationRecord
   has_many :ads, dependent: :restrict_with_error
 
-  validates :slug, presence: true, uniqueness: true
+  # case_sensitive: false acompanha o banco. A collation padrão do MySQL
+  # (utf8mb4_0900_ai_ci) ignora caixa, então o índice único já trataria
+  # "veiculos-4x4" e "Veiculos-4X4" como a mesma slug; sem isto o modelo
+  # prometeria uma distinção que o banco não faz.
+  validates :slug, presence: true, uniqueness: { case_sensitive: false }
   validates :position, presence: true, numericality: { only_integer: true }
 
   scope :ordered, -> { order(:position, :slug) }

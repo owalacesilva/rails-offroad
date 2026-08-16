@@ -57,8 +57,8 @@ RSpec.describe Pagination do
   end
 
   it "conta corretamente mesmo com o escopo ordenado" do
-    # ORDER BY em consulta agregada quebra no Postgres; o objeto remove a ordenação.
-    scope = Ad.order(Arel.sql("ads.year DESC NULLS LAST"))
+    # ORDER BY não muda um COUNT e só faz o banco ordenar à toa; o objeto o remove.
+    scope = Ad.order(year: :desc)
 
     expect(described_class.new(scope, page: 1).total_count).to eq(5)
   end

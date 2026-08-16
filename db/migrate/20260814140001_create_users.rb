@@ -4,7 +4,9 @@ class CreateUsers < ActiveRecord::Migration[8.1]
   ].freeze
 
   def change
-    create_table :users, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
+    # O MySQL não tem tipo UUID: a chave é VARCHAR(36) e quem gera o valor é o
+    # ApplicationRecord, antes do INSERT. Ver app/models/application_record.rb.
+    create_table :users, id: :string, limit: 36 do |t|
       t.string :name, null: false
       t.string :email, null: false
       t.string :password_hash, null: false

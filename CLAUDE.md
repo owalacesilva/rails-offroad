@@ -2,12 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Rails 8.1 · Ruby 3.4 · PostgreSQL 16 · TailwindCSS 4 · Propshaft + Importmap.
+Rails 8.1 · Ruby 3.4 · MySQL 8.4 · TailwindCSS 4 · Propshaft + Importmap.
 A niche classifieds portal for the off-road world (4x4s, trail bikes, UTVs, parts).
 
 ## Everything runs in Docker
 
-**There is no Ruby, Bundler, or PostgreSQL on the host** — `ruby -v` fails, and `sudo`
+**There is no Ruby, Bundler, or MySQL on the host** — `ruby -v` fails, and `sudo`
 requires a password. Every command must go through the `web` container.
 
 ```bash
@@ -16,7 +16,7 @@ docker compose exec web <command>      # against the running container
 docker compose run --rm web <command>  # one-off, when the stack is down
 ```
 
-Services: `web` :3000 · `db` :5432 · `pgadmin` :5050 · `minio` :9000 (console :9001) · `mailhog` :8025.
+Services: `web` :3000 · `db` :3306 · `phpmyadmin` :5050 · `minio` :9000 (console :9001) · `mailhog` :8025.
 `Dockerfile.dev` is the development image; the root `Dockerfile` is Rails' production one.
 Containers run as uid/gid 1000 so generated files stay editable on the host.
 
@@ -83,8 +83,19 @@ check constraints in the database, not just model validations. There are no `_ce
 columns — the form takes reais and `Proposal#offered_value=` only swaps a decimal comma
 for a dot before Rails casts it.
 
-**Every primary key is a UUID** (`gen_random_uuid()`), including join and moderation
-tables. A spec that hardcodes an integer id will not match anything.
+**Every primary key is a UUID**, including join and moderation tables. A spec that
+hardcodes an integer id will not match anything. MySQL has no `uuid` column type and no
+`RETURNING`, so the key is a `VARCHAR(36)` and **`ApplicationRecord` generates the value in
+a `before_create`** — a database-side default would be invisible to Rails and leave
+`record.id` empty after `create`. Migrations therefore write `id: :string, limit: 36` and
+`t.references ..., type: :string, limit: 36`, never `id: :uuid`, which the MySQL adapter
+does not understand.
+
+**The default collation is case-insensitive** (`utf8mb4_0900_ai_ci`). Unique indexes and
+every `where` on a string follow it, so `Category#slug` and `SpecAttribute#name` validate
+uniqueness with `case_sensitive: false` — the model must not promise a distinction the
+database does not make. Ordering follows MySQL too: `NULL` sorts as the smallest value, so
+`AdFilter`'s `year_desc` needs no `NULLS LAST` clause to keep year-less parts at the end.
 
 **`Admin` is a model, so the controller namespace is `Moderation`.** A Ruby constant cannot
 be both a class and a module, so `app/controllers/moderation/` holds the backoffice while

@@ -34,7 +34,7 @@ FactoryBot.define do
       badge { :featured }
     end
 
-    # Peça não tem ano: exercita o NULLS LAST da ordenação por ano.
+    # Peça não tem ano: exercita a posição dos nulos na ordenação por ano.
     trait :without_year do
       year { nil }
     end

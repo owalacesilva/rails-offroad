@@ -5,7 +5,7 @@ RSpec.describe Category, type: :model do
 
   it { is_expected.to have_many(:ads).dependent(:restrict_with_error) }
   it { is_expected.to validate_presence_of(:slug) }
-  it { is_expected.to validate_uniqueness_of(:slug) }
+  it { is_expected.to validate_uniqueness_of(:slug).case_insensitive }
   it { is_expected.to validate_presence_of(:position) }
 
   describe "texto exibido" do

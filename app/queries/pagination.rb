@@ -8,7 +8,7 @@ class Pagination
   def initialize(scope, page:, per_page: PER_PAGE)
     @scope = scope
     @per_page = per_page
-    # except(:order) porque ORDER BY em consulta agregada quebra no Postgres.
+    # except(:order) porque ORDER BY não muda um COUNT e só faz o banco ordenar à toa.
     @total_count = scope.except(:order).count
     @page = page.to_i.clamp(1, total_pages)
   end

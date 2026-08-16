@@ -1,13 +1,14 @@
 # Traduz os parâmetros da URL em um scope de Ad e alimenta os selects do
 # formulário de filtro. Parâmetro desconhecido é ignorado, nunca interpolado.
 class AdFilter
-  # Cada ordenação recebe o scope e devolve o scope ordenado. `year` precisa de
-  # NULLS LAST: peça não tem ano e o Postgres jogaria os nulos na frente no DESC.
+  # Cada ordenação recebe o scope e devolve o scope ordenado. Em `year` os nulos
+  # (peça não tem ano) ficam no fim sem cláusula extra: o MySQL ordena NULL como
+  # o menor valor, então o DESC já o joga para o final.
   SORTS = {
     "recent" => ->(scope) { scope.order(published_at: :desc) },
     "price_asc" => ->(scope) { scope.order(price: :asc) },
     "price_desc" => ->(scope) { scope.order(price: :desc) },
-    "year_desc" => ->(scope) { scope.order(Arel.sql("ads.year DESC NULLS LAST")) }
+    "year_desc" => ->(scope) { scope.order(year: :desc) }
   }.freeze
 
   DEFAULT_SORT = "recent".freeze

@@ -16,8 +16,8 @@ global_job_config:
       - checkout
       # .ruby-version guarda "ruby-3.4.10"; o sem-version quer só a versão.
       - sem-version ruby $(sed 's/^ruby-//' .ruby-version)
-      # Header do libpq para compilar a gem pg.
-      - sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libpq-dev
+      # Headers do cliente MySQL para compilar a gem mysql2.
+      - sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends default-libmysqlclient-dev
       - cache restore gems-$(checksum Gemfile.lock)
       - bundle config set --local path vendor/bundle
       - bundle install --jobs 4 --retry 3
@@ -33,12 +33,12 @@ blocks:
         - name: DB_HOST
           value: 127.0.0.1
         - name: DB_USERNAME
-          value: postgres
+          value: root
         - name: DB_PASSWORD
-          value: postgres
+          value: root
       prologue:
         commands:
-          - sem-service start postgres 16 --username=postgres --password=postgres
+          - sem-service start mysql 8.0 --username=root --password=root
       jobs:
         - name: RSpec
           commands:

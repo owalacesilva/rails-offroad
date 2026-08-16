@@ -4,11 +4,11 @@ class CreateAttributes < ActiveRecord::Migration[8.1]
   DATA_TYPES = %w[STRING INT DECIMAL].freeze
 
   def change
-    create_table :attributes, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
+    create_table :attributes, id: :string, limit: 36 do |t|
       t.string :name, null: false
       t.string :data_type, null: false, default: "STRING"
       t.boolean :is_required, null: false, default: false
-      # jsonb não preservava ordem e a ordem vinha de constante; agora é coluna.
+      # JSON não preservava ordem e a ordem vinha de constante; agora é coluna.
       t.integer :position, null: false, default: 0
 
       t.timestamps

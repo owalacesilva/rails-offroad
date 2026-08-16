@@ -1,7 +1,7 @@
 # Taxonomia fixa: o texto exibido continua vindo de config/locales pela slug.
 class CreateCategories < ActiveRecord::Migration[8.1]
   def change
-    create_table :categories, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
+    create_table :categories, id: :string, limit: 36 do |t|
       t.string :slug, null: false
       t.integer :position, null: false, default: 0
 

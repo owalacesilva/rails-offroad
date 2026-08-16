@@ -116,7 +116,7 @@ ADS = [
   { title: "Polaris General 1000 Deluxe", year: 2020, price: 245_000, city: "Cuiabá", state: "MT", category: "utvs", badge: :prepared,
     specs: { "engine" => "999 cc ProStar", "power" => "100 cv", "transmission" => "CVT", "mileage_km" => 8_900, "color" => "Preto" } },
 
-  # Peças e acessórios (sem ano: exercita o NULLS LAST da ordenação)
+  # Peças e acessórios (sem ano: exercita a posição dos nulos na ordenação)
   { title: "Kit Suspensão Old Man Emu +2\"", year: nil, price: 8_790, city: "Porto Alegre", state: "RS", category: "pecas-acessorios", badge: :new_arrival,
     specs: { "brand" => "ARB Old Man Emu", "material" => "Aço com molas helicoidais" } },
   { title: "Guincho Elétrico 12.000 lbs", year: 2024, price: 5_490, city: "São Paulo", state: "SP", category: "pecas-acessorios", badge: nil,
@@ -167,6 +167,80 @@ SPEC_ATTRIBUTES = [
   { name: "brand",        data_type: "STRING", position: 10, is_required: false },
   { name: "material",     data_type: "STRING", position: 11, is_required: false },
   { name: "warranty",     data_type: "STRING", position: 12, is_required: false }
+].freeze
+
+# Propostas recebidas. `ad` é o título do anúncio; `user` é o e-mail de um
+# anunciante já semeado, para o caso de quem envia estar logado — aí nome e
+# e-mail saem do próprio cadastro. Sem `user` é proposta anônima, que o portal
+# aceita de propósito, e o nome e o e-mail vêm da linha.
+#
+# `days_after` conta a partir da publicação do anúncio: proposta não chega antes
+# do anúncio existir. Valor sempre abaixo do preço pedido — é uma oferta.
+#
+# O telefone fica como o comprador digitaria: diferente de User, Proposal não
+# normaliza, porque este número só é exibido ao anunciante, não vira link wa.me.
+PROPOSALS = [
+  # Um anúncio disputado, para o painel do anunciante não ter só uma linha.
+  { ad: "Jeep Gladiator Overland 3.6", name: "Eduardo Bastos", email: "eduardo.bastos@exemplo.com.br",
+    phone: "(41) 99876-5544", offered_value: 425_000, days_after: 2,
+    message: "Tenho interesse real e pago à vista. Consigo ir buscar em Belo Horizonte ainda este mês.\n\nA garantia de fábrica ainda está válida?" },
+  { ad: "Jeep Gladiator Overland 3.6", user: "rodrigo.tavares@exemplo.com.br",
+    phone: "(65) 99332-2066", offered_value: 432_000, days_after: 5,
+    message: "Trabalho com off-road e conheço bem o modelo. Aceita troca parcial em um Troller 2019?" },
+  { ad: "Jeep Gladiator Overland 3.6", name: "Letícia Moraes", email: "leticia.moraes@exemplo.com.br",
+    phone: nil, offered_value: 410_000, days_after: 9, message: nil },
+
+  { ad: "Toyota Bandeirante OJ-55 Longa", name: "Fernando Queiroz", email: "fernando.queiroz@exemplo.com.br",
+    phone: "(11) 98123-4477", offered_value: 138_000, days_after: 4,
+    message: "Procuro uma Bandeirante original há meses. Tem o manual e a chave reserva?" },
+
+  { ad: "Nissan Frontier Attack 2.3", user: "camila.duarte@exemplo.com.br",
+    phone: "(48) 99100-0088", offered_value: 198_000, days_after: 3,
+    message: "Posso fechar esta semana se aceitar o valor. Levaria a um mecânico de confiança em Porto Alegre antes." },
+  { ad: "Nissan Frontier Attack 2.3", name: "Juliana Prado", email: "juliana.prado@exemplo.com.br",
+    phone: "(51) 99654-1122", offered_value: 205_000, days_after: 7, message: nil },
+
+  { ad: "Troller T4 3.2 TGV", name: "Thiago Menezes", email: "thiago.menezes@exemplo.com.br",
+    phone: "(62) 98877-3311", offered_value: 208_000, days_after: 2,
+    message: "É o meu carro dos sonhos. Consigo dar entrada agora e o restante em até dez dias." },
+
+  { ad: "Jeep Renegade Trailhawk 2.0", user: "marcelo.andrade@exemplo.com.br",
+    phone: "(11) 97766-0022", offered_value: 141_000, days_after: 3,
+    message: "Tem laudo cautelar recente? Se tiver, fecho pelo valor da proposta sem pechinchar." },
+
+  { ad: "Mitsubishi L200 Triton Sport HPE-S", name: "Sandra Vasconcelos", email: "sandra.vasconcelos@exemplo.com.br",
+    phone: nil, offered_value: 179_000, days_after: 4,
+    message: "Uso para trabalho no campo, então rodagem alta não é problema. Aguardo retorno." },
+
+  { ad: "Chevrolet S10 High Country 2.8", name: "Otávio Lins", email: "otavio.lins@exemplo.com.br",
+    phone: "(48) 99201-7788", offered_value: 232_000, days_after: 5,
+    message: "Vi o anúncio hoje e gostei das fotos. Aceita financiamento com entrada de 40%?" },
+
+  { ad: "Suzuki Jimny Sierra 1.5 4x4", user: "patricia.nogueira@exemplo.com.br",
+    phone: "(31) 99544-0044", offered_value: 170_000, days_after: 6,
+    message: "Estou montando um segundo carro só para trilha leve. O Jimny é exatamente o que procuro." },
+
+  { ad: "Sherco SE 300 Factory", name: "Bruno Sartori", email: "bruno.sartori@exemplo.com.br",
+    phone: "(62) 99411-6655", offered_value: 79_000, days_after: 8,
+    message: "Corro enduro amador. Quantas horas de motor a moto tem desde a última revisão?" },
+
+  { ad: "Can-Am Maverick X3 Turbo RR", name: "Ricardo Amorim", email: "ricardo.amorim@exemplo.com.br",
+    phone: "(71) 98120-9944", offered_value: 392_000, days_after: 6,
+    message: "Tenho um UTV menor para dar na troca mais volta em dinheiro. Podemos conversar?" },
+
+  { ad: "Jogo de Pneus BFGoodrich KM3 33\"", name: "Vinícius Rocha", email: "vinicius.rocha@exemplo.com.br",
+    phone: "(48) 99730-2211", offered_value: 9_000, days_after: 10, message: nil },
+
+  { ad: "Guincho Elétrico 12.000 lbs", user: "contato@trilhalivre.com.br",
+    phone: "(41) 98877-0011", offered_value: 5_000, days_after: 12,
+    message: "Levo dois se fizer preço no par. Retiro pessoalmente em São Paulo." },
+
+  { ad: "Bloqueio de Diferencial ARB Air Locker", name: "Marina Coelho", email: "marina.coelho@exemplo.com.br",
+    phone: nil, offered_value: 11_500, days_after: 14,
+    message: "Serve no eixo traseiro de uma Hilux 2018? Se servir, fecho hoje." },
+
+  { ad: "Barra de LED Auxiliar 52\"", name: "Gustavo Pires", email: "gustavo.pires@exemplo.com.br",
+    phone: "(51) 99388-4400", offered_value: 1_150, days_after: 16, message: nil }
 ].freeze
 
 # ad_images guarda URL, não blob: o PNG vai para public/ e a coluna aponta pra ele.
@@ -261,7 +335,35 @@ ADS.each_with_index do |attributes, index|
   end
 end
 
+users_by_email = users.index_by(&:email)
+ads_by_title = Ad.where(title: PROPOSALS.map { |attributes| attributes[:ad] }).index_by(&:title)
+
+PROPOSALS.each do |attributes|
+  ad = ads_by_title.fetch(attributes[:ad])
+  # Quem enviou logado vira o user da proposta; anônimo fica com user_id nulo.
+  sender = attributes[:user] && users_by_email.fetch(attributes[:user])
+
+  # O par (anúncio, e-mail) é a chave natural: rodar o seed de novo não duplica.
+  proposal = Proposal.find_or_initialize_by(ad_id: ad.id, email: sender&.email || attributes[:email])
+  # O min segura a data no presente mesmo se ADS for reordenado e o anúncio
+  # passar a ser mais novo que a proposta.
+  received_at = [ ad.published_at + attributes[:days_after].days, Time.current ].min
+
+  proposal.update!(
+    user: sender,
+    name: sender&.name || attributes[:name],
+    phone: attributes[:phone],
+    # DECIMAL em reais, como o preço do anúncio.
+    offered_value: attributes[:offered_value],
+    message: attributes[:message],
+    # Escalonar a chegada faz a ordenação do painel do anunciante ter sentido.
+    created_at: received_at,
+    updated_at: received_at
+  )
+end
+
 puts "Seed: #{Category.count} categorias, #{SpecAttribute.count} atributos, " \
      "#{Admin.count} moderadores, #{User.count} anunciantes, " \
      "#{Ad.count} anúncios (#{Ad.published.count} aprovados), " \
-     "#{AdImage.count} fotos, #{TechnicalSpecValue.count} especificações."
+     "#{AdImage.count} fotos, #{TechnicalSpecValue.count} especificações, " \
+     "#{Proposal.count} propostas (#{Proposal.where(user: nil).count} anônimas)."

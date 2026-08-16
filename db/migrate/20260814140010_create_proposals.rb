@@ -1,10 +1,10 @@
 class CreateProposals < ActiveRecord::Migration[8.1]
   def change
-    create_table :proposals, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
-      t.references :ad, type: :uuid, null: false, foreign_key: true
+    create_table :proposals, id: :string, limit: 36 do |t|
+      t.references :ad, type: :string, limit: 36, null: false, foreign_key: true
       # Nulo de propósito: proposta anônima continua permitida. Preenchido quando
       # quem envia está autenticado.
-      t.references :user, type: :uuid, null: true, foreign_key: true
+      t.references :user, type: :string, limit: 36, null: true, foreign_key: true
 
       t.string :name, null: false
       t.string :email, null: false

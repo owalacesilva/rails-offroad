@@ -1,12 +1,12 @@
 # Imagem de desenvolvimento. A imagem de produção é o `Dockerfile` gerado pelo Rails.
 FROM ruby:3.4-slim-bookworm
 
-# Dependências de build (pg compila extensão nativa) e utilitários de runtime.
+# Dependências de build (mysql2 compila extensão nativa) e utilitários de runtime.
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
       build-essential \
-      libpq-dev \
-      postgresql-client \
+      default-libmysqlclient-dev \
+      default-mysql-client \
       pkg-config \
       git \
       curl \

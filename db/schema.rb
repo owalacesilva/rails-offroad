@@ -11,12 +11,8 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_catalog.plpgsql"
-  enable_extension "pgcrypto"
-
-  create_table "ad_images", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "ad_id", null: false
+  create_table "ad_images", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "ad_id", limit: 36, null: false
     t.datetime "created_at", null: false
     t.string "file_url", null: false
     t.integer "sort_order", default: 0, null: false
@@ -25,8 +21,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.index ["ad_id"], name: "index_ad_images_on_ad_id"
   end
 
-  create_table "admin_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "admin_id", null: false
+  create_table "admin_sessions", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "admin_id", limit: 36, null: false
     t.datetime "created_at", null: false
     t.string "ip_address"
     t.datetime "updated_at", null: false
@@ -34,7 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.index ["admin_id"], name: "index_admin_sessions_on_admin_id"
   end
 
-  create_table "admins", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "admins", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "name", null: false
@@ -43,10 +39,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.index ["email"], name: "index_admins_on_email", unique: true
   end
 
-  create_table "ads", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "admin_id"
+  create_table "ads", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "admin_id", limit: 36
     t.integer "badge"
-    t.uuid "category_id", null: false
+    t.string "category_id", limit: 36, null: false
     t.string "city", null: false
     t.datetime "created_at", null: false
     t.text "description"
@@ -57,7 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.string "status", default: "pending", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.uuid "user_id", null: false
+    t.string "user_id", limit: 36, null: false
     t.integer "year"
     t.index ["admin_id"], name: "index_ads_on_admin_id"
     t.index ["category_id"], name: "index_ads_on_category_id"
@@ -67,11 +63,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.index ["status"], name: "index_ads_on_status"
     t.index ["user_id"], name: "index_ads_on_user_id"
     t.index ["year"], name: "index_ads_on_year"
-    t.check_constraint "price > 0::numeric", name: "ads_price_positive"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'pending'::character varying, 'approved'::character varying, 'rejected'::character varying]::text[])", name: "ads_status_valid"
+    t.check_constraint "`price` > 0", name: "ads_price_positive"
+    t.check_constraint "`status` in (_utf8mb4'draft',_utf8mb4'pending',_utf8mb4'approved',_utf8mb4'rejected')", name: "ads_status_valid"
   end
 
-  create_table "attributes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "attributes", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "data_type", default: "STRING", null: false
     t.boolean "is_required", default: false, null: false
@@ -80,10 +76,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_attributes_on_name", unique: true
     t.index ["position"], name: "index_attributes_on_position"
-    t.check_constraint "data_type::text = ANY (ARRAY['STRING'::character varying, 'INT'::character varying, 'DECIMAL'::character varying]::text[])", name: "attributes_data_type_valid"
+    t.check_constraint "`data_type` in (_utf8mb4'STRING',_utf8mb4'INT',_utf8mb4'DECIMAL')", name: "attributes_data_type_valid"
   end
 
-  create_table "categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "categories", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "position", default: 0, null: false
     t.string "slug", null: false
@@ -92,8 +88,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
-  create_table "proposals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "ad_id", null: false
+  create_table "proposals", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "ad_id", limit: 36, null: false
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.text "message"
@@ -101,32 +97,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.decimal "offered_value", precision: 12, scale: 2, null: false
     t.string "phone"
     t.datetime "updated_at", null: false
-    t.uuid "user_id"
+    t.string "user_id", limit: 36
     t.index ["ad_id"], name: "index_proposals_on_ad_id"
     t.index ["created_at"], name: "index_proposals_on_created_at"
     t.index ["user_id"], name: "index_proposals_on_user_id"
-    t.check_constraint "offered_value > 0::numeric", name: "proposals_offered_value_positive"
+    t.check_constraint "`offered_value` > 0", name: "proposals_offered_value_positive"
   end
 
-  create_table "sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "sessions", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
     t.datetime "updated_at", null: false
     t.string "user_agent"
-    t.uuid "user_id", null: false
+    t.string "user_id", limit: 36, null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "technical_spec_values", primary_key: ["ad_id", "attribute_id"], force: :cascade do |t|
-    t.uuid "ad_id", null: false
-    t.uuid "attribute_id", null: false
+  create_table "technical_spec_values", primary_key: ["ad_id", "attribute_id"], charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "ad_id", limit: 36, null: false
+    t.string "attribute_id", limit: 36, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "value", null: false
     t.index ["attribute_id"], name: "index_technical_spec_values_on_attribute_id"
   end
 
-  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "users", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "city", null: false
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -137,7 +133,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.string "state", limit: 2, null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.check_constraint "state::text = ANY (ARRAY['AC'::character varying, 'AL'::character varying, 'AP'::character varying, 'AM'::character varying, 'BA'::character varying, 'CE'::character varying, 'DF'::character varying, 'ES'::character varying, 'GO'::character varying, 'MA'::character varying, 'MT'::character varying, 'MS'::character varying, 'MG'::character varying, 'PA'::character varying, 'PB'::character varying, 'PR'::character varying, 'PE'::character varying, 'PI'::character varying, 'RJ'::character varying, 'RN'::character varying, 'RS'::character varying, 'RO'::character varying, 'RR'::character varying, 'SC'::character varying, 'SP'::character varying, 'SE'::character varying, 'TO'::character varying]::text[])", name: "users_state_valid"
+    t.check_constraint "`state` in (_utf8mb4'AC',_utf8mb4'AL',_utf8mb4'AP',_utf8mb4'AM',_utf8mb4'BA',_utf8mb4'CE',_utf8mb4'DF',_utf8mb4'ES',_utf8mb4'GO',_utf8mb4'MA',_utf8mb4'MT',_utf8mb4'MS',_utf8mb4'MG',_utf8mb4'PA',_utf8mb4'PB',_utf8mb4'PR',_utf8mb4'PE',_utf8mb4'PI',_utf8mb4'RJ',_utf8mb4'RN',_utf8mb4'RS',_utf8mb4'RO',_utf8mb4'RR',_utf8mb4'SC',_utf8mb4'SP',_utf8mb4'SE',_utf8mb4'TO')", name: "users_state_valid"
   end
 
   add_foreign_key "ad_images", "ads"
