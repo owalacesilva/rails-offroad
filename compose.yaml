@@ -101,6 +101,12 @@ services:
       SMTP_PORT: 1025
       RAILS_MAX_THREADS: ${RAILS_MAX_THREADS:-5}
       BINDING: "0.0.0.0"
+      # Redes sociais do rodapé. Default vazio de propósito: sem o endereço no
+      # .env o ícone não aparece, em vez de aparecer levando a lugar nenhum.
+      SOCIAL_INSTAGRAM_URL: ${SOCIAL_INSTAGRAM_URL:-}
+      SOCIAL_YOUTUBE_URL: ${SOCIAL_YOUTUBE_URL:-}
+      SOCIAL_FACEBOOK_URL: ${SOCIAL_FACEBOOK_URL:-}
+      SOCIAL_WHATSAPP_URL: ${SOCIAL_WHATSAPP_URL:-}
     volumes:
       - .:/app
       - bundle:/bundle

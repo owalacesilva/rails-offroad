@@ -4,9 +4,9 @@
     <p>&copy; <%= Date.current.year %> OffRoad Classificados. <%= t("layout.footer.legal.rights") %></p>
 
     <nav class="flex flex-wrap gap-4">
-      <%= link_to t("layout.footer.legal.terms"), "#", class: "transition hover:text-stone-900" %>
-      <%= link_to t("layout.footer.legal.privacy"), "#", class: "transition hover:text-stone-900" %>
-      <%= link_to t("layout.footer.contact.help_center"), "#", class: "transition hover:text-stone-900" %>
+      <%= link_to t("layout.footer.legal.terms"), terms_of_use_path, class: "transition hover:text-stone-900" %>
+      <%= link_to t("layout.footer.legal.privacy"), privacy_policy_path, class: "transition hover:text-stone-900" %>
+      <%= link_to t("layout.footer.institutional.how_to_advertise"), how_to_advertise_path, class: "transition hover:text-stone-900" %>
     </nav>
   </div>
 </footer>

@@ -25,6 +25,16 @@
         <%= ad.category.name %>
       </span>
     <% end %>
+
+    <%# Só a régua "Mais Vistos" liga isto: nas outras o número não diz nada
+        sobre o anúncio e só disputaria espaço com a etiqueta. %>
+    <% if local_assigns[:show_views] && ad.views_count.positive? %>
+      <span class="absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-stone-900/80 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+        <%= home_section_icon(:eye, css_class: "h-3 w-3") %>
+        <%= number_with_delimiter(ad.views_count) %>
+        <span class="sr-only"><%= t("home.most_viewed.views", count: ad.views_count) %></span>
+      </span>
+    <% end %>
   </div>
 
   <div class="flex flex-1 flex-col p-3">

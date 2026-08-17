@@ -21,15 +21,29 @@ Rails.application.routes.draw do
     resources :proposals, only: :create, path: "propostas"
   end
 
-  # Painel do anunciante autenticado.
-  scope module: "dashboard" do
-    get   "minha-conta",           to: "dashboard#index",  as: :account
-    get   "minha-conta/anuncios",       to: "ads#index",  as: :account_ads
-    get   "minha-conta/anuncios/novo",  to: "ads#new",    as: :new_account_ad
-    post  "minha-conta/anuncios",       to: "ads#create"
-    get   "minha-conta/perfil",    to: "profiles#edit",    as: :edit_profile
-    patch "minha-conta/perfil",    to: "profiles#update",  as: :profile
-    get   "minha-conta/propostas", to: "proposals#index",  as: :proposals
+  # Páginas institucionais. Uma controller só (PagesController) porque não há
+  # estado nenhum: cada action escolhe um template e o texto vem dos locales.
+  get "sobre-nos",               to: "pages#about",            as: :about
+  get "como-anunciar",           to: "pages#how_to_advertise", as: :how_to_advertise
+  get "politica-de-privacidade", to: "pages#privacy",          as: :privacy_policy
+  get "termos-de-uso",           to: "pages#terms",            as: :terms_of_use
+
+  # Inscrição na newsletter, enviada pelo bloco da home. Só POST: não há
+  # página própria para listar nem editar inscrição.
+  post "newsletter", to: "newsletter_subscriptions#create", as: :newsletter_subscription
+
+  # Painel do anunciante autenticado, todo sob /anunciante. Os helpers seguem
+  # account_* — a rota é portuguesa, o código é inglês.
+  scope module: "dashboard", path: "anunciante" do
+    get   "",              to: "dashboard#index", as: :account
+    get   "anuncios",      to: "ads#index",       as: :account_ads
+    get   "anuncios/novo", to: "ads#new",         as: :new_account_ad
+    # as: nil porque o POST divide o caminho com o GET acima: sem isso o Rails
+    # inventaria o helper `anuncios_path` a partir do segmento em português.
+    post  "anuncios",      to: "ads#create",      as: nil
+    get   "perfil",        to: "profiles#edit",   as: :edit_profile
+    patch "perfil",        to: "profiles#update", as: :profile
+    get   "propostas",     to: "proposals#index", as: :proposals
   end
 
   # Moderação. Sessão própria, separada da do anunciante. O módulo é Moderation

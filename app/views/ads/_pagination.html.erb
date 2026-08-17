@@ -1,11 +1,11 @@
 <nav class="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="<%= t("ads.title") %>">
   <% if pagination.first_page? %>
-    <span class="rounded-full border border-stone-800 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600">
+    <span class="rounded-full border border-stone-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-400">
       <%= t("ads.pagination.previous") %>
     </span>
   <% else %>
     <%= link_to t("ads.pagination.previous"), ads_page_path(pagination.page - 1),
-          class: "rounded-full border border-stone-700 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300" %>
+          class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
   <% end %>
 
   <% paginated_page_numbers(pagination).each do |number| %>
@@ -15,16 +15,16 @@
       </span>
     <% else %>
       <%= link_to number, ads_page_path(number),
-            class: "rounded-full border border-stone-700 px-4 py-2 text-xs font-bold text-stone-300 transition hover:border-brand-500 hover:text-brand-300" %>
+            class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
     <% end %>
   <% end %>
 
   <% if pagination.last_page? %>
-    <span class="rounded-full border border-stone-800 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600">
+    <span class="rounded-full border border-stone-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-400">
       <%= t("ads.pagination.next") %>
     </span>
   <% else %>
     <%= link_to t("ads.pagination.next"), ads_page_path(pagination.page + 1),
-          class: "rounded-full border border-stone-700 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300" %>
+          class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
   <% end %>
 </nav>

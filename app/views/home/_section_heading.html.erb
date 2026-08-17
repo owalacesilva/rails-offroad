@@ -1,0 +1,26 @@
+<%# Cabeçalho das seções da home. Locais: title, icon e — opcionais —
+    subtitle, link_path e link_label. Existe porque a página repete a mesma
+    régua cinco vezes; um ajuste de espaçamento tem que valer para todas. %>
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h2 class="flex items-center gap-3 text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl">
+      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-600">
+        <%= home_section_icon(icon) %>
+      </span>
+      <%= title %>
+    </h2>
+
+    <% if local_assigns[:subtitle].present? %>
+      <p class="mt-2 text-sm text-stone-500"><%= subtitle %></p>
+    <% end %>
+  </div>
+
+  <% if local_assigns[:link_path].present? %>
+    <%= link_to link_path, class: "inline-flex items-center gap-1 text-sm font-bold text-stone-600 transition hover:text-brand-600" do %>
+      <%= link_label %>
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
+    <% end %>
+  <% end %>
+</div>

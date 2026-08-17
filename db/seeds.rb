@@ -147,6 +147,30 @@ PALETTES = [
 
 PHOTOS_PER_AD = 3
 
+# Agenda da home. As datas são relativas a hoje para o seed nunca nascer com a
+# agenda vencida — `days` é quantos dias faltam para o evento começar, e `nights`
+# quantos dias ele dura além do primeiro (ausente = evento de um dia).
+EVENTS = [
+  { title: "Trilhão da Serra Catarinense", city: "Bom Jardim da Serra", state: "SC",
+    venue: "Serra do Rio do Rastro", days: 12, nights: 2,
+    description: "Três dias de trilha em terreno de montanha, com percursos separados para 4x4 e motos. Inscrição limitada por veículo." },
+  { title: "Encontro Nacional de Jipeiros", city: "Poços de Caldas", state: "MG",
+    venue: "Parque de Exposições", days: 26, nights: 1,
+    description: "Exposição de veículos preparados, prova de obstáculos e feira de peças ao lado da arena." },
+  { title: "Expo Off Road Curitiba", city: "Curitiba", state: "PR",
+    venue: "Pavilhão de Eventos", days: 40, nights: 2,
+    description: "Feira coberta de preparação, suspensão e acessórios, com lançamentos das principais oficinas do Sul." },
+  { title: "Enduro da Areia do Litoral Norte", city: "Ilha Comprida", state: "SP",
+    venue: "Faixa de areia norte", days: 54,
+    description: "Prova de um dia na areia, aberta a motos de trilha e quadriciclos. Largada ao amanhecer." },
+  { title: "Feira de Peças e Preparação 4x4", city: "Goiânia", state: "GO",
+    venue: "Centro de Convenções", days: 75, nights: 1,
+    description: "Peça usada, desmanche de doador e serviço de preparação reunidos no mesmo galpão." },
+  { title: "Encontro de UTVs do Cerrado", city: "Cuiabá", state: "MT",
+    venue: "Fazenda Boa Vista", days: 96, nights: 2,
+    description: "Passeio guiado por trilhas de cerrado e travessia de rio, exclusivo para UTVs e side by side." }
+].freeze
+
 # Moderadores. Identidade separada da de anunciante.
 ADMINS = [
   { name: "Equipe OffRoad", email: "moderacao@offroadclassificados.com.br" }
@@ -315,6 +339,11 @@ ADS.each_with_index do |attributes, index|
     published_at: published
   )
 
+  # Visualizações espalhadas por uma progressão que não acompanha a data de
+  # publicação: sem isso "Mais Vistos" sairia idêntico a "Anúncios Recentes".
+  # Só no primeiro seed — rodar de novo não zera o que o portal já contou.
+  ad.views_count = (index * 137) % 900 + 20 if ad.new_record? || ad.views_count.zero?
+
   # As fotos entram antes do save: anúncio aprovado só é válido com 3 a 10.
   if ad.ad_images.empty?
     PHOTOS_PER_AD.times do |photo_index|
@@ -362,8 +391,26 @@ PROPOSALS.each do |attributes|
   )
 end
 
+EVENTS.each do |attributes|
+  # O título é a chave natural: rodar o seed de novo remarca as datas em vez de
+  # criar um segundo evento igual.
+  event = Event.find_or_initialize_by(title: attributes[:title])
+  starts_on = Date.current + attributes[:days].days
+
+  event.update!(
+    city: attributes[:city],
+    state: attributes[:state],
+    venue: attributes[:venue],
+    description: attributes[:description],
+    starts_on: starts_on,
+    # Evento de um dia fica com ends_on nulo, que é o que single_day? espera.
+    ends_on: attributes[:nights] && starts_on + attributes[:nights].days
+  )
+end
+
 puts "Seed: #{Category.count} categorias, #{SpecAttribute.count} atributos, " \
      "#{Admin.count} moderadores, #{User.count} anunciantes, " \
      "#{Ad.count} anúncios (#{Ad.published.count} aprovados), " \
      "#{AdImage.count} fotos, #{TechnicalSpecValue.count} especificações, " \
-     "#{Proposal.count} propostas (#{Proposal.where(user: nil).count} anônimas)."
+     "#{Proposal.count} propostas (#{Proposal.where(user: nil).count} anônimas), " \
+     "#{Event.count} eventos (#{Event.upcoming.count} próximos)."

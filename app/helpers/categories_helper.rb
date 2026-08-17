@@ -23,17 +23,7 @@ module CategoriesHelper
   }.freeze
 
   def category_icon(name, css_class: "h-6 w-6")
-    paths = CATEGORY_ICON_PATHS.fetch(name.to_sym)
-
-    tag.svg(
-      safe_join(paths.map { |path_data| tag.path(d: path_data, "stroke-linecap": "round", "stroke-linejoin": "round") }),
-      class: css_class,
-      fill: "none",
-      viewBox: "0 0 24 24",
-      "stroke-width": "1.5",
-      stroke: "currentColor",
-      "aria-hidden": "true"
-    )
+    outline_icon(CATEGORY_ICON_PATHS.fetch(name.to_sym), css_class: css_class)
   end
 
   def category_icon_for(slug, css_class: "h-6 w-6")

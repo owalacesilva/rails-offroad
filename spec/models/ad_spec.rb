@@ -126,6 +126,40 @@ RSpec.describe Ad, type: :model do
 
       expect(described_class.recent).to eq([ newer, older ])
     end
+
+    it "most_viewed ordena pelo contador de visualizações" do
+      quiet = create(:ad, category: vehicles, views_count: 2)
+      popular = create(:ad, category: vehicles, views_count: 500)
+
+      expect(described_class.most_viewed).to eq([ popular, quiet ])
+    end
+
+    # Acervo novo tem todo mundo zerado; sem desempate a ordem seria indefinida.
+    it "most_viewed desempata pela publicação mais recente" do
+      older = create(:ad, category: vehicles, published_at: 3.days.ago, views_count: 0)
+      newer = create(:ad, category: vehicles, published_at: 1.day.ago, views_count: 0)
+
+      expect(described_class.most_viewed).to eq([ newer, older ])
+    end
+  end
+
+  describe "#record_view" do
+    it "soma uma visualização" do
+      ad = create(:ad, views_count: 4)
+
+      expect { ad.record_view }.to change { ad.reload.views_count }.from(4).to(5)
+    end
+
+    # É contador, não edição do anúncio: um UPDATE direto na coluna, sem
+    # validação nem callback — inclusive o de timestamp.
+    it "não remarca updated_at" do
+      ad = create(:ad)
+      updated_at = ad.updated_at
+
+      ad.record_view
+
+      expect(ad.reload.updated_at).to eq(updated_at)
+    end
   end
 
   describe "#ordered_specifications" do

@@ -1,4 +1,8 @@
 FactoryBot.define do
+  # Uma URL por foto, única em toda a suíte: a galeria da home junta fotos de
+  # vários anúncios, e com URLs repetidas não daria para dizer de quem é qual.
+  sequence(:ad_photo_url) { |n| "/seed-images/anuncio-#{n}.png" }
+
   factory :ad do
     category
     user
@@ -26,7 +30,7 @@ FactoryBot.define do
       next if ad.ad_images.any?
 
       evaluator.image_count.times do |index|
-        ad.ad_images.build(file_url: "/seed-images/teste-#{index}.png", sort_order: index)
+        ad.ad_images.build(file_url: generate(:ad_photo_url), sort_order: index)
       end
     end
 

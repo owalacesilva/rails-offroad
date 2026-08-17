@@ -46,6 +46,9 @@ class Ad < ApplicationRecord
   # Só anúncio aprovado aparece publicamente. É o ponto do fluxo de moderação.
   scope :published, -> { where(status: STATUSES[:approved]) }
   scope :recent, -> { order(published_at: :desc) }
+  # A régua "Mais Vistos" da home. O desempate por data evita que um acervo novo,
+  # em que todo mundo ainda está zerado, saia em ordem indefinida do MySQL.
+  scope :most_viewed, -> { order(views_count: :desc, published_at: :desc) }
   # Subconsulta em vez de joins: evita conflito com o includes(:category) da listagem.
   scope :by_category, ->(slug) { where(category: Category.where(slug: slug)) }
   scope :by_state, ->(state) { where(state: state) }
@@ -68,6 +71,15 @@ class Ad < ApplicationRecord
 
   def cover_image
     ad_images.first
+  end
+
+  # UPDATE atômico direto na coluna: contar visualização não pode disputar com
+  # quem estiver editando o anúncio, nem falhar porque o registro está inválido.
+  #
+  # Deliberadamente ingênuo — recarga e robô contam igual. Visualização única
+  # exigiria uma tabela de visitas, que é justamente o que o contador evita.
+  def record_view
+    self.class.increment_counter(:views_count, id)
   end
 
   # Aprova e publica em um passo: registrar quem avaliou é parte da aprovação.

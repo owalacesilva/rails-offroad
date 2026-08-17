@@ -5,5 +5,10 @@ db/schema.rb linguist-generated
 
 # Mark any vendored files as having been vendored.
 vendor/* linguist-vendored
+
+# A fonte do portal é binária. O git já detectaria isso sozinho, mas o repositório
+# é editado com core.autocrlf ligado: explicitar evita que um clone converta
+# quebras de linha dentro do woff2 e entregue um arquivo corrompido.
+*.woff2 binary
 config/credentials/*.yml.enc diff=rails_credentials
 config/credentials.yml.enc diff=rails_credentials

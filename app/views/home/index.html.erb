@@ -1,4 +1,8 @@
-<%# Home. O Header e o Footer ficam no layout (app/views/layouts/application.html.erb). %>
+<%# Home. O Header e o Footer ficam no layout (app/views/layouts/application.html.erb).
+
+    A ordem das seções abaixo do hero é fixa e foi pedida assim: recentes,
+    galeria, mais vistos, agenda, newsletter e galeria de novo. Mexer na ordem
+    aqui é mexer no pedido, não no layout. %>
 
 <%# ---------------------------------------------------------------- Hero %>
 <section class="relative overflow-hidden bg-stone-900">
@@ -67,57 +71,77 @@
   </div>
 </section>
 
-<%# --------------------------------------------------- Anúncios Recentes %>
+<%# --------------------------------------------------- 1. Anúncios Recentes %>
 <section class="bg-stone-50">
   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <h2 class="flex items-center gap-3 text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl">
-        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-600">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
-        </span>
-        <%= t("home.ads.title") %>
-      </h2>
+    <%= render "home/section_heading", title: t("home.ads.title"), subtitle: t("home.ads.subtitle"),
+          icon: :clock, link_path: ads_path, link_label: t("home.ads.see_all") %>
 
-      <%= link_to ads_path, class: "inline-flex items-center gap-1 text-sm font-bold text-stone-600 transition hover:text-brand-600" do %>
-        <%= t("home.ads.see_all") %>
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-        </svg>
+    <% if @ads.any? %>
+      <%# Duas fileiras de seis, de propósito: uma grade única de doze quebraria
+          em qualquer múltiplo conforme a largura, e a home foi desenhada com a
+          divisão visível. %>
+      <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <%= render partial: "home/ad_card", collection: @ads.first(HomeController::RECENT_ROW), as: :ad %>
+      </div>
+
+      <% if @ads.size > HomeController::RECENT_ROW %>
+        <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          <%= render partial: "home/ad_card", collection: @ads.drop(HomeController::RECENT_ROW), as: :ad %>
+        </div>
       <% end %>
-    </div>
-
-    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-      <%= render partial: "home/ad_card", collection: @ads, as: :ad %>
-    </div>
+    <% else %>
+      <p class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center text-sm text-stone-500">
+        <%= t("home.ads.empty") %>
+      </p>
+    <% end %>
   </div>
 </section>
 
-<%# -------------------------------------------------------- Categorias %>
+<%# ------------------------------------------------------- 2. Galeria de fotos %>
+<%= render "home/photo_gallery", images: @gallery_top,
+      title: t("home.gallery.title"), subtitle: t("home.gallery.subtitle") %>
+
+<%# ------------------------------------------------------------ 3. Mais Vistos %>
+<section class="border-t border-stone-200 bg-stone-50">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+    <%= render "home/section_heading", title: t("home.most_viewed.title"),
+          subtitle: t("home.most_viewed.subtitle"), icon: :eye,
+          link_path: ads_path, link_label: t("home.most_viewed.see_all") %>
+
+    <% if @most_viewed.any? %>
+      <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <%= render partial: "home/ad_card", collection: @most_viewed, as: :ad, locals: { show_views: true } %>
+      </div>
+    <% else %>
+      <p class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center text-sm text-stone-500">
+        <%= t("home.most_viewed.empty") %>
+      </p>
+    <% end %>
+  </div>
+</section>
+
+<%# -------------------------------------------------------- 4. Próximos Eventos %>
 <section class="border-t border-stone-200 bg-white">
   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
-    <div class="max-w-2xl">
-      <h2 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("home.categories.title") %></h2>
-      <p class="mt-2 text-sm text-stone-500"><%= t("home.categories.subtitle") %></p>
-    </div>
+    <%= render "home/section_heading", title: t("home.events.title"),
+          subtitle: t("home.events.subtitle"), icon: :calendar %>
 
-    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <% @categories.each do |category| %>
-        <% count = @ad_counts.fetch(category.id, 0) %>
-        <%= link_to ads_path(category: category.slug), class: "group flex flex-col rounded-2xl border border-stone-200 bg-stone-50 p-6 transition hover:-translate-y-1 hover:border-brand-400 hover:bg-white hover:shadow-lg" do %>
-          <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 transition group-hover:bg-brand-500 group-hover:text-stone-950">
-            <%= category_icon_for(category.slug, css_class: "h-6 w-6") %>
-          </span>
-
-          <h3 class="mt-5 text-base font-bold text-stone-900"><%= category.name %></h3>
-          <p class="mt-1.5 flex-1 text-sm leading-relaxed text-stone-500"><%= category.description %></p>
-
-          <span class="mt-5 text-xs font-bold uppercase tracking-wide text-brand-600">
-            <%= t("home.categories.count", count: count, formatted: number_with_delimiter(count)) %>
-          </span>
-        <% end %>
-      <% end %>
-    </div>
+    <% if @events.any? %>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <%= render partial: "home/event_card", collection: @events, as: :event %>
+      </div>
+    <% else %>
+      <p class="mt-6 rounded-2xl border border-dashed border-stone-300 px-6 py-10 text-center text-sm text-stone-500">
+        <%= t("home.events.empty") %>
+      </p>
+    <% end %>
   </div>
 </section>
+
+<%# ------------------------------------------------------------- 5. Newsletter %>
+<%= render "home/newsletter" %>
+
+<%# --------------------------------------------------- 6. Galeria de fotos (fim) %>
+<%= render "home/photo_gallery", images: @gallery_bottom,
+      title: t("home.gallery.more_title"), subtitle: t("home.gallery.more_subtitle") %>

@@ -36,9 +36,10 @@ detectors:
 
   # Controller conta ivars de todas as actions somadas, mas cada action usa só
   # as suas. AdFilter tem quatro critérios de filtro mais o scope, e o dashboard
-  # monta um painel inteiro em uma action só.
+  # e a home montam uma página inteira em uma action só — a home tem seis seções.
   TooManyInstanceVariables:
     exclude:
       - "AdFilter"
       - "AdsController"
       - "Dashboard::DashboardController"
+      - "HomeController"

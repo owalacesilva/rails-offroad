@@ -63,6 +63,18 @@ CI lives in two places doing the same work: `.semaphore/semaphore.yml` and
 `AdsController`, `SessionsController`, `RegistrationsController`. Comments, locale
 values, and spec descriptions are Portuguese; class and method names are English.
 
+The advertiser dashboard is scoped under **`/anunciante`** while its helpers stay
+`account_*` (`account_path` → `/anunciante`, `account_ads_path` → `/anunciante/anuncios`).
+`spec/requests/account_prefix_spec.rb` is the only place that asserts the literal prefix —
+everything else goes through the helpers, so without it a prefix change is invisible.
+The four institutional routes follow the same split: `/sobre-nos`, `/como-anunciar`,
+`/politica-de-privacidade` and `/termos-de-uso` map to `PagesController#about`,
+`#how_to_advertise`, `#privacy` and `#terms`.
+
+**The `POST /anunciante/anuncios` route is declared `as: nil`.** It shares its path with
+the `GET`, so without that Rails would invent an `anuncios_path` helper out of the
+Portuguese segment — a route helper in the wrong language.
+
 **Locale keys must be added to both `config/locales/pt-BR.yml` and `en-US.yml`.**
 Several request specs assert `response.body` does not include `"translation missing"`,
 so a one-sided key fails the suite.
@@ -75,8 +87,17 @@ the default. Removing `:en` from `available_locales` breaks Faker in the whole t
 
 **Taxonomy is translated, user content is not.** Category names, badge labels, and
 specification labels live in the locale files keyed by slug (`categories.veiculos-4x4.name`,
-`ads.specifications.mileage_km`). Ad titles, cities, and user names are
+`ads.specifications.mileage_km`). Ad titles, cities, event titles, and user names are
 user content: they stay literal in the database.
+
+**The institutional pages are locale data, not templates.** `pages.about`,
+`pages.how_to_advertise`, `pages.privacy` and `pages.terms` each hold a `title`, a `lead`
+and a `sections` array of `{heading, body}`; `steps`, `items`, `cta` and `updated` are
+optional and simply do not render where absent. `app/views/pages/_document.html.erb`
+assembles all four, so a new section is a YAML entry in both locale files — never ERB.
+`body` uses `\n\n` for paragraph breaks and goes through `simple_format`.
+"Last updated" comes from `PagesController::LAST_UPDATED_ON`, not from the locale, so the
+two languages cannot drift apart on the date.
 
 **Money is `DECIMAL(12,2)` in reais** (`ads.price`, `proposals.offered_value`), with `> 0`
 check constraints in the database, not just model validations. There are no `_cents`
@@ -107,6 +128,35 @@ use **explicit** i18n keys (`t("admin.sessions.create.success")`), never lazy `t
 declare `alias_attribute :password_digest, :password_hash` so `has_secure_password` finds
 it. Drop the alias and authentication breaks with a confusing missing-method error.
 
+## Front end
+
+**One theme: light.** There is no dark mode and no `dark:` variant anywhere. Both the
+`color-scheme: light` declaration in `app/assets/tailwind/application.css` and the
+`<meta name="color-scheme" content="light">` in every layout are load-bearing — without
+them a browser in dark mode repaints native controls (`select`, `input`, scrollbars) and a
+light page shows up with black fields. The dark tokens that remain are deliberate: badges
+floating **over photos** (`bg-stone-950/80`), the modal backdrop, active filter pills, and
+the home hero, which is a banner meant to hold a photograph.
+
+**Montserrat is self-hosted.** Two variable `woff2` files (latin, latin-ext) live in
+`app/assets/fonts/`; `@font-face` sits in the Tailwind entry file and Propshaft rewrites
+the relative `url()` into the digested path. Nothing is fetched from a third party — which
+is what the Privacy Policy page promises, and what makes the font work offline. Changing
+`--font-sans` in `@theme` changes the whole portal, because Tailwind's preflight pulls the
+`html` family from it.
+
+**The "Anunciar" button pulses.** `animate-pulse-slow` comes from `--animate-pulse-slow`
+plus a `@keyframes` block inside `@theme`, with a `prefers-reduced-motion` override outside
+any layer so it wins without `!important`. The button uses `transition-colors`, not
+`transition`: the animation already drives `transform`, and transitioning the same property
+on hover makes the two fight. Tailwind tree-shakes the keyframes, so the rule only appears
+in the build while some template still carries the class.
+
+**Social links come from the environment**, via `lib/social_links.rb`: `SOCIAL_INSTAGRAM_URL`,
+`SOCIAL_YOUTUBE_URL`, `SOCIAL_FACEBOOK_URL`, `SOCIAL_WHATSAPP_URL`. A network with no
+variable set disappears from the footer instead of rendering an icon that links to `#`,
+so a bare checkout shows no social row at all — that is the intended behavior, not a bug.
+
 ## Architecture
 
 ### Domain
@@ -117,6 +167,29 @@ it. Drop the alias and authentication breaks with a confusing missing-method err
 
 `Ad` also has `AdImage` (ordered photos) and, through `TechnicalSpecValue`, the EAV
 specifications described below.
+
+`Event` and `NewsletterSubscription` hang off nothing: they are portal content, not an
+advertiser's. `Event` is the home calendar (`Event.upcoming` uses
+`COALESCE(ends_on, starts_on) >= today`, so a three-day meet stays listed on its second
+day). `Event#external_url` whitelists `http(s)` before the card turns it into an `href`.
+
+### Home page section order is a requirement, not a layout choice
+
+Recent ads (12, as **two explicit rows of six**) · photo gallery · most viewed (12) ·
+upcoming events (4) · newsletter · photo gallery again. The hero with the search box sits
+above all of it; the old "Navegue por categoria" grid was removed, and categories are
+reached from the header dropdown and the footer. `spec/requests/home_spec.rb` asserts the
+order by slicing the body between section headings — reordering the view fails the suite.
+
+Both galleries are **one query sliced in two** (`HomeController#gallery_photos`), so the
+bottom one continues where the top stopped instead of repeating a photo.
+
+**"Most viewed" runs on `ads.views_count`**, a denormalized counter bumped by
+`Ad#record_view` in `AdsController#show`. It is an atomic `increment_counter`: no
+validation, no callbacks, and deliberately naive — a reload and a bot both count. Unique
+visits would need a visits table, which is exactly what the counter avoids. The ordering
+falls back to `published_at` so a freshly seeded catalog, where everyone is at zero, is not
+left in MySQL's undefined order.
 
 **A proposal has no required sender account.** `proposals.user_id` is nullable: anyone can
 send an offer without signing in, and the name/email/phone are captured on the proposal row
@@ -229,7 +302,19 @@ the cascade lives in the model, so use `destroy_all`.
 
 **Reek is a hard CI gate** (`bundle exec reek app lib`, exit 2 on any warning) and
 `.reek.yml` excludes classes *by name* — renaming a class without updating the exclude list
-turns a green build red.
+turns a green build red. `TooManyConstants` caps a class at five, which is why
+`HomeController` keeps `RECENT_ROW` and derives the twelve from it instead of holding a
+second constant.
+
+**Brakeman is a hard CI gate too**, and it exits 3 on any warning. `config/brakeman.ignore`
+holds one reviewed finding: `LinkToHref` on the event card, where the `href` is already
+scheme-whitelisted by `Event#external_url`. Brakeman flags any model attribute in a
+`link_to` href and cannot see the whitelist — hence the `note` in that file. Add to it only
+with a written justification.
+
+`spec/factories/ads.rb` draws photo URLs from a shared `:ad_photo_url` sequence, so two ads
+never share a `file_url`; the home gallery specs rely on telling one ad's photo from
+another's.
 
 `spec/system/` is empty but must keep existing: `.github/workflows/ci.yml` runs
 `bundle exec rspec spec/system` as its own job, and RSpec errors on a missing directory.

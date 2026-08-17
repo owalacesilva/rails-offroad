@@ -1,0 +1,37 @@
+<%# Mosaico de fotos dos anúncios. Locais: images, title e subtitle.
+
+    Renderizado duas vezes na home, com metades diferentes da mesma consulta
+    (ver HomeController#gallery_photos), por isso o título vem de fora: dois
+    <h2> iguais na mesma página deixariam a lista de cabeçalhos ilegível para
+    quem navega por leitor de tela. %>
+<section class="border-t border-stone-200 bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+    <%= render "home/section_heading", title: title, subtitle: subtitle, icon: :photo,
+          link_path: ads_path, link_label: t("home.gallery.see_all") %>
+
+    <% if images.any? %>
+      <ul class="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
+        <% images.each do |image| %>
+          <li>
+            <%# O nome acessível do link é o alt da foto: o título só aparece no
+                hover e não existe no toque. %>
+            <%= link_to ad_path(image.ad),
+                  class: "group relative block aspect-square overflow-hidden rounded-xl bg-stone-100 ring-1 ring-stone-200 transition hover:ring-2 hover:ring-brand-400" do %>
+              <%= image_tag image.file_url, alt: image.ad.title, loading: "lazy",
+                    class: "h-full w-full object-cover transition duration-300 group-hover:scale-105" %>
+
+              <span aria-hidden="true"
+                    class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-stone-950/85 to-transparent px-2 pb-2 pt-6 text-[11px] font-semibold leading-tight text-white opacity-0 transition group-hover:opacity-100">
+                <span class="line-clamp-2"><%= image.ad.title %></span>
+              </span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="mt-6 rounded-2xl border border-dashed border-stone-300 px-6 py-10 text-center text-sm text-stone-500">
+        <%= t("home.gallery.empty") %>
+      </p>
+    <% end %>
+  </div>
+</section>

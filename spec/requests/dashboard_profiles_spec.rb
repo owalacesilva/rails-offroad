@@ -8,7 +8,7 @@ RSpec.describe "Meu Perfil", type: :request do
 
   before { sign_in(user) }
 
-  describe "GET /minha-conta/perfil" do
+  describe "GET /anunciante/perfil" do
     it "responde com sucesso" do
       get edit_profile_path
 
@@ -22,7 +22,7 @@ RSpec.describe "Meu Perfil", type: :request do
     end
   end
 
-  describe "PATCH /minha-conta/perfil" do
+  describe "PATCH /anunciante/perfil" do
     it "salva os dados" do
       patch profile_path, params: { user: valid_attributes.merge(city: "Joinville", state: "SC") }
 

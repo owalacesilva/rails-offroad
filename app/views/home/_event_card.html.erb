@@ -1,0 +1,39 @@
+<%# Card da agenda. O evento é do organizador, não do portal: quando há site,
+    o título leva para lá em aba nova; sem site, o card é só informativo. %>
+<article class="group relative flex gap-4 rounded-2xl border border-stone-200 bg-white p-5 transition hover:-translate-y-1 hover:border-brand-400 hover:shadow-lg hover:shadow-stone-900/10">
+  <div class="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl bg-brand-500/15 text-brand-700">
+    <span class="text-xl font-extrabold leading-none"><%= l(event.starts_on, format: :event_card_day) %></span>
+    <span class="mt-1 text-[10px] font-bold uppercase tracking-wide"><%= l(event.starts_on, format: :event_card_month) %></span>
+  </div>
+
+  <div class="min-w-0 flex-1">
+    <h3 class="text-sm font-bold leading-snug text-stone-900 transition group-hover:text-brand-600">
+      <% external_url = event.external_url %>
+      <% if external_url.present? %>
+        <%# nofollow porque o portal não endossa o organizador; noopener porque
+            target="_blank" sem ele entrega window.opener para a outra página. %>
+        <%= link_to external_url, target: "_blank", rel: "noopener nofollow",
+              class: "after:absolute after:inset-0" do %>
+          <%= event.title %>
+          <span class="sr-only">(<%= t("home.events.external") %>)</span>
+        <% end %>
+      <% else %>
+        <%= event.title %>
+      <% end %>
+    </h3>
+
+    <p class="mt-1.5 text-xs font-bold text-brand-600"><%= event_dates(event) %></p>
+
+    <p class="mt-1.5 flex items-center gap-1 text-xs text-stone-500">
+      <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+      </svg>
+      <span class="truncate"><%= [ event.venue, event.location ].compact_blank.join(" · ") %></span>
+    </p>
+
+    <% if event.description.present? %>
+      <p class="mt-2 line-clamp-2 text-xs leading-relaxed text-stone-500"><%= event.description %></p>
+    <% end %>
+  </div>
+</article>

@@ -1,0 +1,88 @@
+<%# Corpo das quatro páginas institucionais. Local: page — o nome do escopo em
+    config/locales (about, how_to_advertise, privacy, terms).
+
+    O texto todo mora nos locales porque ele é o conteúdo: uma página nova ou um
+    parágrafo a mais não deveria pedir ERB. Chaves opcionais (steps, items, cta,
+    updated) simplesmente não são renderizadas quando o idioma não as define. %>
+<% scope = "pages.#{page}" %>
+<% content_for :title, "#{t("#{scope}.title")} — OffRoad Classificados" %>
+
+<header class="border-b border-stone-200 bg-stone-50">
+  <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:py-16">
+    <nav class="flex flex-wrap items-center gap-2 text-xs font-semibold text-stone-500" aria-label="Breadcrumb">
+      <%= link_to t("dashboard.breadcrumb_home"), root_path, class: "transition hover:text-brand-600" %>
+      <span aria-hidden="true">&rsaquo;</span>
+      <span class="text-brand-600"><%= t("#{scope}.title") %></span>
+    </nav>
+
+    <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+      <%= t("#{scope}.title") %>
+    </h1>
+
+    <p class="mt-4 text-base leading-relaxed text-stone-600">
+      <%= t("#{scope}.lead") %>
+    </p>
+
+    <% if t("#{scope}.updated", default: nil) %>
+      <p class="mt-6 inline-flex rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-stone-500 ring-1 ring-stone-200">
+        <%= t("pages.updated", date: l(PagesController::LAST_UPDATED_ON, format: :long)) %>
+      </p>
+    <% end %>
+  </div>
+</header>
+
+<div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:py-16">
+  <% steps = t("#{scope}.steps", default: nil) %>
+  <% if steps.present? %>
+    <ol class="mb-14 space-y-4">
+      <% steps.each_with_index do |step, index| %>
+        <li class="flex gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <span aria-hidden="true" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500 text-sm font-extrabold text-stone-950">
+            <%= index + 1 %>
+          </span>
+          <div>
+            <h2 class="text-sm font-bold text-stone-900"><%= step[:title] %></h2>
+            <p class="mt-1.5 text-sm leading-relaxed text-stone-600"><%= step[:body] %></p>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+  <% end %>
+
+  <%# space-y no lugar de margem por seção: a distância entre blocos é uma só. %>
+  <div class="space-y-10">
+    <% t("#{scope}.sections").each do |section| %>
+      <section>
+        <h2 class="text-lg font-extrabold tracking-tight text-stone-900"><%= section[:heading] %></h2>
+
+        <div class="mt-3 space-y-4 text-sm leading-relaxed text-stone-600">
+          <%= simple_format section[:body] %>
+        </div>
+
+        <% if section[:items].present? %>
+          <ul class="mt-4 space-y-2.5">
+            <% section[:items].each do |item| %>
+              <li class="flex gap-3 text-sm leading-relaxed text-stone-600">
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-brand-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                <span><%= item %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+
+  <% cta = t("#{scope}.cta", default: nil) %>
+  <% if cta.present? %>
+    <aside class="mt-14 rounded-2xl border border-brand-200 bg-brand-50 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold tracking-tight text-stone-900"><%= cta[:title] %></h2>
+      <p class="mt-2 text-sm leading-relaxed text-stone-600"><%= cta[:body] %></p>
+
+      <%= link_to cta[:label], new_account_ad_path,
+            class: "mt-5 inline-flex items-center rounded-full bg-brand-500 px-6 py-3 text-sm font-bold text-stone-950 transition hover:bg-brand-400" %>
+    </aside>
+  <% end %>
+</div>

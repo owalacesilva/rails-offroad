@@ -24,11 +24,12 @@ en-US:
         categories: "Categories"
         institutional: "Company"
         contact: "Contact"
+      # Order and targets live in ApplicationHelper#institutional_links.
       institutional:
         about: "About us"
         how_to_advertise: "How to advertise"
-        plans: "Plans and featured spots"
-        safety: "Safety tips"
+        terms: "Terms of use"
+        privacy: "Privacy policy"
       contact:
         email: "contato@offroadclassificados.com.br"
         phone: "+55 (41) 4002-8922"
@@ -150,21 +151,44 @@ en-US:
         all_categories: "All"
         placeholder: "Search vehicles, parts, services..."
         submit: "Search"
-    categories:
-      title: "Browse by category"
-      subtitle: "Pick your terrain and see what is out there right now."
-      see_all: "See all"
-      count:
-        one: "%{formatted} listing"
-        other: "%{formatted} listings"
     ads:
       title: "Recent Listings"
       subtitle: "The latest vehicles and parts published on the portal."
       see_all: "See all"
+      empty: "No listings published yet. The first one shows up here as soon as moderation approves it."
       badges:
         prepared: "Built"
         featured: "Featured"
         new_arrival: "New"
+    gallery:
+      title: "Photo gallery"
+      subtitle: "Photos from the newest listings. Click one to open the listing."
+      more_title: "More photos from the catalog"
+      more_subtitle: "Picks up where the gallery above stopped — no repeats."
+      see_all: "See all listings"
+      empty: "No photos published on the portal yet."
+    most_viewed:
+      title: "Most Viewed"
+      subtitle: "The listings pulling the most visits on the portal."
+      see_all: "See all"
+      empty: "Not enough views yet to build this list."
+      views:
+        one: "1 view"
+        other: "%{count} views"
+    events:
+      title: "Upcoming Events"
+      subtitle: "Trail rides, meetups and shows on the off-road calendar."
+      empty: "No events scheduled right now. Check back soon."
+      external: "opens the event site in a new tab"
+      date_range: "%{from} – %{to}"
+    newsletter:
+      title: "Subscribe to our Newsletter"
+      subtitle: "New listings, the trail calendar and build tips straight to your inbox. One email a week, no filler."
+      email_label: "Your email"
+      placeholder: "you@example.com"
+      submit: "Sign me up"
+      privacy_link: "Privacy Policy"
+      privacy_html: "We only use your email to send the newsletter, and you can unsubscribe any time. Read the %{policy}."
 
   ads:
     title: "Listings"
@@ -286,6 +310,145 @@ en-US:
     create:
       success: "Offer sent! The advertiser received your details by email."
 
+  newsletter:
+    create:
+      success: "You are in. The next issue of the newsletter lands in your inbox."
+      failure: "We could not subscribe that address. Check it and try again."
+
+  # Company pages. Each body is assembled by app/views/pages/_document.html.erb
+  # from the keys below: `sections` is required; `steps`, `items`, `cta` and
+  # `updated` are optional. The revision date comes from PagesController.
+  pages:
+    updated: "Last updated: %{date}"
+
+    about:
+      title: "About us"
+      lead: "OffRoad Classificados is where people who buy, sell and build off-pavement rigs find each other."
+      sections:
+        - heading: "Why the portal exists"
+          body: "Listings for 4x4s, trail bikes, UTVs and build parts never fit well on a general classifieds site. Nobody shopping for a Troller wants to scroll twenty pages of hatchbacks, and nobody selling a snorkel wants to explain what a snorkel is.\n\nOffRoad Classificados exists to fix exactly that: one place for the off-road world, with the categories, the filters and the vocabulary this crowd actually uses."
+        - heading: "What you will find here"
+          body: "The catalog is split into four categories, and every listing carries the specs that decide a purchase — drivetrain, transmission, engine, mileage, condition."
+          items:
+            - "4x4 vehicles: jeeps, pickups and utility rigs ready for the trail."
+            - "Bikes and ATVs: trail, enduro and quads in every displacement."
+            - "UTVs and side by sides: for sand, mud and speed."
+            - "Parts and accessories: suspension, tires, winches, snorkels and build gear."
+        - heading: "Every listing is moderated"
+          body: "No listing goes live on its own. Once submitted it joins a queue, and a moderator checks the title, category, price and photos before publishing.\n\nThat is slower than publishing straight away, and it is deliberate: it is what keeps duplicates, catalog photos and made-up prices out. Only approved listings appear in search."
+        - heading: "You deal directly, with nobody in between"
+          body: "The portal introduces the two sides and gets out of the way. Buyers reach the advertiser over WhatsApp or send an offer from the listing itself; price, payment, inspection and paperwork are between you.\n\nOffRoad Classificados takes no part in the deal, handles no payment and holds no money."
+      cta:
+        title: "Got something to sell?"
+        body: "Posting is free and takes a few minutes. Fill in the details, add the photos, and moderation takes it from there."
+        label: "Post a listing"
+
+    how_to_advertise:
+      title: "How to advertise"
+      lead: "From sign-up to published in five steps. Listing on the portal is free."
+      steps:
+        - title: "Create your advertiser account"
+          body: "Name (or shop name), email, WhatsApp, city and state. Your WhatsApp number becomes the contact button on every listing you post, so double-check it."
+        - title: "Pick the right category"
+          body: "4x4 vehicles, bikes and ATVs, UTVs, or parts and accessories. The category decides which filter your listing shows up in — getting it wrong is the fastest way to go unfound."
+        - title: "Describe what you are selling"
+          body: "Title with make, model and trim. In the description, cover condition, service history, what comes with it and whether you take trades. Parts do not need a year."
+        - title: "Add 3 to 10 photos"
+          body: "That is the accepted minimum and maximum. The first photo is the cover — the one that shows up in listings and in the home gallery."
+        - title: "Submit for moderation"
+          body: "A moderator reviews the listing before it is published. Until then it sits as \"In review\" in your dashboard; once approved it flips to \"Live\" and enters search."
+      sections:
+        - heading: "What makes a listing sell"
+          body: "Good listings are specific ones. Buyers know what they want and skip whatever is vague."
+          items:
+            - "A full title: \"Jeep Wrangler Rubicon 3.6 V6\" finds more people than \"awesome jeep\"."
+            - "Photos in daylight, rig cleaned, from several angles — including the flaws."
+            - "Mileage, year and condition actually filled in."
+            - "A realistic cash price: \"make me an offer\" drops you out of price-range filters."
+            - "Say whether you take trades, have an inspection report and the paperwork is clean."
+        - heading: "About the photos"
+          body: "Photos are submitted as URLs, one per line, and the order of the lines is the order in the gallery. The first is the cover.\n\nNothing is resized on our side: send images already at a good size and in landscape, which is the shape used across cards and galleries."
+        - heading: "What it costs"
+          body: "Posting is free, and there is no cap on listings per account. We take no commission on the sale — the deal happens directly between you and the buyer, off the portal."
+        - heading: "After it goes live"
+          body: "Offers you receive are collected under \"Proposals\" in your dashboard, with name, email, phone and the amount offered. Each one also reaches you by email, and you can reply straight to the buyer.\n\nIf a listing is rejected, your dashboard says so: fix what was flagged and submit it again."
+      cta:
+        title: "Ready to publish?"
+        body: "Fill in the form, add your photos and follow the review from your dashboard."
+        label: "Create my listing"
+
+    privacy:
+      title: "Privacy Policy"
+      lead: "How OffRoad Classificados collects, uses and protects your personal data."
+      updated: true
+      sections:
+        - heading: "Who handles your data"
+          body: "OffRoad Classificados is the controller of the personal data processed on this portal. For anything privacy related, write to contato@offroadclassificados.com.br."
+        - heading: "What we collect"
+          body: "We collect only what the portal needs to work."
+          items:
+            - "Advertiser account: name or shop name, email, WhatsApp, city and state."
+            - "Listings: title, description, price, year, location, photos and specs you publish yourself."
+            - "Offers: name, email, phone, amount and message from whoever sends one — account or not."
+            - "Newsletter: the email address and which page the sign-up came from."
+            - "Session: an identifier in a cookie, plus the IP address and browser used to sign in."
+        - heading: "What we use it for"
+          body: "We use your data to publish and moderate listings, authenticate your access, deliver offers to the advertiser, send the newsletter to those who asked for it, and keep the portal secure.\n\nWe do not sell personal data and do not use it for third-party advertising."
+        - heading: "Legal basis"
+          body: "Processing rests on performance of the terms of use (account, listings and offers), on consent (the newsletter, which you may withdraw at any time) and on legitimate interest (moderation, fraud prevention and security), under Brazil's General Data Protection Law (Law 13.709/2018)."
+        - heading: "What other people can see"
+          body: "Your listing is public: title, description, price, photos, city, state and your advertiser name are visible to any visitor, and the WhatsApp button uses the phone number on your account.\n\nYour email address is not shown on the listing. The details of someone sending an offer go only to the advertiser of that listing."
+        - heading: "Who we share it with"
+          body: "We share data only with the hosting provider and the email service that operate the portal, and where a legal obligation or court order applies.\n\nThe portal loads no third-party fonts, scripts or trackers: the typeface and the icons are served from our own domain, precisely so that your visit is not reported to anyone else."
+        - heading: "Cookies"
+          body: "We use a single, strictly necessary cookie to keep you signed in across pages. It is signed, marked httponly, and is not used for advertising or analytics.\n\nDeleting it ends your session; nothing else on the portal depends on it."
+        - heading: "How long we keep it"
+          body: "We keep your data for as long as your account exists. Once the account is closed we delete the personal data, retaining only what the law requires. Newsletter sign-ups are deleted as soon as you unsubscribe."
+        - heading: "Your rights"
+          body: "The LGPD gives you the right to confirm that processing exists, access your data, correct it, request anonymization, blocking or deletion, request portability, withdraw consent and object to a given processing.\n\nMost of that you can do yourself under \"My Profile\" in the advertiser dashboard. For the rest, write to contato@offroadclassificados.com.br — we answer within 15 days."
+        - heading: "Security"
+          body: "Passwords are stored only as hashes, never in plain text. The dashboard requires authentication, and the moderation area uses credentials entirely separate from advertiser ones.\n\nNo system is immune: if an incident occurs that poses a relevant risk to you, we will notify both you and Brazil's data protection authority."
+        - heading: "Changes to this policy"
+          body: "If this policy changes, we update the revision date at the top of this page. Material changes are also announced by email to account holders."
+
+    terms:
+      title: "Terms of Use"
+      lead: "The rules for using OffRoad Classificados, posting listings and sending offers."
+      updated: true
+      sections:
+        - heading: "Acceptance"
+          body: "By visiting the portal, creating an account, publishing a listing or sending an offer, you agree to these Terms and to the Privacy Policy. If you disagree with any part of them, do not use the portal."
+        - heading: "Who may use it"
+          body: "You must be 18 or older and legally capable to create an account and post listings. Browsing and sending an offer need no account, but the same legal requirements apply."
+        - heading: "Your account"
+          body: "Account details must be true and kept up to date — the phone number you provide is the contact channel shown on your listings.\n\nYour password is personal and non-transferable. You are responsible for what happens under your account; if you suspect unauthorized access, change the password and tell us."
+        - heading: "Listing rules"
+          body: "A listing is the responsibility of whoever publishes it: the information, the photos and the legality of what is for sale."
+          items:
+            - "List only what exists, is in your possession and can be sold legally."
+            - "Use real photos of the item, not catalog shots or someone else's listing."
+            - "State the cash price in reais, with no token values to game the filters."
+            - "Pick the correct category and do not repeat the same item across listings."
+            - "Do not publish other people's data or offensive, discriminatory or illegal content."
+        - heading: "Moderation"
+          body: "Every listing is reviewed before going live, and only approved ones are visible. We may reject, unpublish or request changes to any listing that breaks these Terms or the law, at any time.\n\nAn approved listing must carry 3 to 10 photos. Review is done by a person and we guarantee no turnaround time."
+        - heading: "Offers and negotiation"
+          body: "An offer sent through the portal is an expression of interest, not a contract: it obliges neither the advertiser to sell nor the sender to buy.\n\nBy sending an offer you authorize the portal to pass your name, email, phone, amount and message to the advertiser of that listing."
+        - heading: "The portal is not part of the deal"
+          body: "OffRoad Classificados is a classifieds site: it introduces the parties and takes no part in the sale. We are not sellers, brokers, custodians or guarantors.\n\nWe do not handle payment, issue invoices, inspect anything, or answer for the existence, provenance, condition, paperwork or delivery of what is listed. Arrange everything directly with the other party, and treat any request for advance payment with suspicion."
+        - heading: "Content you publish"
+          body: "You keep ownership of what you publish. By uploading text and photos you grant the portal a free, non-exclusive licence to display, resize and distribute them as part of presenting your listing, including in the portal's listings and galleries.\n\nYou warrant that you hold the rights to what you upload and are responsible for any infringement of third-party rights."
+        - heading: "The portal's intellectual property"
+          body: "The OffRoad Classificados brand, layout, company copy and code belong to the portal. Copying, bulk scraping or reproducing the catalog without authorization is prohibited."
+        - heading: "Suspension and termination"
+          body: "We may suspend or close an account that breaks these Terms, publishes illegal content or harms other users. You may close your account whenever you like — your listings come down with it."
+        - heading: "Limitation of liability"
+          body: "The portal is provided as is. We do not guarantee uninterrupted availability or freedom from defects, and we are not liable for losses arising from deals made between users.\n\nNothing here removes the rights Brazil's Consumer Protection Code grants you in respect of the portal's own service."
+        - heading: "Changes to these Terms"
+          body: "These Terms may be revised. The revision date sits at the top of this page, and material changes are announced by email to account holders. Continuing to use the portal after a change means accepting it."
+        - heading: "Governing law and contact"
+          body: "Brazilian law applies, and the consumer's home jurisdiction is the agreed venue for any dispute.\n\nQuestions about these Terms: contato@offroadclassificados.com.br."
+
   proposal_mailer:
     received:
       subject: "New offer for %{title}"
@@ -338,9 +501,20 @@ en-US:
           title: "Nothing in this queue"
           subtitle: "No listings with this status right now."
 
+  # Only the event calendar formats. default, short and long keep coming from
+  # rails-i18n: I18n merges the files rather than replacing them.
+  date:
+    formats:
+      event_day: "%B %-d"
+      event_range_day: "%b %-d"
+      event_card_day: "%-d"
+      event_card_month: "%b"
+
   activerecord:
     models:
       proposal: "Offer"
+      event: "Event"
+      newsletter_subscription: "Newsletter subscription"
       ad: "Listing"
       ad_image: "Listing photo"
       user: "Advertiser"
@@ -380,9 +554,25 @@ en-US:
         name: "Name"
         data_type: "Data type"
         is_required: "Required"
+      event:
+        title: "Title"
+        description: "Description"
+        starts_on: "Starts on"
+        ends_on: "Ends on"
+        city: "City"
+        state: "State"
+        venue: "Venue"
+        url: "Event site"
+        image_url: "Image"
+      newsletter_subscription:
+        email: "Email"
     errors:
       models:
         ad:
           attributes:
             ad_images:
               invalid_count: "must be between %{min} and %{max}"
+        event:
+          attributes:
+            ends_on:
+              before_start: "cannot be earlier than the start date"

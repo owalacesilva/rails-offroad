@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_120003) do
   create_table "ad_images", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "ad_id", limit: 36, null: false
     t.datetime "created_at", null: false
@@ -54,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.string "user_id", limit: 36, null: false
+    t.integer "views_count", default: 0, null: false
     t.integer "year"
     t.index ["admin_id"], name: "index_ads_on_admin_id"
     t.index ["category_id"], name: "index_ads_on_category_id"
@@ -62,9 +63,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.index ["state", "city"], name: "index_ads_on_state_and_city"
     t.index ["status"], name: "index_ads_on_status"
     t.index ["user_id"], name: "index_ads_on_user_id"
+    t.index ["views_count"], name: "index_ads_on_views_count"
     t.index ["year"], name: "index_ads_on_year"
     t.check_constraint "`price` > 0", name: "ads_price_positive"
     t.check_constraint "`status` in (_utf8mb4'draft',_utf8mb4'pending',_utf8mb4'approved',_utf8mb4'rejected')", name: "ads_status_valid"
+    t.check_constraint "`views_count` >= 0", name: "ads_views_count_not_negative"
   end
 
   create_table "attributes", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -86,6 +89,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140010) do
     t.datetime "updated_at", null: false
     t.index ["position"], name: "index_categories_on_position"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "events", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "city", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.date "ends_on"
+    t.string "image_url"
+    t.date "starts_on", null: false
+    t.string "state", limit: 2, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.string "venue"
+    t.index ["starts_on"], name: "index_events_on_starts_on"
+    t.index ["state", "city"], name: "index_events_on_state_and_city"
+    t.check_constraint "(`ends_on` is null) or (`ends_on` >= `starts_on`)", name: "events_dates_ordered"
+    t.check_constraint "`state` in (_utf8mb4'AC',_utf8mb4'AL',_utf8mb4'AP',_utf8mb4'AM',_utf8mb4'BA',_utf8mb4'CE',_utf8mb4'DF',_utf8mb4'ES',_utf8mb4'GO',_utf8mb4'MA',_utf8mb4'MT',_utf8mb4'MS',_utf8mb4'MG',_utf8mb4'PA',_utf8mb4'PB',_utf8mb4'PR',_utf8mb4'PE',_utf8mb4'PI',_utf8mb4'RJ',_utf8mb4'RN',_utf8mb4'RS',_utf8mb4'RO',_utf8mb4'RR',_utf8mb4'SC',_utf8mb4'SP',_utf8mb4'SE',_utf8mb4'TO')", name: "events_state_valid"
+  end
+
+  create_table "newsletter_subscriptions", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "source"
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_newsletter_subscriptions_on_email", unique: true
   end
 
   create_table "proposals", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

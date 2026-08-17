@@ -1,18 +1,21 @@
-<%# Card de anúncio, compartilhado entre a home e a listagem. %>
-<article class="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-800 bg-stone-900 transition hover:-translate-y-1 hover:border-brand-500/60">
-  <div class="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-stone-700 via-stone-800 to-stone-900">
+<%# Card de anúncio, compartilhado entre a página do anúncio e a listagem.
+    A home tem o seu, menor, em home/_ad_card. %>
+<article class="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white transition hover:-translate-y-1 hover:border-brand-400 hover:shadow-lg hover:shadow-stone-900/10">
+  <div class="relative aspect-[4/3] overflow-hidden bg-stone-100">
     <% cover = ad.ad_images.first %>
     <% if cover.present? %>
       <%= image_tag cover.file_url, alt: ad.title, loading: "lazy",
             class: "h-full w-full object-cover transition duration-300 group-hover:scale-105" %>
     <% else %>
       <div class="flex h-full w-full items-center justify-center">
-        <svg class="h-10 w-10 text-stone-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+        <svg class="h-10 w-10 text-stone-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
         </svg>
       </div>
     <% end %>
 
+    <%# As etiquetas ficam escuras mesmo no tema claro: elas flutuam sobre a
+        foto, e é do contraste com ela que precisam. %>
     <span class="absolute left-3 top-3 rounded-full bg-stone-950/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-200 backdrop-blur">
       <%= ad.category.name %>
     </span>
@@ -25,13 +28,13 @@
   </div>
 
   <div class="flex flex-1 flex-col p-5">
-    <h3 class="text-sm font-bold leading-snug text-white transition group-hover:text-brand-300">
+    <h3 class="text-sm font-bold leading-snug text-stone-900 transition group-hover:text-brand-600">
       <%# after:inset-0 estende a área clicável para o card inteiro sem repetir o link. %>
       <%= link_to ad.title, ad_path(ad), class: "after:absolute after:inset-0" %>
     </h3>
 
     <% if ad.year.present? %>
-      <p class="mt-2 flex items-center gap-1.5 text-xs text-stone-400">
+      <p class="mt-2 flex items-center gap-1.5 text-xs text-stone-500">
         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
         </svg>
@@ -39,12 +42,12 @@
       </p>
     <% end %>
 
-    <p class="mt-4 text-xl font-extrabold tracking-tight text-white">
+    <p class="mt-4 text-xl font-extrabold tracking-tight text-brand-600">
       <%= ad_price(ad.price) %>
     </p>
 
-    <p class="mt-auto flex items-center gap-1.5 pt-4 text-xs text-stone-400">
-      <svg class="h-3.5 w-3.5 shrink-0 text-brand-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+    <p class="mt-auto flex items-center gap-1.5 pt-4 text-xs text-stone-500">
+      <svg class="h-3.5 w-3.5 shrink-0 text-brand-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
       </svg>

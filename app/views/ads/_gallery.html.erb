@@ -1,6 +1,6 @@
 <%# Galeria a partir de ad_images: URL e ordem vêm da tabela, sem variantes. %>
 <div data-controller="gallery">
-  <div class="relative aspect-[4/3] overflow-hidden rounded-2xl border border-stone-800 bg-gradient-to-br from-stone-700 via-stone-800 to-stone-900">
+  <div class="relative aspect-[4/3] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
     <% images = ad.ad_images.to_a %>
     <% if images.any? %>
       <%= image_tag images.first.file_url,
@@ -9,13 +9,14 @@
             class: "h-full w-full object-cover" %>
     <% else %>
       <div class="flex h-full w-full flex-col items-center justify-center gap-3">
-        <svg class="h-12 w-12 text-stone-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+        <svg class="h-12 w-12 text-stone-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
         </svg>
         <p class="text-xs text-stone-500"><%= t("ads.show.gallery.empty") %></p>
       </div>
     <% end %>
 
+    <%# Escuras de propósito: flutuam sobre a foto e é dela que precisam se destacar. %>
     <span class="absolute left-4 top-4 rounded-full bg-stone-950/80 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-stone-200 backdrop-blur">
       <%= ad.category.name %>
     </span>
@@ -37,7 +38,7 @@
                 data-gallery-url-param="<%= image.file_url %>"
                 data-gallery-alt-param="<%= alt %>"
                 aria-current="<%= index.zero? %>"
-                class="aspect-[4/3] overflow-hidden rounded-lg ring-2 transition <%= index.zero? ? "ring-brand-500" : "ring-stone-700" %> hover:ring-brand-400">
+                class="aspect-[4/3] cursor-pointer overflow-hidden rounded-lg ring-2 transition <%= index.zero? ? "ring-brand-500" : "ring-stone-200" %> hover:ring-brand-400">
           <%= image_tag image.file_url, alt: alt, class: "h-full w-full object-cover" %>
         </button>
       <% end %>

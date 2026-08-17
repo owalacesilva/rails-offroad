@@ -1,7 +1,46 @@
 @import "tailwindcss";
 
-/* Paleta da marca: âmbar/ferrugem sobre neutros escuros (terra batida). */
+/* ------------------------------------------------------------------ Fontes
+   Montserrat servida pelo próprio portal: os arquivos vivem em
+   app/assets/fonts e o Propshaft reescreve as URLs abaixo para o caminho com
+   digest. Nenhuma requisição sai para um CDN de terceiros — é o que a Política
+   de Privacidade promete, e é o que faz a fonte carregar sem internet.
+
+   Um arquivo variável por subconjunto, com o intervalo 400..800 na mesma face:
+   a interface vai de font-normal a font-extrabold e assim baixa dois arquivos
+   em vez de dez. O unicode-range é o do próprio Google Fonts; sem ele o
+   navegador baixaria o latin-ext para qualquer página. */
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("montserrat-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("montserrat-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @theme {
+  /* Preflight do Tailwind puxa a família do html daqui, então trocar --font-sans
+     troca a fonte do portal inteiro. As famílias seguintes são o fallback
+     enquanto o woff2 não chega (font-display: swap). */
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji";
+
+  /* Paleta da marca: âmbar/ferrugem sobre neutros claros (terra batida). */
   --color-brand-50: #fff8eb;
   --color-brand-100: #ffedc6;
   --color-brand-200: #ffd888;
@@ -13,4 +52,43 @@
   --color-brand-800: #942e0c;
   --color-brand-900: #7a270d;
   --color-brand-950: #461102;
+
+  /* Pulso do botão "Anunciar". Lento de propósito: o ciclo longo chama o olho
+     sem competir com a leitura, e o anel cresce para fora em vez de piscar a
+     opacidade do rótulo, que deixaria o texto ilegível na metade do ciclo. */
+  --animate-pulse-slow: pulse-slow 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes pulse-slow {
+    0% {
+      box-shadow: 0 0 0 0 rgba(249, 128, 7, 0.55);
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.045);
+    }
+    70% {
+      box-shadow: 0 0 0 0.75rem rgba(249, 128, 7, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(249, 128, 7, 0);
+      transform: scale(1);
+    }
+  }
+}
+
+@layer base {
+  /* O portal tem um tema só. Sem isto o navegador em modo escuro repinta por
+     conta própria os controles nativos (select, input, scrollbar) e a página
+     clara aparece com campos pretos. */
+  :root {
+    color-scheme: light;
+  }
+}
+
+/* Movimento é decoração aqui: quem pede menos animação continua vendo o botão,
+   parado. Fora do @layer para ganhar da utilitária sem precisar de !important. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-slow {
+    animation: none;
+  }
 }

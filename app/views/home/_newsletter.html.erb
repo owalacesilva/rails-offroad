@@ -1,0 +1,40 @@
+<%# Assine a newsletter. scroll-mt-24 compensa o header fixo: sem isso a âncora
+    #newsletter, para onde a controller redireciona, pararia atrás dele. %>
+<section id="newsletter" class="scroll-mt-24 border-y border-brand-200 bg-brand-50">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+    <div class="grid items-center gap-8 lg:grid-cols-2">
+      <div>
+        <h2 class="flex items-center gap-3 text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white">
+            <%= home_section_icon(:envelope) %>
+          </span>
+          <%= t("home.newsletter.title") %>
+        </h2>
+        <p class="mt-3 max-w-lg text-sm leading-relaxed text-stone-600">
+          <%= t("home.newsletter.subtitle") %>
+        </p>
+      </div>
+
+      <%= form_with url: newsletter_subscription_path, method: :post do %>
+        <%= hidden_field_tag :source, "home" %>
+
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <%= label_tag :email, t("home.newsletter.email_label"), class: "sr-only" %>
+          <%= email_field_tag :email, nil, required: true, autocomplete: "email",
+                placeholder: t("home.newsletter.placeholder"),
+                class: "min-w-0 flex-1 rounded-full border border-stone-300 bg-white px-5 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+
+          <button type="submit" class="shrink-0 rounded-full bg-brand-500 px-7 py-3 text-sm font-bold text-stone-950 transition hover:bg-brand-400">
+            <%= t("home.newsletter.submit") %>
+          </button>
+        </div>
+
+        <p class="mt-3 text-xs leading-relaxed text-stone-500">
+          <%= t("home.newsletter.privacy_html",
+                policy: link_to(t("home.newsletter.privacy_link"), privacy_policy_path,
+                                class: "font-semibold text-brand-700 underline underline-offset-2")) %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+</section>

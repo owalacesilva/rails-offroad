@@ -1,0 +1,104 @@
+require "rails_helper"
+
+RSpec.describe Event, type: :model do
+  subject { build(:event) }
+
+  it { is_expected.to validate_presence_of(:title) }
+  it { is_expected.to validate_presence_of(:city) }
+  it { is_expected.to validate_presence_of(:starts_on) }
+  it { is_expected.to validate_inclusion_of(:state).in_array(User::BRAZILIAN_STATES) }
+
+  describe "intervalo de datas" do
+    it "aceita evento de um dia, sem término" do
+      expect(build(:event, ends_on: nil)).to be_valid
+    end
+
+    it "recusa término anterior ao início" do
+      event = build(:event, starts_on: Date.current, ends_on: Date.current - 1.day)
+
+      expect(event).not_to be_valid
+      expect(event.errors[:ends_on]).to include(I18n.t("activerecord.errors.models.event.attributes.ends_on.before_start"))
+    end
+
+    it "a mesma regra vale no banco, não só no modelo" do
+      event = build(:event, starts_on: Date.current, ends_on: Date.current - 1.day)
+
+      expect { event.save!(validate: false) }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+  end
+
+  describe ".upcoming" do
+    it "traz o que ainda vai começar" do
+      event = create(:event)
+
+      expect(described_class.upcoming).to include(event)
+    end
+
+    it "deixa de fora o que já passou" do
+      expect(described_class.upcoming).not_to include(create(:event, :past))
+    end
+
+    # Encontro de três dias continua sendo notícia no segundo dia.
+    it "mantém o que já começou e ainda não terminou" do
+      expect(described_class.upcoming).to include(create(:event, :ongoing))
+    end
+
+    it "ordena do mais próximo para o mais distante" do
+      later = create(:event, starts_on: 30.days.from_now.to_date)
+      sooner = create(:event, starts_on: 5.days.from_now.to_date)
+
+      expect(described_class.upcoming).to eq([ sooner, later ])
+    end
+  end
+
+  describe "#single_day?" do
+    it "é verdadeiro sem data de término" do
+      expect(build(:event, ends_on: nil)).to be_single_day
+    end
+
+    it "é verdadeiro quando começa e termina no mesmo dia" do
+      expect(build(:event, ends_on: Date.current, starts_on: Date.current)).to be_single_day
+    end
+
+    it "é falso quando dura mais de um dia" do
+      expect(build(:event, :multi_day)).not_to be_single_day
+    end
+  end
+
+  # O card da agenda transforma o endereço num href: esquema fora de http(s)
+  # não pode chegar lá.
+  describe "site do evento" do
+    it "aceita http e https" do
+      expect(build(:event, url: "https://exemplo.com.br/evento")).to be_valid
+    end
+
+    it "aceita evento sem site" do
+      expect(build(:event, url: nil)).to be_valid
+    end
+
+    it "recusa outro esquema" do
+      expect(build(:event, url: "javascript:alert(1)")).not_to be_valid
+    end
+
+    describe "#external_url" do
+      it "devolve a URL quando ela é http(s)" do
+        expect(build(:event, :with_url).external_url).to eq("https://exemplo.com.br/evento")
+      end
+
+      # Segunda barreira: vale mesmo para linha gravada direto por SQL.
+      it "devolve nil para qualquer outro esquema" do
+        expect(build(:event, url: "javascript:alert(1)").external_url).to be_nil
+      end
+
+      it "devolve nil quando não há site" do
+        expect(build(:event, url: nil).external_url).to be_nil
+      end
+    end
+  end
+
+  describe "#location" do
+    it "junta cidade e UF" do
+      expect(build(:event, city: "Cuiabá", state: "MT").location).to eq("Cuiabá, MT")
+    end
+  end
+end

@@ -13,6 +13,10 @@ class AdsController < ApplicationController
             .find(params[:id])
     @related = @ad.related
     @proposal = @ad.proposals.new
+
+    # Depois de carregar: o contador alimenta a régua "Mais Vistos" da home e
+    # não pode custar uma consulta a mais na renderização desta página.
+    @ad.record_view
   end
 
   private

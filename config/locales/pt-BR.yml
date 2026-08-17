@@ -28,11 +28,12 @@ pt-BR:
         categories: "Categorias"
         institutional: "Institucional"
         contact: "Contato"
+      # A ordem e os destinos ficam em ApplicationHelper#institutional_links.
       institutional:
         about: "Sobre nós"
         how_to_advertise: "Como anunciar"
-        plans: "Planos e destaques"
-        safety: "Dicas de segurança"
+        terms: "Termos de uso"
+        privacy: "Política de privacidade"
       contact:
         email: "contato@offroadclassificados.com.br"
         phone: "(41) 4002-8922"
@@ -154,21 +155,44 @@ pt-BR:
         all_categories: "Todas"
         placeholder: "Buscar veículos, peças, serviços..."
         submit: "Buscar"
-    categories:
-      title: "Navegue por categoria"
-      subtitle: "Escolha o terreno e veja o que está rolando agora."
-      see_all: "Ver todos"
-      count:
-        one: "%{formatted} anúncio"
-        other: "%{formatted} anúncios"
     ads:
       title: "Anúncios Recentes"
       subtitle: "Os últimos veículos e peças publicados no portal."
       see_all: "Ver todos"
+      empty: "Nenhum anúncio publicado ainda. Assim que a moderação aprovar o primeiro, ele aparece aqui."
       badges:
         prepared: "Preparado"
         featured: "Destaque"
         new_arrival: "Novo"
+    gallery:
+      title: "Galeria de fotos"
+      subtitle: "As fotos dos anúncios mais recentes. Clique para ir direto ao anúncio."
+      more_title: "Mais fotos do acervo"
+      more_subtitle: "Continua de onde a galeria de cima parou — sem repetir foto."
+      see_all: "Ver todos os anúncios"
+      empty: "Ainda não há fotos publicadas no portal."
+    most_viewed:
+      title: "Mais Vistos"
+      subtitle: "Os anúncios que mais receberam visitas no portal."
+      see_all: "Ver todos"
+      empty: "Ainda não há visualizações suficientes para montar esta lista."
+      views:
+        one: "1 visualização"
+        other: "%{count} visualizações"
+    events:
+      title: "Próximos Eventos"
+      subtitle: "Trilhas, encontros e feiras do calendário off-road."
+      empty: "Nenhum evento marcado no momento. Volte em breve."
+      external: "abre o site do evento em nova aba"
+      date_range: "%{from} a %{to}"
+    newsletter:
+      title: "Assine nossa Newsletter"
+      subtitle: "Receba os anúncios novos, a agenda de trilhas e as dicas de preparação direto no seu e-mail. Um envio por semana, sem enrolação."
+      email_label: "Seu e-mail"
+      placeholder: "seu@email.com.br"
+      submit: "Quero receber"
+      privacy_link: "Política de Privacidade"
+      privacy_html: "Só usamos seu e-mail para enviar a newsletter, e você pode cancelar quando quiser. Veja a %{policy}."
 
   ads:
     title: "Anúncios"
@@ -290,6 +314,146 @@ pt-BR:
     create:
       success: "Proposta enviada! O anunciante recebeu seus dados por e-mail."
 
+  newsletter:
+    create:
+      success: "Pronto! Você vai receber a próxima edição da newsletter."
+      failure: "Não foi possível inscrever este e-mail. Confira o endereço e tente de novo."
+
+  # Páginas institucionais. O corpo de cada uma é montado por
+  # app/views/pages/_document.html.erb a partir das chaves abaixo: `sections` é
+  # obrigatória; `steps`, `items`, `cta` e `updated` são opcionais e só aparecem
+  # onde existem. A data de "Última atualização" vem de PagesController.
+  pages:
+    updated: "Última atualização: %{date}"
+
+    about:
+      title: "Sobre nós"
+      lead: "O OffRoad Classificados é o ponto de encontro de quem compra, vende e prepara veículo para sair do asfalto."
+      sections:
+        - heading: "Por que o portal existe"
+          body: "Anúncio de 4x4, moto de trilha, UTV e peça de preparação sempre coube mal em classificado genérico. Quem procura um Troller não quer rolar vinte páginas de hatch, e quem vende um snorkel precisa falar com alguém que saiba o que é um snorkel.\n\nO OffRoad Classificados nasceu para resolver exatamente isso: um lugar só do mundo fora de estrada, com as categorias, os filtros e o vocabulário que essa turma usa."
+        - heading: "O que você encontra aqui"
+          body: "O acervo é dividido em quatro categorias, e cada anúncio traz as especificações que importam na hora de decidir — tração, câmbio, motor, quilometragem, estado de conservação."
+          items:
+            - "Veículos 4x4: jipes, picapes e utilitários prontos para a trilha."
+            - "Motos e quadriciclos: trail, enduro e quadris de todas as cilindradas."
+            - "UTVs e side by side: para areia, lama e velocidade."
+            - "Peças e acessórios: suspensão, pneus, guinchos, snorkel e preparação."
+        - heading: "Todo anúncio passa por moderação"
+          body: "Nenhum anúncio vai ao ar sozinho. Depois de enviado, ele entra numa fila e um moderador confere título, categoria, preço e fotos antes de publicar.\n\nÉ mais lento do que publicar direto, e é de propósito: é o que segura anúncio duplicado, foto de catálogo e preço que não existe. Só o que foi aprovado aparece na busca."
+        - heading: "Negociação direta, sem intermediário"
+          body: "O portal aproxima as duas pontas e sai da frente. O interessado fala com o anunciante pelo WhatsApp ou manda uma proposta pelo próprio anúncio; o combinado de preço, pagamento, vistoria e transferência é entre vocês.\n\nO OffRoad Classificados não participa da negociação, não intermedia pagamento e não guarda valores."
+      cta:
+        title: "Tem algo para vender?"
+        body: "Publicar é de graça e leva poucos minutos. Você preenche os dados, envia as fotos e a moderação avalia."
+        label: "Anunciar agora"
+
+    how_to_advertise:
+      title: "Como anunciar"
+      lead: "Do cadastro à publicação em cinco passos. Anunciar no portal é gratuito."
+      steps:
+        - title: "Crie sua conta de anunciante"
+          body: "Nome (ou nome da loja), e-mail, WhatsApp, cidade e estado. O WhatsApp é o que vira o botão de contato do seu anúncio, então confira o número."
+        - title: "Escolha a categoria certa"
+          body: "Veículos 4x4, motos e quadriciclos, UTVs ou peças e acessórios. A categoria decide em qual filtro seu anúncio aparece — errar aqui é o jeito mais rápido de não ser encontrado."
+        - title: "Descreva o que está vendendo"
+          body: "Título com marca, modelo e versão. Na descrição, conte o estado de conservação, as manutenções feitas, o que acompanha e se aceita troca. Peça não precisa de ano."
+        - title: "Envie de 3 a 10 fotos"
+          body: "É o mínimo e o máximo aceitos. A primeira foto é a capa, a que aparece nas listagens e na galeria da home."
+        - title: "Envie para moderação"
+          body: "Um moderador avalia o anúncio antes de publicar. Enquanto isso ele fica como \"Em análise\" no seu painel; quando é aprovado, passa a \"Publicado\" e entra na busca."
+      sections:
+        - heading: "O que faz um anúncio vender"
+          body: "Anúncio bom é anúncio específico. Quem procura sabe o que quer e desiste do que está vago."
+          items:
+            - "Título completo: \"Jeep Wrangler Rubicon 3.6 V6\" acha mais gente do que \"Jipe top\"."
+            - "Fotos com luz do dia, veículo limpo e de vários ângulos, inclusive o que tem defeito."
+            - "Quilometragem, ano e estado de conservação preenchidos de verdade."
+            - "Preço à vista realista: valor \"a combinar\" some dos filtros por faixa de preço."
+            - "Diga se aceita troca, se tem laudo e se a documentação está em dia."
+        - heading: "Sobre as fotos"
+          body: "As fotos são enviadas por URL, uma por linha, e a ordem das linhas é a ordem que aparece na galeria. A primeira é a capa.\n\nNão redimensionamos nada: mande imagens já em bom tamanho e na horizontal, que é o formato usado nos cards e na galeria."
+        - heading: "Quanto custa"
+          body: "Publicar anúncio é gratuito, e não há limite de anúncios por conta. Não cobramos comissão sobre a venda — a negociação acontece direto entre você e o comprador, fora do portal."
+        - heading: "Depois de publicado"
+          body: "As propostas recebidas ficam reunidas em \"Propostas\" no seu painel, com nome, e-mail, telefone e valor oferecido. Você também recebe cada uma por e-mail e pode responder direto para o interessado.\n\nSe o anúncio for rejeitado, o painel mostra a situação: ajuste o que foi apontado e envie de novo."
+      cta:
+        title: "Pronto para publicar?"
+        body: "Preencha o formulário, envie as fotos e acompanhe a avaliação pelo seu painel."
+        label: "Criar meu anúncio"
+
+    privacy:
+      title: "Política de Privacidade"
+      lead: "Como o OffRoad Classificados coleta, usa e protege os seus dados pessoais."
+      updated: true
+      sections:
+        - heading: "Quem trata os seus dados"
+          body: "O responsável pelo tratamento dos dados pessoais deste portal é o OffRoad Classificados. Para qualquer assunto relacionado a privacidade, escreva para contato@offroadclassificados.com.br."
+        - heading: "Que dados coletamos"
+          body: "Coletamos apenas o necessário para o portal funcionar."
+          items:
+            - "Cadastro de anunciante: nome ou nome da loja, e-mail, WhatsApp, cidade e estado."
+            - "Anúncios: título, descrição, preço, ano, localização, fotos e especificações que você mesmo publica."
+            - "Propostas: nome, e-mail, telefone, valor oferecido e mensagem de quem envia — mesmo sem conta no portal."
+            - "Newsletter: apenas o e-mail e a página de onde veio a inscrição."
+            - "Sessão: um identificador em cookie, além do endereço IP e do navegador usados no acesso."
+        - heading: "Para que usamos"
+          body: "Usamos os dados para publicar e moderar anúncios, autenticar o seu acesso, entregar ao anunciante as propostas recebidas, enviar a newsletter para quem pediu e manter a segurança do portal.\n\nNão vendemos dados pessoais e não os usamos para publicidade de terceiros."
+        - heading: "Base legal"
+          body: "O tratamento se apoia na execução do contrato de uso do portal (cadastro, anúncios e propostas), no consentimento (newsletter, que você pode retirar a qualquer momento) e no legítimo interesse (moderação, prevenção a fraude e segurança), nos termos da Lei Geral de Proteção de Dados (Lei 13.709/2018)."
+        - heading: "O que fica visível para outras pessoas"
+          body: "O conteúdo do seu anúncio é público: título, descrição, preço, fotos, cidade, estado e o seu nome de anunciante aparecem para qualquer visitante, e o botão de WhatsApp usa o telefone do seu cadastro.\n\nSeu e-mail não é exibido no anúncio. Os dados de quem envia uma proposta são entregues apenas ao anunciante daquele anúncio."
+        - heading: "Com quem compartilhamos"
+          body: "Compartilhamos dados apenas com o provedor de hospedagem e com o serviço de envio de e-mail que operam o portal, e quando houver obrigação legal ou ordem judicial.\n\nO portal não carrega fontes, scripts ou rastreadores de terceiros: a tipografia e os ícones são servidos pelo próprio domínio, justamente para que a sua visita não seja informada a mais ninguém."
+        - heading: "Cookies"
+          body: "Usamos um único cookie, estritamente necessário, para manter você autenticado entre as páginas. Ele é assinado, marcado como httponly e não é usado para publicidade nem para medir audiência.\n\nApagar esse cookie encerra a sessão; nenhum outro recurso do portal depende dele."
+        - heading: "Por quanto tempo guardamos"
+          body: "Mantemos os dados enquanto a sua conta existir. Encerrada a conta, removemos os dados pessoais, preservando apenas o que a lei exigir. Inscrições na newsletter são apagadas assim que você cancela."
+        - heading: "Seus direitos"
+          body: "A LGPD garante a você confirmar a existência de tratamento, acessar seus dados, corrigi-los, pedir anonimização, bloqueio ou eliminação, solicitar a portabilidade, revogar o consentimento e se opor a um tratamento.\n\nBoa parte disso você resolve sozinho em \"Meu Perfil\", no painel do anunciante. Para o restante, escreva para contato@offroadclassificados.com.br — respondemos em até 15 dias."
+        - heading: "Segurança"
+          body: "As senhas são guardadas apenas como hash, nunca em texto puro. O acesso ao painel exige autenticação e a área de moderação usa credenciais separadas das de anunciante.\n\nNenhum sistema é imune: se ocorrer um incidente que traga risco relevante a você, avisaremos você e a Autoridade Nacional de Proteção de Dados."
+        - heading: "Mudanças nesta política"
+          body: "Se esta política mudar, atualizamos a data de revisão no topo desta página. Mudanças relevantes são avisadas também por e-mail a quem tem cadastro."
+
+    terms:
+      title: "Termos de Uso"
+      lead: "As regras para usar o OffRoad Classificados, anunciar e enviar propostas."
+      updated: true
+      sections:
+        - heading: "Aceitação"
+          body: "Ao acessar o portal, criar uma conta, publicar um anúncio ou enviar uma proposta, você concorda com estes Termos e com a Política de Privacidade. Se não concordar com algum ponto, não use o portal."
+        - heading: "Quem pode usar"
+          body: "É preciso ter 18 anos ou mais e capacidade civil para criar conta e anunciar. Navegar e enviar proposta não exige cadastro, mas exige os mesmos requisitos legais."
+        - heading: "Sua conta"
+          body: "Os dados do cadastro devem ser verdadeiros e mantidos atualizados — o telefone informado é o canal de contato exibido nos seus anúncios.\n\nA senha é pessoal e intransferível. Você responde pelo que acontece na sua conta; se suspeitar de acesso indevido, troque a senha e avise a gente."
+        - heading: "Regras do anúncio"
+          body: "O anúncio é de responsabilidade de quem publica: as informações, as fotos e a legalidade do que está à venda."
+          items:
+            - "Anuncie apenas o que existe, está em sua posse e pode ser vendido legalmente."
+            - "Use fotos reais do item, não imagens de catálogo ou de outro anúncio."
+            - "Informe o preço à vista em reais, sem valores simbólicos para burlar filtros."
+            - "Escolha a categoria correta e não repita o mesmo item em vários anúncios."
+            - "Não publique dados de terceiros nem conteúdo ofensivo, discriminatório ou ilegal."
+        - heading: "Moderação"
+          body: "Todo anúncio passa por avaliação antes de ir ao ar e só o aprovado fica visível. Podemos rejeitar, despublicar ou pedir ajuste em qualquer anúncio que descumpra estes Termos ou a lei, a qualquer momento.\n\nAnúncio aprovado precisa ter de 3 a 10 fotos. A avaliação é humana e não temos prazo garantido de resposta."
+        - heading: "Propostas e negociação"
+          body: "A proposta enviada pelo portal é uma manifestação de interesse, não um contrato: ela não obriga o anunciante a vender nem o interessado a comprar.\n\nAo enviar uma proposta, você autoriza o portal a repassar nome, e-mail, telefone, valor e mensagem ao anunciante daquele anúncio."
+        - heading: "O portal não é parte da negociação"
+          body: "O OffRoad Classificados é um classificado: aproxima as partes e não participa da compra e venda. Não somos vendedores, corretores, depositários nem garantidores.\n\nNão intermediamos pagamento, não emitimos nota, não fazemos vistoria e não respondemos pela existência, procedência, estado, documentação ou entrega do que é anunciado. Combine tudo diretamente com a outra parte e desconfie de qualquer pedido de pagamento antecipado."
+        - heading: "Conteúdo que você publica"
+          body: "Você continua dono do que publica. Ao enviar textos e fotos, você concede ao portal uma licença gratuita e não exclusiva para exibi-los, redimensioná-los e divulgá-los na apresentação do seu anúncio, inclusive nas listagens e galerias do portal.\n\nVocê garante ter os direitos sobre o que envia e responde por eventual violação de direito de terceiros."
+        - heading: "Propriedade intelectual do portal"
+          body: "A marca, o layout, os textos institucionais e o código do OffRoad Classificados pertencem ao portal. Copiar, raspar em massa ou reproduzir o acervo sem autorização é proibido."
+        - heading: "Suspensão e encerramento"
+          body: "Podemos suspender ou encerrar uma conta que descumpra estes Termos, publique conteúdo ilegal ou prejudique outros usuários. Você pode encerrar a sua conta quando quiser — os anúncios saem do ar junto."
+        - heading: "Limitação de responsabilidade"
+          body: "O portal é oferecido no estado em que se encontra. Não garantimos disponibilidade ininterrupta nem ausência de falhas, e não respondemos por prejuízos decorrentes de negociações realizadas entre usuários.\n\nNada aqui afasta os direitos que o Código de Defesa do Consumidor assegura a você em relação ao serviço do próprio portal."
+        - heading: "Alterações destes Termos"
+          body: "Estes Termos podem ser revisados. A data de revisão fica no topo desta página, e mudanças relevantes são comunicadas por e-mail a quem tem cadastro. Continuar usando o portal depois da mudança significa aceitá-la."
+        - heading: "Lei aplicável e contato"
+          body: "Aplica-se a lei brasileira, e fica eleito o foro do domicílio do consumidor para resolver qualquer controvérsia.\n\nDúvidas sobre estes Termos: contato@offroadclassificados.com.br."
+
   proposal_mailer:
     received:
       subject: "Nova proposta para %{title}"
@@ -342,9 +506,22 @@ pt-BR:
           title: "Nada nesta fila"
           subtitle: "Nenhum anúncio com esta situação no momento."
 
+  # Só os formatos da agenda de eventos. default, short e long continuam vindo
+  # da gem rails-i18n: o I18n mescla os dois arquivos em vez de substituir.
+  date:
+    formats:
+      event_day: "%-d de %B"
+      # Intervalo sai numérico dos dois lados ("12/09 a 14/09"): é curto e não
+      # depende da ordem das palavras, que muda de idioma para idioma.
+      event_range_day: "%-d/%m"
+      event_card_day: "%-d"
+      event_card_month: "%b"
+
   activerecord:
     models:
       proposal: "Proposta"
+      event: "Evento"
+      newsletter_subscription: "Inscrição na newsletter"
       ad: "Anúncio"
       ad_image: "Foto do anúncio"
       user: "Anunciante"
@@ -384,9 +561,25 @@ pt-BR:
         name: "Nome"
         data_type: "Tipo de dado"
         is_required: "Obrigatório"
+      event:
+        title: "Título"
+        description: "Descrição"
+        starts_on: "Início"
+        ends_on: "Término"
+        city: "Cidade"
+        state: "UF"
+        venue: "Local"
+        url: "Site do evento"
+        image_url: "Imagem"
+      newsletter_subscription:
+        email: "E-mail"
     errors:
       models:
         ad:
           attributes:
             ad_images:
               invalid_count: "devem ser entre %{min} e %{max}"
+        event:
+          attributes:
+            ends_on:
+              before_start: "não pode ser anterior à data de início"

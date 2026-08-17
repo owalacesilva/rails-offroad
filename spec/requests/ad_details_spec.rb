@@ -26,6 +26,11 @@ RSpec.describe "Detalhe do anúncio", type: :request do
       expect(response.body).not_to include("translation missing")
     end
 
+    # É o contador que alimenta a régua "Mais Vistos" da home.
+    it "conta a visualização" do
+      expect { get ad_path(ad) }.to change { ad.reload.views_count }.by(1)
+    end
+
     it "mostra o nome do anunciante" do
       expect(response.body).to include("Garagem Trilha Livre")
     end

@@ -6,7 +6,7 @@ RSpec.describe "Meus Anúncios", type: :request do
 
   before { sign_in(user) }
 
-  describe "GET /minha-conta/anuncios" do
+  describe "GET /anunciante/anuncios" do
     it "responde com sucesso" do
       get account_ads_path
 
@@ -84,7 +84,7 @@ RSpec.describe "Meus Anúncios", type: :request do
     end
   end
 
-  describe "GET /minha-conta/anuncios/novo" do
+  describe "GET /anunciante/anuncios/novo" do
     it "responde com sucesso" do
       get new_account_ad_path
 
@@ -104,7 +104,7 @@ RSpec.describe "Meus Anúncios", type: :request do
     end
   end
 
-  describe "POST /minha-conta/anuncios" do
+  describe "POST /anunciante/anuncios" do
     let(:photo_urls) { (1..Ad::IMAGE_COUNT.min).map { |n| "/seed-images/foto-#{n}.png" }.join("\n") }
     let(:valid_attributes) do
       { title: "Jeep Wrangler de Teste", category_id: vehicles.id, price: "45.000,50",
