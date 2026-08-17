@@ -96,12 +96,14 @@ usuário: ele existe como base de fallback (`en-US` decompõe para `en`) e é on
 `rails-i18n` e `faker` guardam seus dados. Os idiomas escolhíveis são
 `ApplicationController::SUPPORTED_LOCALES`, então `?locale=en` cai no padrão.
 
-A troca acontece em `ApplicationController#set_locale`, nesta ordem: `?locale=` na URL,
-depois o `Accept-Language` do navegador, senão o padrão.
+A troca acontece em `ApplicationController#set_locale`: **pt-BR é o padrão e só sai dele
+por `?locale=` na URL**. O `Accept-Language` do navegador é ignorado de propósito — ele
+diria `en-US` para qualquer visitante com o sistema em inglês, e o padrão do portal
+deixaria de valer sem ninguém ter pedido. Quem quer outro idioma usa o seletor do header.
 
 ```bash
-curl "http://localhost:3000/?locale=en-US"
-curl -H "Accept-Language: en-US" http://localhost:3000/
+curl "http://localhost:3000/?locale=en-US"          # em inglês
+curl -H "Accept-Language: en-US" http://localhost:3000/   # segue em pt-BR
 ```
 
 Nomes de categoria e badges são taxonomia fixa e vivem nos arquivos de locale. Já título e

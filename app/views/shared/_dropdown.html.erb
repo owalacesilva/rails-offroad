@@ -1,0 +1,20 @@
+<%# Menu suspenso da área logada. Renderize com `render layout:`, passando
+    `label` (o texto do gatilho) e os itens no bloco, cada um com a classe de
+    dropdown_item_class.
+
+    É um details/summary, não uma div com JavaScript: abre, fecha e navega por
+    teclado sozinho. O dropdown_controller só acrescenta o que o elemento nativo
+    não faz — fechar ao clicar fora e no Esc —, então sem JS o menu continua
+    servindo. %>
+<details class="group relative" data-controller="dropdown">
+  <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-stone-300 px-3 py-1.5 text-sm font-semibold text-stone-600 transition hover:border-stone-900 hover:text-stone-900 [&::-webkit-details-marker]:hidden">
+    <span class="max-w-32 truncate sm:max-w-none"><%= label %></span>
+    <svg class="h-4 w-4 shrink-0 transition group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    </svg>
+  </summary>
+
+  <nav class="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-xl border border-stone-200 bg-white py-1 shadow-lg shadow-stone-900/10">
+    <%= yield %>
+  </nav>
+</details>

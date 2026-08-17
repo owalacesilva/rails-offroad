@@ -24,7 +24,9 @@ Rails.application.routes.draw do
   # Painel do anunciante autenticado.
   scope module: "dashboard" do
     get   "minha-conta",           to: "dashboard#index",  as: :account
-    get   "minha-conta/anuncios",  to: "ads#index",        as: :account_ads
+    get   "minha-conta/anuncios",       to: "ads#index",  as: :account_ads
+    get   "minha-conta/anuncios/novo",  to: "ads#new",    as: :new_account_ad
+    post  "minha-conta/anuncios",       to: "ads#create"
     get   "minha-conta/perfil",    to: "profiles#edit",    as: :edit_profile
     patch "minha-conta/perfil",    to: "profiles#update",  as: :profile
     get   "minha-conta/propostas", to: "proposals#index",  as: :proposals

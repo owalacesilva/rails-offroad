@@ -1,112 +1,123 @@
 <%# Home. O Header e o Footer ficam no layout (app/views/layouts/application.html.erb). %>
 
 <%# ---------------------------------------------------------------- Hero %>
-<section class="relative overflow-hidden border-b border-stone-800 bg-stone-900">
-  <!-- Espaço para a imagem temática: troque o gradiente abaixo por image_tag "hero-trilha.jpg", class: "absolute inset-0 h-full w-full object-cover" -->
+<section class="relative overflow-hidden bg-stone-900">
+  <!-- Espaço para a imagem temática: troque o gradiente abaixo por
+       image_tag "hero-trilha.jpg", class: "absolute inset-0 h-full w-full object-cover" -->
   <div class="absolute inset-0"
        style="background-image:
-         radial-gradient(circle at 15% 20%, rgba(249, 128, 7, 0.28), transparent 55%),
-         radial-gradient(circle at 85% 10%, rgba(183, 60, 6, 0.22), transparent 50%),
-         linear-gradient(160deg, #1c1917 0%, #0c0a09 100%);"></div>
-  <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent"></div>
+         radial-gradient(circle at 12% 15%, rgba(249, 128, 7, 0.30), transparent 55%),
+         radial-gradient(circle at 88% 8%, rgba(183, 60, 6, 0.26), transparent 52%),
+         radial-gradient(circle at 50% 120%, rgba(120, 53, 15, 0.35), transparent 60%),
+         linear-gradient(160deg, #292524 0%, #0c0a09 100%);"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-transparent to-stone-950/70"></div>
 
-  <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-    <div class="max-w-3xl">
-      <span class="inline-flex items-center gap-2 rounded-full border border-brand-500/40 bg-brand-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-300">
-        <span class="h-1.5 w-1.5 rounded-full bg-brand-400"></span>
-        <%= t("home.hero.badge") %>
-      </span>
+  <div class="relative mx-auto max-w-4xl px-4 py-14 text-center sm:px-6 lg:py-20">
+    <h1 class="text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+      <%= t("home.hero.title_lead") %>
+      <span class="text-brand-400"><%= t("home.hero.title_highlight") %></span>
+      <%= t("home.hero.title_tail") %>
+    </h1>
 
-      <h1 class="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-        <%= t("home.hero.title_lead") %>
-        <span class="text-brand-400"><%= t("home.hero.title_highlight") %></span>
-      </h1>
+    <p class="mx-auto mt-4 max-w-2xl text-sm text-stone-300 sm:text-base">
+      <%= t("home.hero.subtitle") %>
+    </p>
 
-      <p class="mt-5 max-w-2xl text-base leading-relaxed text-stone-300 sm:text-lg">
-        <%= t("home.hero.subtitle") %>
-      </p>
-
-      <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-        <a href="#" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-stone-950 shadow-lg shadow-brand-900/40 transition hover:bg-brand-400">
-          <%= t("home.hero.cta_primary") %>
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+    <%# Busca de verdade: cai em /anuncios com os mesmos parâmetros que o painel
+        de filtros da listagem usa. %>
+    <%= form_with url: ads_path, method: :get, class: "mx-auto mt-8 max-w-3xl" do %>
+      <div class="flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-xl shadow-stone-950/30 sm:flex-row sm:items-center sm:rounded-full">
+        <div class="flex items-center gap-2 border-stone-200 px-3 sm:w-52 sm:shrink-0 sm:border-r">
+          <svg class="h-4 w-4 shrink-0 text-stone-400" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
           </svg>
-        </a>
-        <%= link_to t("home.hero.cta_secondary"), ads_path,
-              class: "inline-flex items-center justify-center rounded-full border border-stone-600 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300" %>
-      </div>
+          <%= label_tag :category, t("home.hero.search.category_label"), class: "sr-only" %>
+          <%= select_tag :category,
+                options_for_select([ [ t("home.hero.search.all_categories"), "" ] ] + home_category_options),
+                class: "w-full cursor-pointer appearance-none bg-transparent py-2.5 text-sm font-semibold text-stone-700 focus:outline-none" %>
+        </div>
 
-      <dl class="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-stone-700/60 pt-8">
-        <div>
-          <dt class="text-2xl font-extrabold text-white sm:text-3xl"><%= number_with_delimiter(5_600) %>+</dt>
-          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.ads") %></dd>
+        <%= label_tag :q, t("home.hero.search.label"), class: "sr-only" %>
+        <%= search_field_tag :q, nil, placeholder: t("home.hero.search.placeholder"), autocomplete: "off",
+              class: "min-w-0 flex-1 bg-transparent px-3 py-2.5 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none" %>
+
+        <button type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand-500 px-7 py-3 text-sm font-bold text-stone-950 transition hover:bg-brand-400">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+          <%= t("home.hero.search.submit") %>
+        </button>
+      </div>
+    <% end %>
+
+    <%# Atalhos: veículos em cima, peças embaixo — cada um é uma busca real. %>
+    <div class="mt-6 space-y-2" aria-label="<%= t('home.hero.quick_label') %>">
+      <% HomeController::QUICK_SEARCHES.each do |group, terms| %>
+        <div class="flex flex-wrap justify-center gap-2">
+          <% terms.each do |term| %>
+            <%= link_to term, ads_path(q: term), class: quick_search_class(group) %>
+          <% end %>
         </div>
-        <div>
-          <dt class="text-2xl font-extrabold text-white sm:text-3xl"><%= number_with_delimiter(1_240) %></dt>
-          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.sellers") %></dd>
-        </div>
-        <div>
-          <dt class="text-2xl font-extrabold text-white sm:text-3xl">27</dt>
-          <dd class="mt-1 text-xs uppercase tracking-wide text-stone-400"><%= t("home.hero.stats.states") %></dd>
-        </div>
-      </dl>
+      <% end %>
+    </div>
+
+    <p class="mt-8 text-sm font-bold text-white">
+      <%= t("home.hero.tagline") %>
+    </p>
+  </div>
+</section>
+
+<%# --------------------------------------------------- Anúncios Recentes %>
+<section class="bg-stone-50">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <h2 class="flex items-center gap-3 text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-600">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </span>
+        <%= t("home.ads.title") %>
+      </h2>
+
+      <%= link_to ads_path, class: "inline-flex items-center gap-1 text-sm font-bold text-stone-600 transition hover:text-brand-600" do %>
+        <%= t("home.ads.see_all") %>
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
+      <% end %>
+    </div>
+
+    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <%= render partial: "home/ad_card", collection: @ads, as: :ad %>
     </div>
   </div>
 </section>
 
 <%# -------------------------------------------------------- Categorias %>
-<section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-  <div class="max-w-2xl">
-    <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl"><%= t("home.categories.title") %></h2>
-    <p class="mt-2 text-sm text-stone-400"><%= t("home.categories.subtitle") %></p>
-  </div>
-
-  <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    <% @categories.each do |category| %>
-      <% count = @ad_counts.fetch(category.id, 0) %>
-      <%= link_to ads_path(category: category.slug), class: "group relative flex flex-col overflow-hidden rounded-2xl border border-stone-800 bg-stone-900 p-7 transition hover:-translate-y-1 hover:border-brand-500/60 hover:bg-stone-800/60" do %>
-        <span class="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/25 transition group-hover:bg-brand-500 group-hover:text-stone-950">
-          <%= category_icon_for(category.slug, css_class: "h-7 w-7") %>
-        </span>
-
-        <h3 class="mt-6 text-lg font-bold text-white"><%= category.name %></h3>
-        <p class="mt-2 flex-1 text-sm leading-relaxed text-stone-400"><%= category.description %></p>
-
-        <div class="mt-6 flex items-center justify-between border-t border-stone-800 pt-4">
-          <span class="text-xs font-semibold uppercase tracking-wide text-stone-500">
-            <%= t("home.categories.count", count: count, formatted: number_with_delimiter(count)) %>
-          </span>
-          <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-400">
-            <%= t("home.categories.see_all") %>
-            <svg class="h-4 w-4 transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-            </svg>
-          </span>
-        </div>
-      <% end %>
-    <% end %>
-  </div>
-</section>
-
-<%# --------------------------------------------------- Anúncios Recentes %>
-<section class="border-t border-stone-800 bg-stone-900/40">
-  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-    <div class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h2 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl"><%= t("home.ads.title") %></h2>
-        <p class="mt-2 text-sm text-stone-400"><%= t("home.ads.subtitle") %></p>
-      </div>
-      <%= link_to ads_path, class: "inline-flex items-center gap-1.5 rounded-full border border-stone-700 px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-200 transition hover:border-brand-500 hover:text-brand-300" do %>
-        <%= t("home.ads.see_all") %>
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-        </svg>
-      <% end %>
+<section class="border-t border-stone-200 bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("home.categories.title") %></h2>
+      <p class="mt-2 text-sm text-stone-500"><%= t("home.categories.subtitle") %></p>
     </div>
 
-    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      <%= render partial: "ads/card", collection: @ads, as: :ad %>
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <% @categories.each do |category| %>
+        <% count = @ad_counts.fetch(category.id, 0) %>
+        <%= link_to ads_path(category: category.slug), class: "group flex flex-col rounded-2xl border border-stone-200 bg-stone-50 p-6 transition hover:-translate-y-1 hover:border-brand-400 hover:bg-white hover:shadow-lg" do %>
+          <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 transition group-hover:bg-brand-500 group-hover:text-stone-950">
+            <%= category_icon_for(category.slug, css_class: "h-6 w-6") %>
+          </span>
+
+          <h3 class="mt-5 text-base font-bold text-stone-900"><%= category.name %></h3>
+          <p class="mt-1.5 flex-1 text-sm leading-relaxed text-stone-500"><%= category.description %></p>
+
+          <span class="mt-5 text-xs font-bold uppercase tracking-wide text-brand-600">
+            <%= t("home.categories.count", count: count, formatted: number_with_delimiter(count)) %>
+          </span>
+        <% end %>
+      <% end %>
     </div>
   </div>
 </section>

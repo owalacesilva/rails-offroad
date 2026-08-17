@@ -1,0 +1,13 @@
+<%# As quatro categorias reais mais o atalho para a listagem inteira. Vive num
+    partial porque o header repete a lista no menu de desktop e no de mobile.
+
+    Slugs literais de propósito, como no footer: o header roda em toda página,
+    inclusive nas de erro, e não vale uma consulta ao banco por render. %>
+<% %w[veiculos-4x4 motos-quadriciclos utvs pecas-acessorios].each do |slug| %>
+  <%= link_to ads_path(category: slug), class: dropdown_item_class do %>
+    <%= category_icon_for(slug, css_class: "h-4 w-4 text-brand-500") %>
+    <%= t("categories.#{slug}.name") %>
+  <% end %>
+<% end %>
+
+<%= link_to t("layout.nav.all_categories"), ads_path, class: separated_dropdown_item_class %>

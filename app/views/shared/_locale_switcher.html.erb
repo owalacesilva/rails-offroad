@@ -1,0 +1,17 @@
+<%# Troca de idioma do portal: dois botões, não um menu — com dois idiomas o
+    alvo já está à vista e trocar custa um clique. São links GET comuns, então
+    funciona sem JavaScript. %>
+<div class="hidden shrink-0 items-center gap-0.5 rounded-full border border-stone-200 bg-stone-100 p-0.5 sm:flex"
+     role="group" aria-label="<%= t("layout.locale.label") %>">
+  <% offered_locales.each do |locale| %>
+    <% current = current_locale?(locale) %>
+    <%= link_to locale_switch_path(locale), hreflang: locale, lang: locale,
+          title: t("layout.locale.switch_to", language: locale_name(locale)),
+          "aria-current": current ? "true" : nil,
+          class: "rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide transition " \
+                 "#{current ? 'bg-stone-900 text-white' : 'text-stone-500 hover:text-stone-900'}" do %>
+      <%= locale_code(locale) %>
+      <span class="sr-only"><%= locale_name(locale) %></span>
+    <% end %>
+  <% end %>
+</div>

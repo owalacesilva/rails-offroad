@@ -58,6 +58,45 @@ RSpec.describe AdFilter do
     end
   end
 
+  describe "busca por texto" do
+    # Método em vez de let: os três anúncios acima já usam os cinco memoized
+    # helpers que o RuboCop admite no grupo.
+    def searched_title
+      "Suzuki Jimny Sierra 1.5 4x4"
+    end
+
+    def titles(params)
+      filtered(params).map(&:title)
+    end
+
+    before { create(:ad, category: vehicles, title: searched_title) }
+
+    it "encontra pelo trecho do título" do
+      expect(titles(q: "jimny")).to eq([ searched_title ])
+    end
+
+    it "não diferencia maiúsculas de minúsculas" do
+      expect(titles(q: "JIMNY")).to eq([ searched_title ])
+    end
+
+    it "descarta espaços em volta do termo" do
+      expect(titles(q: "  Jimny  ")).to eq([ searched_title ])
+    end
+
+    it "trata % como texto, não como curinga" do
+      # Sem escapar, "%" casaria com o acervo inteiro.
+      expect(filtered(q: "%")).to be_empty
+    end
+
+    it "combina com os demais filtros" do
+      expect(filtered(q: "Jimny", state: "SP")).to be_empty
+    end
+
+    it "conta como filtro aplicado" do
+      expect(described_class.new({ q: "Jimny" }).applied_count).to eq(1)
+    end
+  end
+
   describe "ordenação" do
     it "usa mais recentes por padrão" do
       expect(filtered.to_a).to eq([ wrangler, snorkel, hilux ])

@@ -11,28 +11,28 @@ class ApplicationController < ActionController::Base
   # :en existe só como base de fallback de en-US, não é escolhível.
   SUPPORTED_LOCALES = %w[pt-BR en-US].freeze
 
+  # Cada idioma escrito no próprio idioma: "English" continua "English" com a
+  # interface em português, e é por isso que fica aqui e não em config/locales —
+  # não é texto traduzível, é o nome próprio do idioma. Fica junto da lista
+  # acima de propósito: acrescentar um locale sem o nome quebra no fetch.
+  LOCALE_NAMES = { "pt-BR" => "Português", "en-US" => "English" }.freeze
+
   before_action :set_locale
 
   private
-    # Precedência: ?locale= na URL, depois o Accept-Language do navegador,
-    # senão o padrão da aplicação (pt-BR).
+    # O portal é brasileiro: pt-BR é o padrão e só sai dele por escolha explícita
+    # em ?locale=. O Accept-Language do navegador não entra na conta de
+    # propósito — ele diria "en-US" para qualquer visitante com o sistema em
+    # inglês, e o padrão do portal deixaria de valer sem ninguém ter pedido.
     def set_locale
-      I18n.locale = locale_from_params || locale_from_header || I18n.default_locale
+      I18n.locale = locale_from_params || I18n.default_locale
     end
 
     def locale_from_params
       supported_locale(params[:locale])
     end
 
-    def locale_from_header
-      request.env["HTTP_ACCEPT_LANGUAGE"].to_s
-        .scan(/[a-z]{2}(?:-[a-z]{2})?/i)
-        .lazy
-        .filter_map { |tag| supported_locale(tag) }
-        .first
-    end
-
-    # Comparação sem diferenciar caixa: o navegador pode mandar "en-us".
+    # Comparação sem diferenciar caixa: ?locale=en-us digitado à mão também vale.
     def supported_locale(tag)
       return if tag.blank?
 

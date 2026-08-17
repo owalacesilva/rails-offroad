@@ -13,17 +13,17 @@ class AdFilter
 
   DEFAULT_SORT = "recent".freeze
 
-  attr_reader :category, :state, :city, :sort
+  attr_reader :query, :category, :state, :city, :sort
 
   # Só anúncio aprovado entra na vitrine — o filtro nunca enxerga a fila de
   # moderação.
   def initialize(params, scope: Ad.published.includes(:category, :ad_images))
     @scope = scope
+    @query = normalize(params[:q])
     @category = normalize(params[:category])
     @state = normalize(params[:state])&.upcase
     @city = normalize(params[:city])
-    requested_sort = params[:sort]
-    @sort = SORTS.key?(requested_sort) ? requested_sort : DEFAULT_SORT
+    @sort = resolved_sort(params[:sort])
 
     # Cidade de outro estado viraria resultado vazio sem explicação: descarta.
     @city = nil if @city.present? && city_options.exclude?(@city)
@@ -34,7 +34,7 @@ class AdFilter
   end
 
   def applied_count
-    [ category, state, city ].count(&:present?)
+    [ query, category, state, city ].count(&:present?)
   end
 
   def applied?
@@ -64,6 +64,7 @@ class AdFilter
   private
     def filtered
       scoped = @scope
+      scoped = scoped.matching(query) if query.present?
       scoped = scoped.by_category(category) if category.present?
       scoped = scoped.by_state(state) if state.present?
       scoped = scoped.by_city(city) if city.present?
@@ -73,6 +74,11 @@ class AdFilter
     def ordered(scope)
       # id como desempate mantém a paginação estável entre páginas.
       SORTS.fetch(sort).call(scope).order(id: :desc)
+    end
+
+    # Extraído do initialize para o método caber no limite de statements do reek.
+    def resolved_sort(requested)
+      SORTS.key?(requested) ? requested : DEFAULT_SORT
     end
 
     def normalize(value)

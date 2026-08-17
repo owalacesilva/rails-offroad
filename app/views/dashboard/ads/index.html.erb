@@ -1,11 +1,20 @@
 <% content_for :title, "#{t('dashboard.ads_index.title')} — OffRoad Classificados" %>
 <% content_for :breadcrumb, t("dashboard.nav.ads") %>
 
-<div class="flex flex-wrap items-baseline justify-between gap-2">
-  <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("dashboard.ads_index.title") %></h1>
-  <p class="text-sm text-stone-500"><%= t("dashboard.ads_index.count", count: @ads.size) %></p>
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("dashboard.ads_index.title") %></h1>
+    <p class="mt-1 text-sm text-stone-500"><%= t("dashboard.ads_index.subtitle") %></p>
+  </div>
+
+  <%= link_to new_account_ad_path, class: "inline-flex shrink-0 items-center gap-1.5 rounded-full bg-brand-500 px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" do %>
+    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    <%= t("dashboard.ads_new.title") %>
+  <% end %>
 </div>
-<p class="mt-1 text-sm text-stone-500"><%= t("dashboard.ads_index.subtitle") %></p>
+<p class="mt-2 text-sm text-stone-500"><%= t("dashboard.ads_index.count", count: @ads.size) %></p>
 
 <%# Filtro por situação. Só aparecem as situações que o anunciante tem. %>
 <nav class="mt-6 flex flex-wrap gap-2" aria-label="<%= t("dashboard.ads_index.filter_label") %>">

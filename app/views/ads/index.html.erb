@@ -38,6 +38,14 @@
     <div id="ad-filters" data-filters-target="panel" class="border-t border-stone-800">
       <%= form_with url: ads_path, method: :get do %>
         <div class="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4">
+          <%# A busca por texto vem do hero da home; aqui ela fica visível e
+              editável, e o form a carrega ao mudar qualquer outro filtro. %>
+          <div class="sm:col-span-2 lg:col-span-4">
+            <%= label_tag :q, t("ads.filters.query"), class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
+            <%= search_field_tag :q, @filter.query, placeholder: t("ads.filters.query_placeholder"), autocomplete: "off",
+                  class: "mt-2 w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-sm text-stone-100 placeholder:text-stone-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+          </div>
+
           <div>
             <%= label_tag :category, t("ads.filters.category"), class: "block text-xs font-semibold uppercase tracking-wide text-stone-400" %>
             <%= select_tag :category,

@@ -22,6 +22,15 @@ RSpec.describe Proposal, type: :model do
       expect(build(:proposal, offered_value: "1500,50").offered_value).to eq(1_500.50)
     end
 
+    it "aceita o ponto de milhar junto da vírgula decimal" do
+      # "45.000,50" é como o brasileiro digita; sem tratar viraria 45.
+      expect(build(:proposal, offered_value: "45.000,50").offered_value).to eq(45_000.50)
+    end
+
+    it "preserva o ponto quando não há vírgula, que aí é o decimal" do
+      expect(build(:proposal, offered_value: "1500.50").offered_value).to eq(1_500.50)
+    end
+
     it "preserva as duas casas decimais no banco" do
       proposal = create(:proposal, offered_value: "1500,50")
 

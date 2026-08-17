@@ -8,12 +8,8 @@ class Proposal < ApplicationRecord
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :offered_value, numericality: { greater_than: 0 }
 
-  # O formulário trabalha em reais com vírgula; a coluna é DECIMAL com ponto.
+  # Vírgula do formulário vira ponto antes do cast (ver ApplicationRecord).
   def offered_value=(value)
     super(self.class.normalize_decimal(value))
-  end
-
-  def self.normalize_decimal(value)
-    value.is_a?(String) ? value.strip.tr(",", ".") : value
   end
 end

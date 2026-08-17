@@ -34,8 +34,14 @@ class Ad < ApplicationRecord
               less_than_or_equal_to: ->(_ad) { Date.current.year + 1 }
             },
             allow_nil: true
-  # Só cobra fotos de quem já está no ar: rascunho pode estar incompleto.
-  validate :image_count_within_bounds, if: :approved?
+  # Fotos são cobradas em dois momentos: no anúncio aprovado, que já está no ar,
+  # e na submissão pelo formulário do anunciante, que cai direto na fila — sem
+  # elas o moderador receberia um anúncio que não tem como aprovar. Rascunho e
+  # seed seguem podendo ficar incompletos.
+  #
+  # As duas condições moram no mesmo `validate` de propósito: registrar o mesmo
+  # método duas vezes não soma callbacks, a segunda chamada substitui a primeira.
+  validate :image_count_within_bounds, if: -> { approved? || validation_context == :submission }
 
   # Só anúncio aprovado aparece publicamente. É o ponto do fluxo de moderação.
   scope :published, -> { where(status: STATUSES[:approved]) }
@@ -44,11 +50,20 @@ class Ad < ApplicationRecord
   scope :by_category, ->(slug) { where(category: Category.where(slug: slug)) }
   scope :by_state, ->(state) { where(state: state) }
   scope :by_city, ->(city) { where(city: city) }
+  # Busca por texto no título. sanitize_sql_like escapa % e _ digitados pelo
+  # usuário: sem isso, procurar por "100%" viraria curinga e traria o acervo
+  # inteiro. A comparação é indiferente a maiúsculas pela collation do MySQL.
+  scope :matching, ->(term) { where("ads.title LIKE ?", "%#{sanitize_sql_like(term)}%") }
 
   # Antes vinha de um hash jsonb ordenado por constante; agora a ordem é a
   # coluna `position` do atributo.
   def ordered_specifications
     technical_spec_values.includes(:spec_attribute).sort_by(&:position).map(&:to_pair)
+  end
+
+  # Vírgula do formulário vira ponto antes do cast (ver ApplicationRecord).
+  def price=(value)
+    super(self.class.normalize_decimal(value))
   end
 
   def cover_image

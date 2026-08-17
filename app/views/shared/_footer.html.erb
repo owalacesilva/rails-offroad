@@ -4,11 +4,9 @@
     <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <div class="flex items-center gap-2.5">
-          <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-stone-950">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 17.25 8.25 9l3.75 5.25L15.75 6l5.25 11.25H3Z" />
-            </svg>
-          </span>
+          <%# Mesmo lockup do header: emblema mais o nome por extenso. %>
+          <%= image_tag "logo.png", alt: "", width: 248, height: 252, loading: "lazy",
+                class: "h-11 w-auto" %>
           <span class="text-base font-extrabold uppercase leading-none tracking-tight text-white">
             OffRoad<span class="text-brand-400"> Classificados</span>
           </span>

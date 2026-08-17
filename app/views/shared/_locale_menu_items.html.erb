@@ -1,0 +1,20 @@
+<%# Troca de idioma dentro dos menus do painel e da moderação. Ali o header já
+    está cheio, e o idioma é uma preferência da conta: cabe no menu, não na barra.
+    O bloco começa separado do resto e o idioma em uso leva o visto. %>
+<p class="<%= separated_dropdown_item_class %> pointer-events-none pb-1 pt-3 text-xs uppercase tracking-wide text-stone-400">
+  <%= t("layout.locale.label") %>
+</p>
+
+<% offered_locales.each do |locale| %>
+  <% current = current_locale?(locale) %>
+  <%= link_to locale_switch_path(locale), hreflang: locale, lang: locale,
+        "aria-current": current ? "true" : nil,
+        class: "#{dropdown_item_class} #{'text-stone-900' if current}" do %>
+    <%= locale_name(locale) %>
+    <% if current %>
+      <svg class="ml-auto h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+      </svg>
+    <% end %>
+  <% end %>
+<% end %>

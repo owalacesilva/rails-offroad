@@ -1,16 +1,23 @@
 # Interface copy in US English. Missing keys fall back to pt-BR (see config/application.rb).
 en-US:
   layout:
+    nav:
+      label: "Main navigation"
+      home: "Home"
+      classifieds: "Classifieds"
+      all_categories: "See all"
+      menu: "Menu"
     header:
-      search_label: "Search listings"
-      search_placeholder: "Search by model, brand or part..."
-      search_submit: "Search"
+      brand: "OffRoad Classificados"
       sign_in: "Sign in"
       sign_out: "Sign out"
       greeting: "Hi, %{name}"
       new_ad: "Post a listing"
     account:
       back_to_portal: "Back to portal"
+    locale:
+      label: "Language"
+      switch_to: "Switch to %{language}"
     footer:
       tagline: "Classifieds for people who live off the pavement. Buy and sell 4x4s, trail bikes, UTVs and parts with folks who know the terrain."
       headings:
@@ -64,6 +71,24 @@ en-US:
       categories: "Active categories"
     by_status: "Listing status"
     by_category: "Listings by category"
+    ads_new:
+      title: "New Listing"
+      subtitle: "Fill in what you want to sell. The listing goes to the moderation queue before it shows up on the portal."
+      title_placeholder: "E.g. Jeep Wrangler Rubicon 3.6 V6"
+      description_placeholder: "Condition, servicing, what is included, whether you take trades..."
+      price_hint: "In reais. Use a comma for cents."
+      year_hint: "Leave empty for parts."
+      photos: "Photos"
+      photos_hint: "One URL per line, in the order they should appear. From %{min} to %{max} photos."
+      submit: "Send to moderation"
+      cancel: "Cancel"
+      moderation_hint: "A moderator reviews it before publishing."
+      errors:
+        one: "Fix 1 problem to continue:"
+        other: "Fix %{count} problems to continue:"
+    ads:
+      create:
+        success: "\"%{title}\" sent to moderation. It shows up on the portal once approved."
     ads_index:
       title: "My Listings"
       subtitle: "Only approved listings appear on the portal. Here is where each one stands."
@@ -113,16 +138,18 @@ en-US:
 
   home:
     hero:
-      badge: "100% off-road classifieds"
-      title_lead: "Find or sell your"
-      title_highlight: "trail machine"
-      subtitle: "Jeeps, 4x4 pickups, enduro bikes, quads, UTVs and everything in parts and builds — listed by people who actually get muddy."
-      cta_primary: "Post for free"
-      cta_secondary: "Browse listings"
-      stats:
-        ads: "Active listings"
-        sellers: "Sellers"
-        states: "States"
+      title_lead: "Brazil's Largest"
+      title_highlight: "Off Road"
+      title_tail: "Classifieds Portal"
+      subtitle: "Find vehicles, parts and services for your 4x4 adventure."
+      tagline: "Keep up with everything happening in the Off Road world"
+      quick_label: "Quick searches"
+      search:
+        label: "Search listings"
+        category_label: "Category"
+        all_categories: "All"
+        placeholder: "Search vehicles, parts, services..."
+        submit: "Search"
     categories:
       title: "Browse by category"
       subtitle: "Pick your terrain and see what is out there right now."
@@ -156,6 +183,8 @@ en-US:
       state: "State"
       city: "City"
       sort: "Sort by"
+      query: "Search"
+      query_placeholder: "Model, brand or part..."
       any_category: "All categories"
       any_state: "All states"
       any_city: "All cities"

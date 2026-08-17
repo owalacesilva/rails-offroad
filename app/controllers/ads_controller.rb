@@ -17,6 +17,6 @@ class AdsController < ApplicationController
 
   private
     def filter_params
-      params.permit(:category, :state, :city, :sort)
+      params.permit(:q, :category, :state, :city, :sort)
     end
 end

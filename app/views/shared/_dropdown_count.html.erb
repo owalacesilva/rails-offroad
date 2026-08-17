@@ -1,0 +1,5 @@
+<%# Contador à direita do item do menu. Zero não vira badge: um "0" cinza só
+    acrescenta ruído a quem ainda não tem nada. %>
+<% if count.positive? %>
+  <span class="ml-auto rounded-full bg-stone-100 px-2 py-0.5 text-[11px] font-bold text-stone-600"><%= count %></span>
+<% end %>

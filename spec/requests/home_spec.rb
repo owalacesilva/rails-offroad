@@ -26,6 +26,33 @@ RSpec.describe "Home", type: :request do
     end
   end
 
+  describe "busca do hero" do
+    before { create(:ad, category: vehicles, title: "Suzuki Jimny Sierra 1.5 4x4") }
+
+    it "envia a busca para a listagem" do
+      get root_path
+
+      expect(response.body).to include('action="/anuncios"', 'name="q"', 'name="category"')
+    end
+
+    it "oferece atalhos que são buscas de verdade" do
+      get root_path
+
+      expect(response.body).to include(ads_path(q: "Jimny"))
+    end
+
+    # Afirmar só a presença passaria mesmo sem filtro nenhum, porque os dois
+    # anúncios cabem na primeira página: a ausência do outro é a prova.
+    it "o atalho filtra a listagem de verdade" do
+      create(:ad, category: vehicles, title: "Ford Ranger Raptor 2.0")
+
+      get ads_path(q: "Jimny")
+
+      expect(response.body).to include("Suzuki Jimny Sierra 1.5 4x4")
+      expect(response.body).not_to include("Ford Ranger Raptor 2.0")
+    end
+  end
+
   describe "seleção de locale" do
     it "usa pt-BR por padrão" do
       get root_path
@@ -39,8 +66,15 @@ RSpec.describe "Home", type: :request do
       expect(response.body).to include(I18n.t("home.ads.title", locale: :"en-US"))
     end
 
-    it "aceita en-US pelo cabeçalho Accept-Language" do
+    it "ignora o Accept-Language do navegador e mantém o padrão" do
+      # O portal é brasileiro: só ?locale= tira a interface do pt-BR.
       get root_path, headers: { "Accept-Language" => "en-US,en;q=0.9" }
+
+      expect(response.body).to include(I18n.t("home.ads.title", locale: :"pt-BR"))
+    end
+
+    it "atende o ?locale= mesmo com o navegador pedindo outra coisa" do
+      get root_path(locale: "en-US"), headers: { "Accept-Language" => "pt-BR,pt;q=0.9" }
 
       expect(response.body).to include(I18n.t("home.ads.title", locale: :"en-US"))
     end
