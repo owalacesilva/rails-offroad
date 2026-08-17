@@ -40,7 +40,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.0"
 
 # Ligação com a libvips (libvips42 entra pelo Dockerfile.dev). Já vinha junto como
 # dependência do image_processing; está declarada porque o upload de foto a usa
