@@ -17,7 +17,7 @@ class AdFilter
 
   # Só anúncio aprovado entra na vitrine — o filtro nunca enxerga a fila de
   # moderação.
-  def initialize(params, scope: Ad.published.includes(:category, :ad_images))
+  def initialize(params, scope: Ad.published.with_photos.includes(:category))
     @scope = scope
     @query = normalize(params[:q])
     @category = normalize(params[:category])

@@ -4,7 +4,7 @@
   <div class="relative aspect-[4/3] overflow-hidden bg-stone-100">
     <% cover = ad.cover_image %>
     <% if cover.present? %>
-      <%= image_tag cover.file_url, alt: ad.title, loading: "lazy",
+      <%= image_tag cover.url, alt: ad.title, loading: "lazy",
             class: "h-full w-full object-cover transition duration-300 group-hover:scale-105" %>
     <% else %>
       <div class="flex h-full w-full items-center justify-center">

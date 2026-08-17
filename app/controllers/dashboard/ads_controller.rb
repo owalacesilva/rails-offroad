@@ -5,7 +5,7 @@ module Dashboard
     AD_FIELDS = %i[title description price category_id year city state].freeze
 
     def index
-      scope = current_user.ads.includes(:category, :ad_images)
+      scope = current_user.ads.with_photos.includes(:category)
 
       @counts = scope.group(:status).count
       @status = requested_status
@@ -38,17 +38,22 @@ module Dashboard
         requested if Ad::STATUSES.key?(requested&.to_sym)
       end
 
-      # Uma URL por linha no formulário. A ordem das linhas vira o sort_order,
-      # que é como ad_images guarda a ordem das fotos — o mesmo motivo de a
-      # tabela existir no lugar do Active Storage.
+      # As fotos já subiram uma a uma pelo Dropzone (ver AdPhotosController) e
+      # chegam aqui como signed_ids de blobs. A posição no array é a ordem da
+      # fila no formulário, e é ela que vira o sort_order da galeria.
       def build_images(ad)
-        submitted_photo_urls.each_with_index do |url, index|
-          ad.ad_images.build(file_url: url, sort_order: index)
+        submitted_blobs.each_with_index do |blob, index|
+          ad.ad_images.build(sort_order: index).file.attach(blob)
         end
       end
 
-      def submitted_photo_urls
-        params[:photo_urls].to_s.split("\n").map(&:strip).reject(&:blank?)
+      # find_signed devolve nil para id adulterado ou blob já removido, em vez
+      # de estourar: a foto some da lista e quem reclama é a validação de 3 a 10.
+      # O first(máximo) evita que um POST fora do formulário mande mil fotos.
+      def submitted_blobs
+        Array(params[:photo_signed_ids])
+          .filter_map { |signed_id| ActiveStorage::Blob.find_signed(signed_id) }
+          .first(Ad::IMAGE_COUNT.max)
       end
 
       def ad_params

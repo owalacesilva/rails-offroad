@@ -513,6 +513,7 @@ DEPENDENCIES
   rspec-rails
   rubocop-rails-omakase
   rubocop-rspec
+  ruby-vips
   selenium-webdriver
   shoulda-matchers
   solid_cable

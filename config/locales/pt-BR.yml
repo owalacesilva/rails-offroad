@@ -84,8 +84,25 @@ pt-BR:
       price_hint: "Em reais. Use vírgula para os centavos."
       year_hint: "Deixe vazio se for peça."
       photos: "Fotos"
-      photos_hint: "Uma URL por linha, na ordem em que devem aparecer. De %{min} a %{max} fotos."
+      photos_hint: "De %{min} a %{max} fotos, na ordem em que devem aparecer. Imagens maiores que %{width} x %{height} px são reduzidas no envio."
+      photos_prompt: "Arraste as fotos aqui ou clique para escolher"
+      photos_counter: "%{count} de %{max} fotos (mínimo de %{min})"
+      photos_too_many: "Máximo de %{max} fotos por anúncio."
+      photos_failed: "Não foi possível enviar esta foto."
+      photos_required: "Envie ao menos %{min} fotos para publicar."
+      photos_no_js: "O envio de fotos precisa de JavaScript ativado."
+      photo_remove: "Remover foto"
+      city_placeholder: "Comece a digitar o município"
+      city_hint: "Escolha a UF primeiro; as sugestões vêm dos municípios daquele estado."
+      format:
+        label: "Formatação"
+        bold: "Negrito"
+        italic: "Itálico"
+        bullet_list: "Lista com marcadores"
+        ordered_list: "Lista numerada"
+        heading: "Título"
       submit: "Enviar para moderação"
+      sending: "Enviando..."
       cancel: "Cancelar"
       moderation_hint: "Um moderador avalia antes de publicar."
       errors:
@@ -94,6 +111,15 @@ pt-BR:
     ads:
       create:
         success: "\"%{title}\" enviado para moderação. Ele aparece no portal assim que for aprovado."
+    # Mensagens do upload de foto, devolvidas em JSON para o Dropzone mostrar
+    # embaixo da miniatura recusada.
+    ad_photos:
+      errors:
+        missing: "Nenhum arquivo recebido."
+        type: "Envie uma imagem JPEG, PNG ou WebP."
+        size: "A foto passa de %{max} MB."
+        dimensions: "A foto passa de %{width} x %{height} pixels."
+        unreadable: "Não foi possível ler esta imagem."
     ads_index:
       title: "Meus Anúncios"
       subtitle: "Só anúncio aprovado aparece no portal. Aqui você vê em que pé está cada um."
@@ -555,6 +581,8 @@ pt-BR:
         city: "Cidade"
         state: "UF"
         status: "Situação"
+        category: "Categoria"
+        description: "Descrição"
         published_at: "Publicado em"
         ad_images: "Fotos"
       spec_attribute:
@@ -579,6 +607,10 @@ pt-BR:
           attributes:
             ad_images:
               invalid_count: "devem ser entre %{min} e %{max}"
+        ad_image:
+          attributes:
+            base:
+              missing_file: "precisa de um arquivo enviado ou de uma URL"
         event:
           attributes:
             ends_on:

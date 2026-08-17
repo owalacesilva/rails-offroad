@@ -85,6 +85,96 @@
   }
 }
 
+@layer components {
+  /* Descrição do anúncio: o único HTML do portal que vem de fora, escrito no
+     editor do formulário e limitado a Ad::DESCRIPTION_TAGS.
+
+     O reset do Tailwind zera tamanho de título, marcador de lista e recuo, e
+     não há como pendurar classe utilitária em tag gerada pelo editor — então a
+     forma dessas poucas tags mora aqui. A mesma classe veste o contenteditable
+     do formulário, para o que se escreve ser o que se vê depois. */
+  .ad-description > :first-child {
+    margin-block-start: 0;
+  }
+
+  .ad-description > :last-child {
+    margin-block-end: 0;
+  }
+
+  .ad-description p {
+    margin-block: 0.75rem;
+  }
+
+  .ad-description h3 {
+    margin-block: 1.25rem 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-stone-900);
+  }
+
+  .ad-description ul,
+  .ad-description ol {
+    margin-block: 0.75rem;
+    padding-inline-start: 1.5rem;
+  }
+
+  .ad-description ul {
+    list-style-type: disc;
+  }
+
+  .ad-description ol {
+    list-style-type: decimal;
+  }
+
+  .ad-description li {
+    margin-block: 0.25rem;
+  }
+
+  .ad-description strong,
+  .ad-description b {
+    font-weight: 700;
+    color: var(--color-stone-900);
+  }
+
+  .ad-description em,
+  .ad-description i {
+    font-style: italic;
+  }
+
+  /* Dropzone. O CSS que vem no pacote não é carregado: o preview é montado pelo
+     <template> do formulário, já com as classes do projeto. Aqui fica só o que
+     depende das classes de estado que o próprio Dropzone acrescenta ao preview
+     durante o envio, e que não há como escrever no template. */
+  .dz-preview .dz-error-message {
+    display: none;
+  }
+
+  .dz-preview.dz-error .dz-error-message {
+    display: flex;
+  }
+
+  .dz-preview.dz-success .dz-progress {
+    display: none;
+  }
+
+  /* A mensagem "arraste aqui" é criada pelo Dropzone, não pelo template. */
+  .dz-zone .dz-message {
+    margin: 0;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-stone-500);
+  }
+
+  .dz-zone .dz-button {
+    cursor: pointer;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+  }
+}
+
 /* Movimento é decoração aqui: quem pede menos animação continua vendo o botão,
    parado. Fora do @layer para ganhar da utilitária sem precisar de !important. */
 @media (prefers-reduced-motion: reduce) {

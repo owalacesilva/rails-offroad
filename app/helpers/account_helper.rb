@@ -9,6 +9,17 @@ module AccountHelper
     end
   end
 
+  # Fotos que já subiram e precisam reaparecer quando a submissão volta com erro:
+  # sem isto o anunciante subiria tudo de novo por causa de um preço inválido.
+  # Blob que não existe mais some da lista em silêncio.
+  def submitted_photos(signed_ids)
+    Array(signed_ids).filter_map do |signed_id|
+      blob = ActiveStorage::Blob.find_signed(signed_id)
+
+      { signed_id: signed_id, url: rails_storage_proxy_path(blob), name: blob.filename.to_s } if blob
+    end
+  end
+
   # O item ativo ganha a barra lateral da marca; o resto fica neutro.
   NAV_STATE = {
     true => "border-brand-500 bg-brand-50 text-stone-900",

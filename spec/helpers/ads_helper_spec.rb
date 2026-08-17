@@ -1,6 +1,42 @@
 require "rails_helper"
 
 RSpec.describe AdsHelper, type: :helper do
+  # Duas origens convivem: o HTML do editor do formulário e o texto puro com
+  # linhas em branco que o seed grava.
+  describe "#ad_description" do
+    it "mostra o HTML do editor como está" do
+      ad = build(:ad, description: "<h3>Motor</h3><ul><li>Pneu novo</li></ul>")
+
+      expect(helper.ad_description(ad)).to eq("<h3>Motor</h3><ul><li>Pneu novo</li></ul>")
+    end
+
+    it "transforma linha em branco de texto puro em parágrafo" do
+      ad = build(:ad, description: "Bem conservado.\n\nAceito troca.")
+
+      expect(helper.ad_description(ad)).to eq("<p>Bem conservado.</p>\n\n<p>Aceito troca.</p>")
+    end
+
+    # O sanitizador já escapou o & na entrada; escapar de novo daria "&amp;amp;".
+    it "não escapa duas vezes o texto puro" do
+      ad = build(:ad, description: "Motor & câmbio revisados")
+
+      expect(helper.ad_description(ad)).to eq("<p>Motor &amp; câmbio revisados</p>")
+    end
+
+    # Defesa em profundidade: update_column passa por fora do setter do modelo,
+    # como passaria um INSERT feito na mão ou uma importação antiga.
+    it "sanitiza também na exibição" do
+      ad = create(:ad)
+      ad.update_column(:description, "<p>ok</p><iframe src='x'></iframe>")
+
+      expect(helper.ad_description(ad.reload)).to eq("<p>ok</p>")
+    end
+
+    it "não devolve nada quando não há descrição" do
+      expect(helper.ad_description(build(:ad, description: nil))).to be_nil
+    end
+  end
+
   describe "#ad_price" do
     it "formata em reais sem centavos usando os separadores do pt-BR" do
       expect(helper.ad_price(389_900)).to eq("R$ 389.900")

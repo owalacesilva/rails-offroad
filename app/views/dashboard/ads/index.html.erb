@@ -44,7 +44,7 @@
         <% cover = ad.ad_images.first %>
         <div class="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-stone-100">
           <% if cover.present? %>
-            <%= image_tag cover.file_url, alt: ad.title, loading: "lazy", class: "h-full w-full object-cover" %>
+            <%= image_tag cover.url, alt: ad.title, loading: "lazy", class: "h-full w-full object-cover" %>
           <% else %>
             <div class="flex h-full w-full items-center justify-center text-stone-300">
               <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">

@@ -48,11 +48,21 @@ docker compose exec web bin/bundler-audit check --update
 # database
 docker compose exec web bin/rails db:migrate
 docker compose exec web bin/rails db:seed                          # idempotent
+docker compose exec web bin/rails cities:import                    # only the municipalities
+docker compose exec web bin/rails active_storage:purge_unattached # abandoned upload blobs
 docker compose exec -e RAILS_ENV=test web bin/rails db:prepare
 ```
 
 `reek` with no path argument **reads from STDIN and exits 0 having analysed nothing** —
 silently useless in scripts and CI. Always pass `app lib`.
+
+**`db/seeds.rb` returns immediately under `RAILS_ENV=test`.** This is load-bearing, not a
+preference: `db:prepare` runs the seed file by itself whenever it *creates* the database,
+which is exactly what CI does before RSpec. Without the guard the suite would start with
+4 categories, 8 users, 36 ads and 5,571 cities already committed — outside any test
+transaction — and every spec that counts records or builds a category with a known slug
+would fail on a collision. Specs build what they need with factories; to populate a test
+database deliberately, call the loader directly (`cities:import`).
 
 CI lives in two places doing the same work: `.semaphore/semaphore.yml` and
 `.github/workflows/ci.yml`. Changes to the test or lint commands must land in both.
@@ -152,6 +162,49 @@ any layer so it wins without `!important`. The button uses `transition-colors`, 
 on hover makes the two fight. Tailwind tree-shakes the keyframes, so the rule only appears
 in the build while some template still carries the class.
 
+### The ad form
+
+`app/views/dashboard/ads/new.html.erb` carries four Stimulus controllers and is the most
+JavaScript in the project. Things worth knowing before editing it:
+
+**`ad.description` is HTML now, sanitized on write.** `Ad#description=` runs
+`Rails::HTML5::SafeListSanitizer` against `Ad::DESCRIPTION_TAGS` — the five editor controls
+and the blocks they emit, with **no attributes at all**. Cleaning on the way in means the
+column only ever holds allowed markup. Render it with `AdsHelper#ad_description`, never
+`simple_format` directly: plain-text descriptions (every seeded ad, and anything typed with
+JS off) still exist, and the helper tells them apart by looking for a `<` — after
+sanitizing, a literal `<` can only be a tag, because text `<` came back as `&lt;`. Plain
+text goes through `simple_format(..., sanitize: false)`; sanitizing it twice would turn
+`&amp;` into `&amp;amp;`.
+
+The `.ad-description` class in `app/assets/tailwind` is what gives those tags shape — the
+Tailwind reset strips heading sizes and list markers, and there is no way to hang a utility
+class on markup the editor generated. The same class dresses the editor itself.
+
+**The editor is `contenteditable` + `document.execCommand`.** Obsolete on paper, with no
+implemented replacement; it is what the off-the-shelf editors still run on. The `<textarea>`
+stays the real form field — the controller hides it and mirrors the HTML into it — so the
+form still posts with JS off.
+
+**Photo upload is JS-only, deliberately.** The submit button ships `disabled` and only the
+photo controller unlocks it, once `Ad::IMAGE_COUNT.min` photos are up. Without JS there is
+no way to send a file anyway, so the form says so instead of pretending.
+
+**`Dashboard::AdPhotosController` is the last word on image limits.** Dropzone resizes to
+fit `MAX_WIDTH × MAX_HEIGHT` in the browser before uploading, and never upscales, but the
+controller re-measures with libvips and rejects anything over — nothing from a browser
+counts as a guarantee. Content type is checked against the header *and* against whether
+libvips can open the file at all.
+
+**Category is a radio group painted as badges**, not a `<select>` and not JavaScript: the
+inputs are `peer sr-only` and Tailwind's `peer-checked:` styles the label. Keyboard and
+screen reader still see an ordinary radio group. `peer-checked:` only reaches siblings of
+the input, so the colour lives on the label and the icon inherits it via `currentColor`.
+
+**Ad year may not be in the future** — `less_than_or_equal_to: Date.current.year`. This
+tightened an earlier rule of `year + 1`, which existed for the industry's habit of selling
+next model year early; a 2027 truck listed in 2026 is now rejected.
+
 **Social links come from the environment**, via `lib/social_links.rb`: `SOCIAL_INSTAGRAM_URL`,
 `SOCIAL_YOUTUBE_URL`, `SOCIAL_FACEBOOK_URL`, `SOCIAL_WHATSAPP_URL`. A network with no
 variable set disappears from the footer instead of rendering an icon that links to `#`,
@@ -167,6 +220,32 @@ so a bare checkout shows no social row at all — that is the intended behavior,
 
 `Ad` also has `AdImage` (ordered photos) and, through `TechnicalSpecValue`, the EAV
 specifications described below.
+
+`City` is the one piece of **reference** data: the 5,570 Brazilian municipalities plus
+Fernando de Noronha, which IBGE lists alongside them though it is a state district of PE.
+It is the only seeded table that also belongs in production, which is why it loads from
+`lib/brazilian_cities.rb` and has its own `cities:import` task rather than living only in
+`db/seeds.rb`. The data is versioned at `db/cities.csv` so initialization never depends on
+the IBGE API being up.
+
+The primary key is a UUID like everywhere else; `ibge_code` is the **natural** key and
+carries the unique index, so `import` is an upsert that only touches `name` and `state` —
+a municipality renamed by IBGE is corrected without its `id` changing under anything that
+already referenced it. The second unique index is `(state, name)`, not `name`: 240 names
+repeat across the country (there are five "Bom Jesus"), but none repeats inside one state,
+including under the accent- and case-insensitive collation.
+
+`db/cities.csv` is parsed by hand rather than with the `csv` gem — `csv` stopped being a
+default gem in Ruby 3.4 and would have to enter the Gemfile, while the file is generated by
+us and provably has three flat columns. `BrazilianCities::ROW` is the guard: a line that
+does not match raises `InvalidRow` with a `file:line` reference instead of landing crooked
+in the database.
+
+**`cities` feeds the ad form's autocomplete**, through `GET /municipios?state=PR&q=curi`
+(`CitiesController`, public, JSON, capped at `LIMIT`). It returns names only, because
+`ads.city` still stores the name as a string — there is no foreign key, and wiring one up
+is a separate change with a data migration for existing rows. The accent- and
+case-insensitive collation is what lets `q=sao` find "São Paulo" with no normalized column.
 
 `Event` and `NewsletterSubscription` hang off nothing: they are portal content, not an
 advertiser's. `Event` is the home calendar (`Event.upcoming` uses
@@ -259,9 +338,40 @@ constraint on `users.state`, so a direct SQL write cannot slip past it.
 
 ### Storage and mail
 
-Photos are plain rows in `ad_images`: a `file_url` and a `sort_order`, no blobs, no
-variants, no Active Storage. Ordering is explicit, which is exactly what Active Storage
-could not give. Nothing resizes an upload — `file_url` is taken as-is.
+**`ad_images` rows own the ordering; Active Storage owns the bytes.** The row keeps
+`sort_order` — explicit ordering is the reason the table exists instead of a bare
+`has_many_attached` — and the photo itself arrives one of two ways:
+
+- **an attached blob** (`has_one_attached :file`), for anything uploaded through the ad
+  form, stored on MinIO in development;
+- **a `file_url` string**, which is how `db/seeds.rb` points at `/seed-images`.
+
+Both coexist and `AdImage#url` picks: attachment first, `file_url` otherwise. Every view
+calls `#url`, never `file_url` directly. `file_url` is nullable for exactly this reason.
+
+**Blob URLs are proxy paths, never direct MinIO URLs.** Inside Compose the endpoint is
+`http://minio:9000`, which the host's browser cannot resolve — the proxy makes Rails fetch
+the object instead (`config.active_storage.resolve_model_to_route = :rails_storage_proxy`).
+`AdImage#url` must pass `only_path: true`: Active Storage's route is a direct route, and
+outside a request (console, job) it otherwise tries to build an absolute URL and raises
+"Missing host to link to".
+
+**`active_storage_attachments.record_id` is `VARCHAR(36)`, not bigint.** The generated
+migration was edited: this project's primary keys are UUID strings, and the stock bigint
+column cannot hold one. The Active Storage tables themselves keep bigint primary keys on
+purpose — the framework generates those ids, and its models inherit from
+`ActiveRecord::Base`, so they never reach our `before_create` UUID hook.
+
+**Preload with `Ad.with_photos`**, not `includes(:ad_images)`. `AdImage#url` asks whether a
+blob is attached, so without `includes(ad_images: { file_attachment: :blob })` every listing
+costs one query per photo. `AdImage.with_attached_file` is the equivalent for a bare photo
+query, as in `HomeController#gallery_photos`.
+
+**Uploads never touch `AdsController#create` directly.** Dropzone posts one photo at a time
+to `Dashboard::AdPhotosController`, which validates and returns a blob `signed_id`; the form
+submits those ids as `photo_signed_ids[]` and the create action attaches them in array
+order. A blob whose form is abandoned stays unattached — `bin/rails
+active_storage:purge_unattached` is what collects them, and nothing runs it automatically.
 
 `db/seeds.rb` generates placeholder PNGs through `lib/placeholder_image.rb`, which writes
 the file byte by byte with `Zlib` — no image gem, no binary assets in the repo — and drops
@@ -316,6 +426,11 @@ with a written justification.
 never share a `file_url`; the home gallery specs rely on telling one ad's photo from
 another's.
 
+**Upload specs need real image bytes.** `spec/support/photo_uploads.rb` builds them with the
+same `PlaceholderImage` the seed uses — `AdPhotosController` measures the file with libvips,
+so a `StringIO` of junk is rejected as unreadable rather than accepted. `photo_signed_ids(n)`
+is the shortcut for "n photos already uploaded", which is the state the ad form posts from.
+
 `spec/system/` is empty but must keep existing: `.github/workflows/ci.yml` runs
 `bundle exec rspec spec/system` as its own job, and RSpec errors on a missing directory.
 
@@ -325,7 +440,7 @@ another's.
 outside this history. Compose warns about it on every command and uses `compose.yaml`.
 `compose.yaml` is the versioned one; the duplicate is safe to delete.
 
-**MinIO and Active Storage are now dead weight.** Photos moved to the `ad_images` table, so
-nothing attaches or reads a blob any more, but the `minio` service still starts and
-`config.active_storage.*` is still set in all three environments. None of it is wired to
-anything — removing the service, the config and the gem is safe whenever someone wants to.
+**MinIO and Active Storage are load-bearing again.** They were dead weight while photos were
+plain URLs; the ad form's Dropzone upload put them back in the path, so the `minio` service,
+`config.active_storage.*` and the `aws-sdk-s3` gem are all wired to something now. Removing
+them would break photo upload.

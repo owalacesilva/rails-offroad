@@ -21,11 +21,23 @@ cp .env-example .env                         # opcional: há default para tudo
 docker compose build
 docker compose run --rm web bundle install   # popula o volume de gems
 docker compose run --rm web bin/rails db:prepare
-docker compose run --rm web bin/rails db:seed    # 4 categorias e 36 anúncios
+docker compose run --rm web bin/rails db:seed    # 5.571 municípios, 4 categorias, 36 anúncios
 docker compose up
 ```
 
 O seed é idempotente: rodar de novo não duplica registros.
+
+Os **municípios** são a única parte do seed que não é amostra: são os 5.570 municípios
+brasileiros mais Fernando de Noronha, vindos do IBGE e versionados em `db/cities.csv`, e
+valem em qualquer ambiente. Em produção, ou para recarregar só eles:
+
+```bash
+docker compose exec web bin/rails cities:import   # idempotente
+```
+
+Em `RAILS_ENV=test` o `db/seeds.rb` não faz nada de propósito: `db:prepare` chama o arquivo
+sozinho quando cria o banco, e dado pré-existente quebraria a suíte, que monta o que precisa
+com factories.
 
 ### Serviços
 

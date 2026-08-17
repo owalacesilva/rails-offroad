@@ -24,7 +24,7 @@ class HomeController < ApplicationController
   }.freeze
 
   def index
-    published = Ad.published.includes(:category, :ad_images)
+    published = Ad.published.with_photos.includes(:category)
     photos = gallery_photos
 
     @ads = published.recent.limit(RECENT_ROW * 2)
@@ -42,7 +42,8 @@ class HomeController < ApplicationController
     # A ordem mantém juntas as fotos de um mesmo anúncio, que é o que faz o
     # mosaico parecer galeria e não uma segunda régua de capas.
     def gallery_photos
-      AdImage.joins(:ad)
+      AdImage.with_attached_file
+             .joins(:ad)
              .merge(Ad.published)
              .includes(:ad)
              .order("ads.published_at DESC", :ad_id, :sort_order)

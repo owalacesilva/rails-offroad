@@ -32,6 +32,10 @@ Rails.application.routes.draw do
   # página própria para listar nem editar inscrição.
   post "newsletter", to: "newsletter_subscriptions#create", as: :newsletter_subscription
 
+  # Autocomplete de municípios (JSON). Alimenta o campo de cidade do formulário
+  # de anúncio, que pede só os da UF escolhida em vez dos 5.571 de uma vez.
+  get "municipios", to: "cities#index", as: :cities
+
   # Painel do anunciante autenticado, todo sob /anunciante. Os helpers seguem
   # account_* — a rota é portuguesa, o código é inglês.
   scope module: "dashboard", path: "anunciante" do
@@ -41,6 +45,8 @@ Rails.application.routes.draw do
     # as: nil porque o POST divide o caminho com o GET acima: sem isso o Rails
     # inventaria o helper `anuncios_path` a partir do segmento em português.
     post  "anuncios",      to: "ads#create",      as: nil
+    # Uma requisição por foto, do Dropzone. Devolve o signed_id do blob.
+    post  "anuncios/fotos", to: "ad_photos#create", as: :account_ad_photos
     get   "perfil",        to: "profiles#edit",   as: :edit_profile
     patch "perfil",        to: "profiles#update", as: :profile
     get   "propostas",     to: "proposals#index", as: :proposals

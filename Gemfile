@@ -42,6 +42,11 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Ligação com a libvips (libvips42 entra pelo Dockerfile.dev). Já vinha junto como
+# dependência do image_processing; está declarada porque o upload de foto a usa
+# direto, para ler largura e altura antes de mandar o arquivo para o MinIO.
+gem "ruby-vips"
+
 # Cliente S3 do Active Storage. Em desenvolvimento aponta para o MinIO (ver config/storage.yml).
 gem "aws-sdk-s3", require: false
 

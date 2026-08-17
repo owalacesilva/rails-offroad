@@ -3,7 +3,7 @@
   <div class="relative aspect-[4/3] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
     <% images = ad.ad_images.to_a %>
     <% if images.any? %>
-      <%= image_tag images.first.file_url,
+      <%= image_tag images.first.url,
             data: { gallery_target: "main" },
             alt: t("ads.show.gallery.main", title: ad.title),
             class: "h-full w-full object-cover" %>
@@ -35,11 +35,11 @@
         <button type="button"
                 data-gallery-target="thumb"
                 data-action="gallery#select"
-                data-gallery-url-param="<%= image.file_url %>"
+                data-gallery-url-param="<%= image.url %>"
                 data-gallery-alt-param="<%= alt %>"
                 aria-current="<%= index.zero? %>"
                 class="aspect-[4/3] cursor-pointer overflow-hidden rounded-lg ring-2 transition <%= index.zero? ? "ring-brand-500" : "ring-stone-200" %> hover:ring-brand-400">
-          <%= image_tag image.file_url, alt: alt, class: "h-full w-full object-cover" %>
+          <%= image_tag image.url, alt: alt, class: "h-full w-full object-cover" %>
         </button>
       <% end %>
     </div>

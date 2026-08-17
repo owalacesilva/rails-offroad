@@ -10,6 +10,12 @@ class Ad < ApplicationRecord
 
   RELATED_LIMIT = 4
 
+  # O que a descrição pode conter: exatamente os cinco controles do editor do
+  # formulário (negrito, itálico, as duas listas e H3) mais os blocos que eles
+  # produzem. Nenhum atributo passa — nem style, nem class, nem href: o campo
+  # descreve um veículo, não é uma página.
+  DESCRIPTION_TAGS = %w[p br strong em b i ul ol li h3].freeze
+
   belongs_to :user
   belongs_to :category
   # Quem avaliou. Nulo enquanto ninguém moderou.
@@ -27,11 +33,14 @@ class Ad < ApplicationRecord
   validates :city, presence: true
   validates :state, presence: true, length: { is: 2 }
   validates :price, numericality: { greater_than: 0 }
+  # Ano no futuro não é aceito: o teto é o ano corrente. Antes o limite era
+  # ano + 1, para o modelo-ano adiantado que a indústria automotiva usa; a regra
+  # agora é a literal, então uma picape "2027" anunciada em 2026 é recusada.
   validates :year,
             numericality: {
               only_integer: true,
               greater_than: 1900,
-              less_than_or_equal_to: ->(_ad) { Date.current.year + 1 }
+              less_than_or_equal_to: ->(_ad) { Date.current.year }
             },
             allow_nil: true
   # Fotos são cobradas em dois momentos: no anúncio aprovado, que já está no ar,
@@ -49,6 +58,9 @@ class Ad < ApplicationRecord
   # A régua "Mais Vistos" da home. O desempate por data evita que um acervo novo,
   # em que todo mundo ainda está zerado, saia em ordem indefinida do MySQL.
   scope :most_viewed, -> { order(views_count: :desc, published_at: :desc) }
+  # Fotos prontas para exibir. O anexo entra no preload junto porque AdImage#url
+  # pergunta se há blob: sem isto seria uma consulta por foto em cada listagem.
+  scope :with_photos, -> { includes(ad_images: { file_attachment: :blob }) }
   # Subconsulta em vez de joins: evita conflito com o includes(:category) da listagem.
   scope :by_category, ->(slug) { where(category: Category.where(slug: slug)) }
   scope :by_state, ->(state) { where(state: state) }
@@ -67,6 +79,23 @@ class Ad < ApplicationRecord
   # Vírgula do formulário vira ponto antes do cast (ver ApplicationRecord).
   def price=(value)
     super(self.class.normalize_decimal(value))
+  end
+
+  # A descrição chega como HTML do editor do formulário e é limpa na entrada,
+  # não na exibição: assim o banco só guarda o que já está dentro da lista, e
+  # nenhuma tela precisa lembrar de sanitizar de novo (a de exibição sanitiza
+  # mesmo assim, por cima).
+  #
+  # Texto puro atravessa sem virar HTML — é o que o seed grava e o que sobra de
+  # quem preenche o formulário com o JavaScript desligado.
+  def description=(value)
+    super(self.class.sanitize_description(value))
+  end
+
+  def self.sanitize_description(value)
+    return value if value.blank?
+
+    Rails::HTML5::SafeListSanitizer.new.sanitize(value.to_s, tags: DESCRIPTION_TAGS, attributes: [])
   end
 
   def cover_image
@@ -99,7 +128,7 @@ class Ad < ApplicationRecord
   # pondera estado nem faixa de preço.
   def related(limit: RELATED_LIMIT)
     self.class.published
-        .includes(:category, :ad_images)
+        .with_photos.includes(:category)
         .where(category_id: category_id)
         .where.not(id: id)
         .recent

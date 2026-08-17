@@ -3,6 +3,25 @@ require "stringio"
 # Idempotente: rodar `bin/rails db:seed` mais de uma vez não duplica registros
 # nem reescreve fotos. Preços em reais (DECIMAL), sem conversão para centavos.
 
+# Banco de teste não recebe seed. Não é preferência: `db:prepare` chama este
+# arquivo sozinho quando cria o banco, e é exatamente o que a CI roda antes do
+# RSpec — sem esta guarda a suíte começaria com 4 categorias, 8 anunciantes e 36
+# anúncios já gravados, e todo spec que conta registro ou cria uma categoria de
+# slug conhecido quebraria por colisão.
+#
+# Cada spec monta o que precisa com factories. Para popular um banco de teste de
+# propósito, chame o carregador direto: `bin/rails cities:import`.
+if Rails.env.test?
+  puts "Seed ignorado: em teste cada exemplo monta os próprios dados."
+  return
+end
+
+# Municípios do IBGE. Diferente de tudo que vem abaixo, este é dado de
+# referência e não amostra: vale em qualquer ambiente, inclusive produção, onde
+# se carrega sozinho por `bin/rails cities:import`. Vem primeiro porque é o único
+# bloco de que outro poderia depender.
+cities_count = BrazilianCities.import
+
 CATEGORIES = [
   { slug: "veiculos-4x4", position: 1 },
   { slug: "motos-quadriciclos", position: 2 },
@@ -408,7 +427,7 @@ EVENTS.each do |attributes|
   )
 end
 
-puts "Seed: #{Category.count} categorias, #{SpecAttribute.count} atributos, " \
+puts "Seed: #{cities_count} municípios, #{Category.count} categorias, #{SpecAttribute.count} atributos, " \
      "#{Admin.count} moderadores, #{User.count} anunciantes, " \
      "#{Ad.count} anúncios (#{Ad.published.count} aprovados), " \
      "#{AdImage.count} fotos, #{TechnicalSpecValue.count} especificações, " \

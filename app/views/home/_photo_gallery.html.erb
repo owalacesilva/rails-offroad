@@ -17,7 +17,7 @@
                 hover e não existe no toque. %>
             <%= link_to ad_path(image.ad),
                   class: "group relative block aspect-square overflow-hidden rounded-xl bg-stone-100 ring-1 ring-stone-200 transition hover:ring-2 hover:ring-brand-400" do %>
-              <%= image_tag image.file_url, alt: image.ad.title, loading: "lazy",
+              <%= image_tag image.url, alt: image.ad.title, loading: "lazy",
                     class: "h-full w-full object-cover transition duration-300 group-hover:scale-105" %>
 
               <span aria-hidden="true"

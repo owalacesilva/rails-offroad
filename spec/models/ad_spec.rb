@@ -33,8 +33,56 @@ RSpec.describe Ad, type: :model do
       expect(build(:ad, :without_year)).to be_valid
     end
 
+    it "aceita o ano corrente" do
+      expect(build(:ad, year: Date.current.year)).to be_valid
+    end
+
+    # O teto é o ano corrente: nada de modelo-ano adiantado, que era o que o
+    # limite anterior (ano + 1) permitia.
+    it "recusa o ano que vem" do
+      expect(build(:ad, year: Date.current.year + 1)).not_to be_valid
+    end
+
     it "recusa ano no futuro distante" do
       expect(build(:ad, year: Date.current.year + 5)).not_to be_valid
+    end
+
+    it "recusa ano anterior ao automóvel" do
+      expect(build(:ad, year: 1899)).not_to be_valid
+    end
+  end
+
+  # A descrição chega como HTML do editor do formulário e é limpa na entrada:
+  # o banco só guarda o que está dentro de DESCRIPTION_TAGS.
+  describe "descrição" do
+    it "mantém as tags que o editor produz" do
+      ad = build(:ad, description: "<h3>Motor</h3><p>Revisado e <strong>impecável</strong>.</p><ul><li>Pneu novo</li></ul>")
+
+      expect(ad.description).to eq("<h3>Motor</h3><p>Revisado e <strong>impecável</strong>.</p><ul><li>Pneu novo</li></ul>")
+    end
+
+    it "descarta tag fora da lista" do
+      expect(build(:ad, description: "<p>ok</p><iframe src='x'></iframe>").description).to eq("<p>ok</p>")
+    end
+
+    it "descarta atributo, inclusive evento de clique" do
+      expect(build(:ad, description: %(<p onclick="alert(1)" class="x">ok</p>)).description).to eq("<p>ok</p>")
+    end
+
+    it "descarta link, que o editor não oferece" do
+      expect(build(:ad, description: %(<p>veja <a href="http://x">aqui</a></p>)).description).to eq("<p>veja aqui</p>")
+    end
+
+    # Texto puro é o que o seed grava e o que sobra sem JavaScript: atravessa
+    # sem virar HTML.
+    it "deixa texto puro em paz" do
+      ad = build(:ad, description: "Bem conservado.\n\nAceito troca.")
+
+      expect(ad.description).to eq("Bem conservado.\n\nAceito troca.")
+    end
+
+    it "aceita descrição vazia" do
+      expect(build(:ad, description: nil)).to be_valid
     end
   end
 
