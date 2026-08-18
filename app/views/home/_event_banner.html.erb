@@ -1,0 +1,43 @@
+<%# Banner promocional do evento em destaque. Um por vez, escolhido na gestão
+    (Event#feature!); sem destaque válido a seção inteira não é renderizada. %>
+<section class="border-b border-brand-200 bg-brand-50">
+  <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="relative overflow-hidden rounded-2xl bg-stone-900">
+      <% cover = event.cover_url %>
+      <% if cover.present? %>
+        <%= image_tag cover, alt: "", loading: "lazy",
+              class: "absolute inset-0 h-full w-full object-cover opacity-45" %>
+      <% end %>
+
+      <div class="relative grid gap-4 p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-brand-300">
+            <%= t("home.event_banner.label") %>
+          </p>
+
+          <h2 class="mt-2 text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl">
+            <%= event.title %>
+          </h2>
+
+          <p class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-semibold text-stone-200">
+            <span class="text-brand-300"><%= event_dates(event) %></span>
+            <span aria-hidden="true">&middot;</span>
+            <span><%= [ event.venue, event.location ].compact_blank.join(" · ") %></span>
+          </p>
+
+          <% if event.description.present? %>
+            <p class="mt-3 max-w-2xl text-sm leading-relaxed text-stone-300"><%= event.description %></p>
+          <% end %>
+        </div>
+
+        <% if event.external_url.present? %>
+          <%= link_to event.external_url, target: "_blank", rel: "noopener nofollow",
+                class: "inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand-500 px-7 py-3 text-sm font-bold text-stone-950 transition hover:bg-brand-400" do %>
+            <%= t("home.event_banner.cta") %>
+            <span class="sr-only">(<%= t("home.events.external") %>)</span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>

@@ -2,7 +2,7 @@
     A home tem o seu, menor, em home/_ad_card. %>
 <article class="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white transition hover:-translate-y-1 hover:border-brand-400 hover:shadow-lg hover:shadow-stone-900/10">
   <div class="relative aspect-[4/3] overflow-hidden bg-stone-100">
-    <% cover = ad.ad_images.first %>
+    <% cover = ad.cover_image %>
     <% if cover.present? %>
       <%= image_tag cover.url, alt: ad.title, loading: "lazy",
             class: "h-full w-full object-cover transition duration-300 group-hover:scale-105" %>

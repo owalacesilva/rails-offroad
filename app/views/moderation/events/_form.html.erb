@@ -73,11 +73,16 @@
     </div>
 
     <div>
-      <%= form.label :image_url, class: label_class %>
-      <%= form.url_field :image_url, placeholder: "https://exemplo.com.br/foto.jpg", class: field_class %>
-      <p class="mt-1 text-xs text-stone-400"><%= t("admin.events.form.image_url_hint") %></p>
+      <%= form.label :featured, class: label_class %>
+      <label class="mt-2 flex cursor-pointer items-start gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2.5">
+        <%= form.check_box :featured, class: "mt-0.5 size-4 cursor-pointer accent-brand-500" %>
+        <span class="text-xs leading-relaxed text-stone-600"><%= t("admin.events.form.featured_hint") %></span>
+      </label>
     </div>
   </div>
+
+  <%= render "shared/cover_field", form: form, url_field: :image_url,
+        current: event.cover_url, label_class: label_class, field_class: field_class %>
 
   <div class="flex flex-wrap items-center gap-3 border-t border-stone-200 pt-5">
     <%= form.submit submit_label,

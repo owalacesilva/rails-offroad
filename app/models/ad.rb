@@ -10,19 +10,18 @@ class Ad < ApplicationRecord
 
   RELATED_LIMIT = 4
 
-  # O que a descrição pode conter: exatamente os cinco controles do editor do
-  # formulário (negrito, itálico, as duas listas e H3) mais os blocos que eles
-  # produzem. Nenhum atributo passa — nem style, nem class, nem href: o campo
-  # descreve um veículo, não é uma página.
-  DESCRIPTION_TAGS = %w[p br strong em b i ul ol li h3].freeze
-
   belongs_to :user
   belongs_to :category
   # Quem avaliou. Nulo enquanto ninguém moderou.
   belongs_to :admin, optional: true
 
   has_many :proposals, dependent: :destroy
+  # Todas as fotos, inclusive as bloqueadas: é o que a moderação precisa ver.
   has_many :ad_images, -> { ordered }, dependent: :destroy, inverse_of: :ad
+  # O que o portal exibe. Foto bloqueada some daqui e da contagem que valida o
+  # anúncio aprovado — é o que faz o bloqueio ter consequência.
+  has_many :visible_images, -> { visible.ordered }, class_name: "AdImage",
+                            inverse_of: :ad, dependent: nil
   has_many :technical_spec_values, dependent: :destroy, inverse_of: :ad
   has_many :spec_attributes, through: :technical_spec_values, source: :spec_attribute
 
@@ -68,7 +67,9 @@ class Ad < ApplicationRecord
   scope :most_viewed, -> { order(views_count: :desc, published_at: :desc) }
   # Fotos prontas para exibir. O anexo entra no preload junto porque AdImage#url
   # pergunta se há blob: sem isto seria uma consulta por foto em cada listagem.
-  scope :with_photos, -> { includes(ad_images: { file_attachment: :blob }) }
+  scope :with_photos, -> { includes(visible_images: { file_attachment: :blob }) }
+  # A fila de moderação precisa das bloqueadas junto, para poder desbloquear.
+  scope :with_all_photos, -> { includes(ad_images: { file_attachment: :blob }) }
   # Subconsulta em vez de joins: evita conflito com o includes(:category) da listagem.
   scope :by_category, ->(slug) { where(category: Category.where(slug: slug)) }
   scope :by_state, ->(state) { where(state: state) }
@@ -107,17 +108,11 @@ class Ad < ApplicationRecord
   # Texto puro atravessa sem virar HTML — é o que o seed grava e o que sobra de
   # quem preenche o formulário com o JavaScript desligado.
   def description=(value)
-    super(self.class.sanitize_description(value))
-  end
-
-  def self.sanitize_description(value)
-    return value if value.blank?
-
-    Rails::HTML5::SafeListSanitizer.new.sanitize(value.to_s, tags: DESCRIPTION_TAGS, attributes: [])
+    super(self.class.sanitize_rich_text(value))
   end
 
   def cover_image
-    ad_images.first
+    visible_images.first
   end
 
   # UPDATE atômico direto na coluna: contar visualização não pode disputar com
@@ -138,8 +133,25 @@ class Ad < ApplicationRecord
     update(status: :approved, admin: admin, reviewed_at: now, published_at: published_at || now)
   end
 
-  def reject(admin)
-    update(status: :rejected, admin: admin, reviewed_at: Time.current)
+  # O recado é opcional na assinatura mas cobrado no formulário da moderação:
+  # rejeitar sem dizer por quê deixa o anunciante sem o que corrigir.
+  def reject(admin, note: nil)
+    update(status: :rejected, admin: admin, reviewed_at: Time.current, moderation_note: note)
+  end
+
+  # Tira uma foto do ar sem mexer no resto do anúncio.
+  #
+  # Se sobrar menos que o mínimo, o anúncio aprovado volta para a fila: aprovado
+  # com duas fotos é um estado que a validação não aceita, e deixá-lo no portal
+  # seria publicar um anúncio que a própria moderação não conseguiria reaprovar.
+  def block_image(image, admin, note: nil)
+    now = Time.current
+    image.update!(blocked_at: now)
+    review = { admin: admin, reviewed_at: now }
+    review[:moderation_note] = note if note.present?
+    review[:status] = :pending if demote_after_block?
+
+    update(review)
   end
 
   # Mesma categoria, exceto o próprio anúncio. Deliberadamente simples: não
@@ -151,18 +163,6 @@ class Ad < ApplicationRecord
         .where.not(id: id)
         .recent
         .limit(limit)
-  end
-
-  # Slug livre a partir de uma base, com sufixo numérico quando já existe.
-  # Corrida entre dois INSERTs simultâneos ainda esbarra no índice único — que
-  # é justamente quem garante a unicidade de verdade.
-  def self.unique_slug(base)
-    return base unless exists?(slug: base)
-
-    suffix = 2
-    suffix += 1 while exists?(slug: "#{base}-#{suffix}")
-
-    "#{base}-#{suffix}"
   end
 
   private
@@ -187,9 +187,23 @@ class Ad < ApplicationRecord
       errors.add(:base, :missing_specifications, names: missing.map(&:label).to_sentence)
     end
 
+    # Conta só o que está no ar: foto bloqueada não sustenta anúncio aprovado.
     def image_count_within_bounds
-      return if IMAGE_COUNT.cover?(ad_images.size)
+      return if IMAGE_COUNT.cover?(countable_images.size)
 
       errors.add(:ad_images, :invalid_count, min: IMAGE_COUNT.min, max: IMAGE_COUNT.max)
+    end
+
+    # Só anúncio no ar precisa voltar para a fila. Rascunho e rejeitado já não
+    # aparecem no portal, e promovê-los a "pendente" desfaria o que a moderação
+    # tinha decidido antes.
+    def demote_after_block?
+      approved? && !IMAGE_COUNT.cover?(visible_images.reload.size)
+    end
+
+    # Em registro novo as fotos ainda estão só na memória, e `visible_images`
+    # faria uma consulta que não enxerga nenhuma delas.
+    def countable_images
+      new_record? ? ad_images.reject(&:blocked?) : visible_images
     end
 end

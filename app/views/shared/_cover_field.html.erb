@@ -1,0 +1,49 @@
+<%# Capa enviada pela gestão. Locais: form, url_field (o nome da coluna de URL),
+    current (o endereço atual, se houver), label_class e field_class.
+
+    Duas origens para a mesma imagem: o arquivo enviado, que vira anexo do
+    Active Storage, e a URL, que continua valendo para imagem já hospedada em
+    outro lugar (é o que o seed usa). O modelo prefere o anexo. %>
+<div class="rounded-lg border border-stone-200 bg-stone-50 p-4"
+     data-controller="cover-upload"
+     data-cover-upload-url-value="<%= admin_uploads_path %>"
+     data-cover-upload-text-value="<%= {
+           sending: t("admin.cover.sending"),
+           failed: t("uploads.errors.unreadable")
+         }.to_json %>">
+  <p class="<%= label_class %>"><%= t("admin.cover.label") %></p>
+  <p class="mt-1 text-xs text-stone-400">
+    <%= t("admin.cover.hint", width: PhotoUpload::MAX_WIDTH, height: PhotoUpload::MAX_HEIGHT) %>
+  </p>
+
+  <div class="mt-3 flex flex-wrap items-start gap-4">
+    <figure data-cover-upload-target="preview" hidden
+            class="h-24 w-40 shrink-0 overflow-hidden rounded-lg border border-stone-200 bg-white">
+      <%= image_tag(current.presence || "", alt: "", data: { cover_upload_target: "image" },
+            class: "h-full w-full object-cover") %>
+    </figure>
+
+    <div class="min-w-0 flex-1">
+      <%= file_field_tag :cover_file, accept: PhotoUpload::CONTENT_TYPES.join(","),
+            data: { cover_upload_target: "input", action: "change->cover-upload#selected" },
+            class: "block w-full cursor-pointer text-xs text-stone-600 file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-stone-900 file:px-4 file:py-2 file:text-xs file:font-bold file:uppercase file:tracking-wide file:text-white hover:file:bg-stone-700" %>
+
+      <%# O signed_id do blob viaja no formulário; vazio significa "sem capa". %>
+      <%= hidden_field_tag "#{form.object_name}[cover_signed_id]", nil,
+            data: { cover_upload_target: "signedId" } %>
+
+      <p data-cover-upload-target="status" class="mt-2 text-xs font-semibold text-stone-500"></p>
+      <p data-cover-upload-target="error" role="alert" class="mt-1 text-xs font-semibold text-red-600"></p>
+
+      <button type="button" data-action="cover-upload#remove" data-cover-upload-target="remove" hidden
+              class="mt-2 cursor-pointer text-xs font-bold uppercase tracking-wide text-red-600 transition hover:text-red-500">
+        <%= t("admin.cover.remove") %>
+      </button>
+
+      <details class="mt-3">
+        <summary class="cursor-pointer text-xs font-semibold text-stone-500"><%= t("admin.cover.by_url") %></summary>
+        <%= form.url_field url_field, placeholder: "https://exemplo.com.br/capa.jpg", class: field_class %>
+      </details>
+    </div>
+  </div>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_18_130003) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -41,12 +41,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
 
   create_table "ad_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "ad_id", null: false
+    t.datetime "blocked_at"
     t.datetime "created_at", null: false
     t.string "file_url"
     t.integer "sort_order", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["ad_id", "sort_order"], name: "index_ad_images_on_ad_id_and_sort_order"
     t.index ["ad_id"], name: "index_ad_images_on_ad_id"
+    t.index ["blocked_at"], name: "index_ad_images_on_blocked_at"
   end
 
   create_table "admin_sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -74,6 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
     t.string "city", null: false
     t.datetime "created_at", null: false
     t.text "description"
+    t.text "moderation_note"
     t.integer "price_cents", null: false
     t.datetime "published_at"
     t.datetime "reviewed_at"
@@ -147,6 +150,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
     t.datetime "created_at", null: false
     t.text "description"
     t.date "ends_on"
+    t.boolean "featured", default: false, null: false
     t.string "image_url"
     t.date "starts_on", null: false
     t.string "state", limit: 2, null: false
@@ -154,6 +158,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
     t.datetime "updated_at", null: false
     t.string "url"
     t.string "venue"
+    t.index ["featured"], name: "index_events_on_featured"
     t.index ["starts_on"], name: "index_events_on_starts_on"
     t.index ["state", "city"], name: "index_events_on_state_and_city"
     t.check_constraint "(`ends_on` is null) or (`ends_on` >= `starts_on`)", name: "events_dates_ordered"
@@ -166,6 +171,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
     t.string "source"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_newsletter_subscriptions_on_email", unique: true
+  end
+
+  create_table "posts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "admin_id", null: false
+    t.text "body", null: false
+    t.string "cover_url"
+    t.datetime "created_at", null: false
+    t.text "excerpt"
+    t.datetime "published_at"
+    t.string "slug", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_id"], name: "index_posts_on_admin_id"
+    t.index ["published_at"], name: "index_posts_on_published_at"
+    t.index ["slug"], name: "index_posts_on_slug", unique: true
   end
 
   create_table "proposals", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -228,6 +248,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
   add_foreign_key "ads", "users"
   add_foreign_key "attribute_categories", "attributes"
   add_foreign_key "attribute_categories", "categories"
+  add_foreign_key "posts", "admins"
   add_foreign_key "proposals", "ads"
   add_foreign_key "proposals", "users"
   add_foreign_key "sessions", "users"

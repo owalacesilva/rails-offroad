@@ -1,0 +1,30 @@
+<% content_for :title, "#{t('posts.index.title')} — OffRoad Classificados" %>
+
+<header class="border-b border-stone-200 bg-stone-50">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <h1 class="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl"><%= t("posts.index.title") %></h1>
+    <p class="mt-3 max-w-2xl text-base leading-relaxed text-stone-600"><%= t("posts.index.subtitle") %></p>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+  <% if @posts.any? %>
+    <p class="text-sm font-semibold text-stone-500">
+      <%= t("posts.index.count", count: @pagination.total_count) %>
+    </p>
+
+    <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <%= render partial: "posts/card", collection: @posts, as: :post %>
+    </div>
+
+    <% if @pagination.many_pages? %>
+      <%= render "shared/pagination", pagination: @pagination, label: t("posts.index.title"),
+            page_path: ->(page) { posts_path(page: page) } %>
+    <% end %>
+  <% else %>
+    <div class="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-6 py-16 text-center">
+      <h2 class="text-lg font-bold text-stone-800"><%= t("posts.index.empty.title") %></h2>
+      <p class="mt-2 text-sm text-stone-500"><%= t("posts.index.empty.subtitle") %></p>
+    </div>
+  <% end %>
+</section>

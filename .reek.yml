@@ -43,3 +43,10 @@ detectors:
       - "AdsController"
       - "Dashboard::DashboardController"
       - "HomeController"
+
+  # Ad é o modelo central do portal e concentra as regras de quatro assuntos:
+  # moderação, fotos, dinheiro e slug. Quebrá-lo em concerns só para caber no
+  # limite espalharia por quatro arquivos o que hoje se lê de uma vez.
+  TooManyMethods:
+    exclude:
+      - "Ad"

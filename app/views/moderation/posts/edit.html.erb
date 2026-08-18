@@ -1,0 +1,22 @@
+<% content_for :title, "#{@post.title} — #{t('admin.title')}" %>
+
+<section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+  <nav class="text-xs font-semibold text-stone-500">
+    <%= link_to t("admin.posts.index.title"), admin_posts_path, class: "transition hover:text-brand-600" %>
+    <span aria-hidden="true">&rsaquo;</span>
+    <span class="text-brand-600"><%= t("admin.posts.edit.title") %></span>
+  </nav>
+
+  <div class="mt-4 flex flex-wrap items-start justify-between gap-3">
+    <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= @post.title %></h1>
+    <% if @post.published? %>
+      <%= link_to t("admin.posts.index.view"), post_path(@post), target: "_blank", rel: "noopener",
+            class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
+    <% end %>
+  </div>
+  <p class="mt-1 text-sm text-stone-500"><%= t("admin.posts.edit.subtitle") %></p>
+
+  <div class="mt-6 rounded-xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+    <%= render "form", post: @post, submit_label: t("admin.posts.edit.submit") %>
+  </div>
+</section>

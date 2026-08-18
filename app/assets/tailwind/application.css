@@ -86,58 +86,58 @@
 }
 
 @layer components {
-  /* Descrição do anúncio: o único HTML do portal que vem de fora, escrito no
-     editor do formulário e limitado a Ad::DESCRIPTION_TAGS.
+  /* Texto rico: o HTML que vem de fora, escrito no editor do formulário de
+     anúncio e no de post, limitado a ApplicationRecord::RICH_TEXT_TAGS.
 
      O reset do Tailwind zera tamanho de título, marcador de lista e recuo, e
      não há como pendurar classe utilitária em tag gerada pelo editor — então a
      forma dessas poucas tags mora aqui. A mesma classe veste o contenteditable
      do formulário, para o que se escreve ser o que se vê depois. */
-  .ad-description > :first-child {
+  .rich-text > :first-child {
     margin-block-start: 0;
   }
 
-  .ad-description > :last-child {
+  .rich-text > :last-child {
     margin-block-end: 0;
   }
 
-  .ad-description p {
+  .rich-text p {
     margin-block: 0.75rem;
   }
 
-  .ad-description h3 {
+  .rich-text h3 {
     margin-block: 1.25rem 0.5rem;
     font-size: 1rem;
     font-weight: 700;
     color: var(--color-stone-900);
   }
 
-  .ad-description ul,
-  .ad-description ol {
+  .rich-text ul,
+  .rich-text ol {
     margin-block: 0.75rem;
     padding-inline-start: 1.5rem;
   }
 
-  .ad-description ul {
+  .rich-text ul {
     list-style-type: disc;
   }
 
-  .ad-description ol {
+  .rich-text ol {
     list-style-type: decimal;
   }
 
-  .ad-description li {
+  .rich-text li {
     margin-block: 0.25rem;
   }
 
-  .ad-description strong,
-  .ad-description b {
+  .rich-text strong,
+  .rich-text b {
     font-weight: 700;
     color: var(--color-stone-900);
   }
 
-  .ad-description em,
-  .ad-description i {
+  .rich-text em,
+  .rich-text i {
     font-style: italic;
   }
 

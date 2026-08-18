@@ -5,16 +5,18 @@ module Moderation
       @status = requested_status
       @counts = Ad.group(:status).count
       @ads = Ad.where(status: @status)
-               .includes(:user, :category, :ad_images)
+               .with_all_photos.includes(:user, :category)
                .order(created_at: :desc)
     end
 
     def approve
-      review(:approve)
+      review(:approve) { |ad| ad.approve(current_admin) }
     end
 
+    # Só a rejeição carrega recado: aprovar não precisa de explicação, e o
+    # formulário da fila é quem cobra o texto de quem rejeita.
     def reject
-      review(:reject)
+      review(:reject) { |ad| ad.reject(current_admin, note: params[:note].presence) }
     end
 
     private
@@ -29,7 +31,7 @@ module Moderation
         # Pela slug, e não pelo id: Ad#to_param devolve a slug, então é ela que
         # os helpers de rota colocam na URL, inclusive aqui na moderação.
         ad = Ad.find_by!(slug: params[:id])
-        reviewed = ad.public_send(action, current_admin)
+        reviewed = yield(ad)
         # Depois da avaliação o status mudou: a fila de destino é a nova.
         queue = admin_ads_path(status: ad.status)
 

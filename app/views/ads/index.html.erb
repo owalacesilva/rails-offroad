@@ -109,7 +109,8 @@
     </div>
 
     <% if @pagination.many_pages? %>
-      <%= render "ads/pagination", pagination: @pagination %>
+      <%= render "shared/pagination", pagination: @pagination, label: t("ads.title"),
+            page_path: ->(page) { ads_page_path(page) } %>
     <% end %>
   <% else %>
     <div class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-6 py-16 text-center">

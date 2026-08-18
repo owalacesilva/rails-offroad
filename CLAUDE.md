@@ -211,7 +211,12 @@ form still posts with JS off.
 photo controller unlocks it, once `Ad::IMAGE_COUNT.min` photos are up. Without JS there is
 no way to send a file anyway, so the form says so instead of pretending.
 
-**`Dashboard::AdPhotosController` is the last word on image limits.** Dropzone resizes to
+**`PhotoUpload` is the last word on image limits**, shared by the advertiser's ad photos and
+the moderator's covers — same dimensions, same byte cap, same libvips check, different
+session. Its constants are what the ad form reads (`PhotoUpload::MAX_WIDTH`), and its
+messages live under `uploads.errors.*`.
+
+**`Dashboard::AdPhotosController` applies those limits.** Dropzone resizes to
 fit `MAX_WIDTH × MAX_HEIGHT` in the browser before uploading, and never upscales, but the
 controller re-measures with libvips and rejects anything over — nothing from a browser
 counts as a guarantee. Content type is checked against the header *and* against whether
@@ -221,6 +226,18 @@ libvips can open the file at all.
 inputs are `peer sr-only` and Tailwind's `peer-checked:` styles the label. Keyboard and
 screen reader still see an ordinary radio group. `peer-checked:` only reaches siblings of
 the input, so the colour lives on the label and the icon inherits it via `currentColor`.
+
+**The rich-text editor is shared.** `shared/_rich_text_field` renders the toolbar,
+the contenteditable and the backing `<textarea>` for both the ad description and the post
+body; the allowlist behind it is `ApplicationRecord::RICH_TEXT_TAGS`, and
+`ApplicationHelper#rich_text` is the matching renderer. Adding a sixth control means
+touching the partial, the tag list and `rich_text_controller.js` together — the three are
+one feature.
+
+**`shared/_pagination` takes a lambda**, not a path helper: the ads listing has to carry its
+filters into every page link and the blog has nothing to carry, so each caller passes
+`page_path: ->(page) { ... }`. `paginated_page_numbers` moved to `ApplicationHelper` for the
+same reason.
 
 **Specifications are filled in a modal.** All four categories render a block of spec
 fields inside one `<dialog>`; `category_specs_controller.js` shows the selected category's
@@ -299,14 +316,42 @@ in the database.
 is a separate change with a data migration for existing rows. The accent- and
 case-insensitive collation is what lets `q=sao` find "São Paulo" with no normalized column.
 
+`Post` is the blog: portal content written by the team, so it belongs to an `Admin`
+(the author, `NOT NULL`) rather than to a `User`. **There is no status column** —
+`published_at` says everything: nil is a draft, a future timestamp is scheduled, a past one
+is live. The three admin tabs are exactly the `drafts` / `scheduled` / `published` scopes,
+and a spec asserts they partition the table so nothing can hide between them. Only
+`published` reaches `/blog` and the home page; a draft or a scheduled post 404s publicly.
+
 `Event` and `NewsletterSubscription` hang off nothing: they are portal content, not an
-advertiser's. **Events are managed from the moderation area** (`Moderation::EventsController`,
+advertiser's. **Advertisers are managed from `/admin/anunciantes`** — list, search, status tabs, and
+buttons that move an account between `active` / `inactive` / `blocked`. Deliberately
+read-only on personal data: name, email and phone belong to the advertiser, who edits them
+in their own profile. Changing status is the whole point, because `Ad.published` filters by
+`User.active`, so blocking one account pulls all of its listings at once.
+
+**Blog and events are both managed from the moderation area** (`Moderation::PostsController`
+at `/admin/blog`, `Moderation::EventsController` at
 `/admin/eventos`) — full CRUD with no approval queue, because what the portal's own team
 publishes is already trusted, unlike an advertiser's ad. The list has two tabs backed by the
 `upcoming` and `past` scopes, which partition the table between them; only `upcoming` reaches
 the home page. `Event` is the home calendar (`Event.upcoming` uses
 `COALESCE(ends_on, starts_on) >= today`, so a three-day meet stays listed on its second
-day). `Event#external_url` and `#cover_url` whitelist `http(s)` before the card turns them into an
+day). **Event and post covers are uploads now**, attached with `has_one_attached :cover_image`
+through `Moderation::UploadsController`. The `image_url` / `cover_url` columns survive as a
+fallback — the seed still uses them, and an image already hosted elsewhere is still valid —
+and the readers prefer the attachment. `CoverAttachment` is what wires the form's
+`cover_signed_id` to the record: **absent means "leave it alone", empty means "remove it"**,
+which is what lets an edit that only changes the title keep the picture. It purges
+synchronously, because `purge_later` enqueues the blob deletion without detaching, and the
+cover would keep showing until the job ran.
+
+**One event at a time can be `featured`**, and that one becomes the home page banner
+(`Event.banner`, which also requires the event not to have passed). Exclusivity lives in an
+`after_save` callback rather than in a method, because the flag is also set straight from
+the admin form's checkbox — both paths need the same guarantee.
+
+`Event#external_url` and `#cover_url` whitelist `http(s)` before the card turns them into an
 `href` and an `img src`; `Event::HTTP_URL` validates the same thing on write, so the scheme is
 checked twice — a row written by hand in SQL still cannot put `javascript:` on the home page.
 
@@ -339,6 +384,17 @@ check constraint. **Only `approved` ads are public**: `Ad.published` is the scop
 public controller and `AdFilter` starts from, so a new ad is invisible until a
 moderator clears it. `Ad#approve` records `admin_id` and `reviewed_at` and stamps
 `published_at`; `Ad#reject` records the review without publishing.
+
+**Moderation talks back through `ads.moderation_note`.** Rejecting requires a reason (the
+queue asks for it in a modal), and the advertiser sees that text on their own listing page.
+The same column carries the note when a blocked photo drops an ad below the photo minimum.
+
+**Photos can be blocked individually** — `ad_images.blocked_at`, set from the queue. A
+blocked photo disappears from the whole portal: `Ad#visible_images` is what every public
+view and `Ad.with_photos` use, and the 3-to-10 validation counts only visible ones. If
+blocking leaves an **approved** ad short, `Ad#block_image` sends it back to `pending` with
+the note; a draft or rejected ad keeps its status, because promoting it to pending would
+undo a decision moderation already made.
 
 Both return `false` instead of raising, because **an approved ad must carry 3 to 10 photos**
 (`Ad::IMAGE_COUNT`) and the queue has to show that failure rather than 500. The validation

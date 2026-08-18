@@ -1,10 +1,15 @@
-<nav class="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="<%= t("ads.title") %>">
+<%# Régua de paginação, compartilhada pela listagem de anúncios e pelo blog.
+
+    Locais: pagination, label (o nome acessível da navegação) e page_path — uma
+    lambda que recebe o número e devolve o caminho. É lambda porque cada
+    listagem preserva parâmetros diferentes: os filtros na vitrine, nada no blog. %>
+<nav class="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="<%= label %>">
   <% if pagination.first_page? %>
     <span class="rounded-full border border-stone-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-400">
-      <%= t("ads.pagination.previous") %>
+      <%= t("shared.pagination.previous") %>
     </span>
   <% else %>
-    <%= link_to t("ads.pagination.previous"), ads_page_path(pagination.page - 1),
+    <%= link_to t("shared.pagination.previous"), page_path.call(pagination.page - 1),
           class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
   <% end %>
 
@@ -14,17 +19,17 @@
         <%= number %>
       </span>
     <% else %>
-      <%= link_to number, ads_page_path(number),
+      <%= link_to number, page_path.call(number),
             class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
     <% end %>
   <% end %>
 
   <% if pagination.last_page? %>
     <span class="rounded-full border border-stone-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-400">
-      <%= t("ads.pagination.next") %>
+      <%= t("shared.pagination.next") %>
     </span>
   <% else %>
-    <%= link_to t("ads.pagination.next"), ads_page_path(pagination.page + 1),
+    <%= link_to t("shared.pagination.next"), page_path.call(pagination.page + 1),
           class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
   <% end %>
 </nav>

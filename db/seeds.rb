@@ -171,8 +171,9 @@ PHOTOS_PER_AD = 3
 # agenda vencida — `days` é quantos dias faltam para o evento começar, e `nights`
 # quantos dias ele dura além do primeiro (ausente = evento de um dia).
 EVENTS = [
+  # O primeiro entra como destaque: é ele que aparece no banner da home.
   { title: "Trilhão da Serra Catarinense", city: "Bom Jardim da Serra", state: "SC",
-    venue: "Serra do Rio do Rastro", days: 12, nights: 2,
+    venue: "Serra do Rio do Rastro", days: 12, nights: 2, featured: true,
     description: "Três dias de trilha em terreno de montanha, com percursos separados para 4x4 e motos. Inscrição limitada por veículo." },
   { title: "Encontro Nacional de Jipeiros", city: "Poços de Caldas", state: "MG",
     venue: "Parque de Exposições", days: 26, nights: 1,
@@ -432,6 +433,31 @@ PROPOSALS.each do |attributes|
   )
 end
 
+# Blog do portal. Como os eventos, é conteúdo da equipe: o autor é o moderador
+# semeado, e `days_ago` posiciona a publicação para a home ter o que mostrar.
+POSTS = [
+  { title: "Como escolher o pneu certo para trilha", days_ago: 3,
+    excerpt: "Barro, pedra e areia pedem carcaças diferentes. O que olhar antes de gastar com um jogo novo.",
+    body: "<h3>Composto e desenho</h3><p>O pneu de trilha vive do <strong>vão entre as garras</strong>: quanto maior, melhor ele se limpa no barro e pior ele se comporta no asfalto.</p><ul><li>Lama pede garra alta e espaçada.</li><li>Pedra pede flanco reforçado.</li><li>Areia pede banda larga e pressão baixa.</li></ul><p>Não existe pneu bom para tudo — existe o pneu certo para o terreno que você mais anda.</p>" },
+  { title: "Snorkel serve para quê, afinal", days_ago: 11,
+    excerpt: "Não é enfeite, e também não é passaporte para atravessar rio fundo. O que ele resolve de verdade.",
+    body: "<h3>O que o snorkel faz</h3><p>Ele tira a tomada de ar de perto do chão e leva para a altura do teto. Isso resolve <em>poeira</em> e <em>respingo</em>, que é o uso do dia a dia.</p><p>Travessia funda continua dependendo de vedação de diferencial, câmbio e motor. Snorkel sozinho não faz submarino.</p>" },
+  { title: "Revisão pós-trilha em sete passos", days_ago: 21,
+    excerpt: "O que conferir na segunda-feira depois de um fim de semana pesado, antes que vire prejuízo.",
+    body: "<h3>Antes de guardar</h3><ol><li>Lave por baixo, principalmente o radiador.</li><li>Confira o óleo do diferencial — água deixa ele leitoso.</li><li>Olhe coifas de homocinética.</li><li>Cheque folga de terminais e barra.</li><li>Reaperte a proteção de cárter.</li><li>Calibre os pneus de volta para a rua.</li><li>Anote o que rangeu.</li></ol><p>Meia hora aqui economiza um guincho depois.</p>" }
+].freeze
+
+POSTS.each do |attributes|
+  post = Post.find_or_initialize_by(title: attributes[:title])
+
+  post.update!(
+    admin: moderator,
+    excerpt: attributes[:excerpt],
+    body: attributes[:body],
+    published_at: attributes[:days_ago].days.ago
+  )
+end
+
 EVENTS.each do |attributes|
   # O título é a chave natural: rodar o seed de novo remarca as datas em vez de
   # criar um segundo evento igual.
@@ -445,7 +471,8 @@ EVENTS.each do |attributes|
     description: attributes[:description],
     starts_on: starts_on,
     # Evento de um dia fica com ends_on nulo, que é o que single_day? espera.
-    ends_on: attributes[:nights] && starts_on + attributes[:nights].days
+    ends_on: attributes[:nights] && starts_on + attributes[:nights].days,
+    featured: attributes.fetch(:featured, false)
   )
 end
 
@@ -455,4 +482,5 @@ puts "Seed: #{cities_count} municípios, #{Category.count} categorias, #{SpecAtt
      "#{AdImage.count} fotos, #{TechnicalSpecValue.count} especificações, " \
      "#{Proposal.count} propostas (#{Proposal.where(user: nil).count} anônimas), " \
      "#{AttributeCategory.count} vínculos atributo-categoria, " \
-     "#{Event.count} eventos (#{Event.upcoming.count} próximos)."
+     "#{Event.count} eventos (#{Event.upcoming.count} próximos), " \
+     "#{Post.count} posts (#{Post.published.count} publicados)."

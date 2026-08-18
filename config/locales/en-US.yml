@@ -1,9 +1,23 @@
 # Interface copy in US English. Missing keys fall back to pt-BR (see config/application.rb).
 en-US:
+  # Pieces reused by more than one screen.
+  shared:
+    pagination:
+      previous: "Previous"
+      next: "Next"
+    rich_text:
+      label: "Formatting"
+      bold: "Bold"
+      italic: "Italic"
+      bullet_list: "Bulleted list"
+      ordered_list: "Numbered list"
+      heading: "Heading"
+
   layout:
     nav:
       label: "Main navigation"
       home: "Home"
+      blog: "Blog"
       classifieds: "Classifieds"
       all_categories: "See all"
       menu: "Menu"
@@ -40,6 +54,16 @@ en-US:
         terms: "Terms of use"
         privacy: "Privacy"
         cookies: "Cookies"
+
+  # Image upload messages, returned as JSON. Shared by the ad photo upload
+  # and by the event and post cover upload.
+  uploads:
+    errors:
+      missing: "No file received."
+      type: "Upload a JPEG, PNG or WebP image."
+      size: "That photo is over %{max} MB."
+      dimensions: "That photo is over %{width} x %{height} pixels."
+      unreadable: "That image could not be read."
 
   categories:
     veiculos-4x4:
@@ -98,13 +122,6 @@ en-US:
       specifications_counter: "%{count} of %{total} filled in"
       specifications_required: "Fill in every specification for the category."
       city_hint: "Pick the state first; suggestions come from that state's municipalities."
-      format:
-        label: "Formatting"
-        bold: "Bold"
-        italic: "Italic"
-        bullet_list: "Bulleted list"
-        ordered_list: "Numbered list"
-        heading: "Heading"
       submit: "Send to moderation"
       sending: "Sending..."
       cancel: "Cancel"
@@ -115,15 +132,6 @@ en-US:
     ads:
       create:
         success: "\"%{title}\" sent to moderation. It shows up on the portal once approved."
-    # Photo upload messages, returned as JSON for Dropzone to show under the
-    # rejected thumbnail.
-    ad_photos:
-      errors:
-        missing: "No file received."
-        type: "Upload a JPEG, PNG or WebP image."
-        size: "That photo is over %{max} MB."
-        dimensions: "That photo is over %{width} x %{height} pixels."
-        unreadable: "That image could not be read."
     ads_index:
       title: "My Listings"
       subtitle: "Only approved listings appear on the portal. Here is where each one stands."
@@ -137,6 +145,10 @@ en-US:
         other: "%{count} photos"
       view: "View on portal"
       not_public: "Not live"
+      moderation_note: "Moderator note"
+      blocked_images:
+        one: "1 photo blocked by moderation"
+        other: "%{count} photos blocked by moderation"
       hints:
         pending: "Waiting on moderator review."
         rejected: "Rejected in moderation. Fix the listing and submit it again."
@@ -216,6 +228,14 @@ en-US:
       views:
         one: "1 view"
         other: "%{count} views"
+    posts:
+      title: "From the Blog"
+      subtitle: "Builds, trails and maintenance from people who ride off the pavement."
+      see_all: "See all"
+      empty: "Nothing published yet. New writing lands here soon."
+    event_banner:
+      label: "Featured event"
+      cta: "Learn more"
     events:
       title: "Upcoming Events"
       subtitle: "Trail rides, meetups and shows on the off-road calendar."
@@ -230,6 +250,20 @@ en-US:
       submit: "Sign me up"
       privacy_link: "Privacy Policy"
       privacy_html: "We only use your email to send the newsletter, and you can unsubscribe any time. Read the %{policy}."
+
+  posts:
+    by: "By %{name}"
+    index:
+      title: "Blog"
+      subtitle: "Builds, trails, maintenance and whatever else turns up on the way off the pavement."
+      count:
+        one: "1 post"
+        other: "%{count} posts"
+      empty:
+        title: "Nothing published yet"
+        subtitle: "The first piece shows up here as soon as it goes out."
+    show:
+      related: "Read next"
 
   ads:
     title: "Listings"
@@ -272,8 +306,6 @@ en-US:
       subtitle: "Try removing a filter or widening the search to another city."
     pagination:
       showing: "Showing %{from}–%{to} of %{total}"
-      previous: "Previous"
-      next: "Next"
     show:
       back: "Back to listings"
       published_at: "Published on %{date}"
@@ -511,6 +543,8 @@ en-US:
     nav:
       queue: "Queue"
       events: "Events"
+      users: "Advertisers"
+      posts: "Blog"
       sign_out: "Sign out"
     sessions:
       required: "Sign in as a moderator to continue."
@@ -523,6 +557,55 @@ en-US:
         failure: "Wrong email or password."
       destroy:
         success: "Signed out."
+    posts:
+      scopes:
+        published: "Published"
+        scheduled: "Scheduled"
+        drafts: "Drafts"
+      index:
+        title: "Blog"
+        subtitle: "The portal's writing. Published is what shows on /blog and the home page."
+        filter_label: "Filter posts"
+        new: "New post"
+        edit: "Edit"
+        view: "View live"
+        destroy: "Delete"
+        destroy_confirm: "Delete \"%{title}\"? This cannot be undone."
+        empty:
+          published:
+            title: "No posts published"
+            subtitle: "Write the first one and set a publish date."
+          scheduled:
+            title: "Nothing scheduled"
+            subtitle: "A post dated in the future waits here until its time comes."
+          drafts:
+            title: "No drafts"
+            subtitle: "A post with no publish date is kept here."
+      form:
+        title_placeholder: "E.g. How to pick a trail tire"
+        excerpt_placeholder: "A line or two summing the piece up."
+        excerpt_hint: "Shown on cards. Left blank, the summary comes from the top of the body."
+        body_placeholder: "The body of the post..."
+        cover_url_hint: "Cover image for the cards and the top of the post. Optional."
+        published_at_hint: "Blank is a draft. A future date schedules publication."
+        cancel: "Cancel"
+        errors:
+          one: "Fix 1 problem to continue:"
+          other: "Fix %{count} problems to continue:"
+      new:
+        title: "New Post"
+        subtitle: "Save it as a draft and publish whenever you like."
+        submit: "Save post"
+      edit:
+        title: "Edit post"
+        subtitle: "Changes take effect on the portal as soon as they are saved."
+        submit: "Save changes"
+      create:
+        success: "\"%{title}\" saved."
+      update:
+        success: "\"%{title}\" updated."
+      destroy:
+        success: "\"%{title}\" deleted."
     events:
       scopes:
         upcoming: "Upcoming"
@@ -548,7 +631,7 @@ en-US:
         description_placeholder: "What happens, who it is for, how to sign up..."
         ends_on_hint: "Leave empty for a single-day event."
         url_hint: "The organizer's site or sign-up page. Opens in a new tab."
-        image_url_hint: "Cover image for the home page card. Optional."
+        featured_hint: "Marks this event as the home page banner. Only one at a time."
         cancel: "Cancel"
         errors:
           one: "Fix 1 problem to continue:"
@@ -567,6 +650,57 @@ en-US:
         success: "\"%{title}\" updated."
       destroy:
         success: "\"%{title}\" removed from the calendar."
+    users:
+      statuses:
+        active: "Active"
+        inactive: "Inactive"
+        blocked: "Blocked"
+      actions:
+        active: "Reactivate"
+        inactive: "Deactivate"
+        blocked: "Block"
+        confirm:
+          active: "Reactivate %{name}? Their listings return to the portal."
+          inactive: "Deactivate %{name}? They can no longer sign in and their listings come down."
+          blocked: "Block %{name}? They can no longer sign in and their listings leave the portal."
+      index:
+        title: "Advertisers"
+        subtitle: "Everyone who lists on the portal. Blocking or deactivating pulls their listings without touching each one."
+        filter_label: "Filter by status"
+        all: "All"
+        search: "Search"
+        search_placeholder: "Name or email"
+        member_since: "On the portal since %{date}"
+        ads:
+          one: "1 listing"
+          other: "%{count} listings"
+        published:
+          one: "1 live"
+          other: "%{count} live"
+        empty:
+          title: "No advertisers here"
+          subtitle: "Adjust the search or switch tabs."
+      status:
+        success: "%{name} is now %{status}."
+    images:
+      block: "Block"
+      unblock: "Unblock"
+      blocked: "Blocked"
+      block_confirm: "Block this photo? It leaves the portal immediately."
+      default_note: "One of your photos was blocked by moderation. Upload another in its place."
+      blocked_count:
+        one: "1 blocked"
+        other: "%{count} blocked"
+      block:
+        success: "Photo on \"%{title}\" blocked."
+      unblock:
+        success: "Photo on \"%{title}\" unblocked."
+    cover:
+      label: "Featured image"
+      hint: "Uploaded from your computer. At most %{width} x %{height} pixels."
+      sending: "Uploading..."
+      remove: "Remove image"
+      by_url: "Or use the address of an image hosted elsewhere"
     ads:
       statuses:
         draft: "Drafts"
@@ -579,6 +713,13 @@ en-US:
       reject:
         success: "\"%{title}\" rejected."
         failure: "Could not reject: %{errors}"
+      reject_modal:
+        title: "Reject listing"
+        note: "Reason"
+        placeholder: "Explain what needs fixing for the listing to be approved."
+        hint: "The advertiser sees this text in their dashboard."
+        cancel: "Cancel"
+        submit: "Reject"
       index:
         title: "Moderation queue"
         subtitle: "Listings awaiting review before they appear on the portal."
@@ -588,6 +729,7 @@ en-US:
           one: "1 photo"
           other: "%{count} photos"
         reviewed_by: "Reviewed by %{name}"
+        note: "Note"
         view: "View"
         approve: "Approve"
         reject: "Reject"

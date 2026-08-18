@@ -1,7 +1,8 @@
-<%# Galeria a partir de ad_images: URL e ordem vêm da tabela, sem variantes. %>
+<%# Galeria a partir de ad_images: URL e ordem vêm da tabela, sem variantes.
+    Só as liberadas: foto bloqueada pela moderação some do portal. %>
 <div data-controller="gallery">
   <div class="relative aspect-[4/3] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
-    <% images = ad.ad_images.to_a %>
+    <% images = ad.visible_images.to_a %>
     <% if images.any? %>
       <%= image_tag images.first.url,
             data: { gallery_target: "main" },

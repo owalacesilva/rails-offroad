@@ -18,10 +18,10 @@
         <h2 class="text-sm font-bold uppercase tracking-wide text-stone-900"><%= t("ads.show.description") %></h2>
 
         <% if @ad.description.present? %>
-          <%# .ad-description dá forma às tags que o editor produz (ver
+          <%# .rich-text dá forma às tags que o editor produz (ver
               app/assets/tailwind): sem isto o reset do Tailwind deixaria h3 e
               li sem tamanho, sem marcador e sem recuo. %>
-          <div class="ad-description mt-4 text-sm leading-relaxed text-stone-600">
+          <div class="rich-text mt-4 text-sm leading-relaxed text-stone-600">
             <%= ad_description(@ad) %>
           </div>
         <% else %>

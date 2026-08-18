@@ -30,6 +30,8 @@
           <nav class="hidden items-center gap-4 text-sm font-semibold text-stone-600 sm:flex">
             <%= link_to t("admin.nav.queue"), admin_ads_path, class: "transition hover:text-brand-600" %>
             <%= link_to t("admin.nav.events"), admin_events_path, class: "transition hover:text-brand-600" %>
+            <%= link_to t("admin.nav.posts"), admin_posts_path, class: "transition hover:text-brand-600" %>
+            <%= link_to t("admin.nav.users"), admin_users_path, class: "transition hover:text-brand-600" %>
           </nav>
 
           <div class="ml-auto flex items-center gap-3">
@@ -42,6 +44,8 @@
               <% end %>
 
               <%= link_to t("admin.nav.events"), admin_events_path, class: separated_dropdown_item_class %>
+              <%= link_to t("admin.nav.posts"), admin_posts_path, class: dropdown_item_class %>
+              <%= link_to t("admin.nav.users"), admin_users_path, class: dropdown_item_class %>
 
               <%= link_to t("layout.account.back_to_portal"), root_path,
                     class: dropdown_item_class %>

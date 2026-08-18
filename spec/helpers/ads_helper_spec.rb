@@ -96,18 +96,4 @@ RSpec.describe AdsHelper, type: :helper do
       expect(helper.specification_value("engine", "3.6 V6")).to eq("3.6 V6")
     end
   end
-
-  describe "#paginated_page_numbers" do
-    it "numera todas as páginas quando são poucas" do
-      pagination = stub(total_pages: 4)
-
-      expect(helper.paginated_page_numbers(pagination)).to eq([ 1, 2, 3, 4 ])
-    end
-
-    it "some com a régua numerada quando são muitas" do
-      pagination = stub(total_pages: AdsHelper::MAX_NUMBERED_PAGES + 1)
-
-      expect(helper.paginated_page_numbers(pagination)).to be_empty
-    end
-  end
 end

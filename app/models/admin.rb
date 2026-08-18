@@ -9,6 +9,9 @@ class Admin < ApplicationRecord
   # Anúncio avaliado sobrevive à saída do moderador; só perde a autoria.
   has_many :reviewed_ads, class_name: "Ad", foreign_key: :admin_id,
                           inverse_of: :admin, dependent: :nullify
+  # Post, ao contrário, exige autor: `posts.admin_id` é NOT NULL, então apagar
+  # quem escreveu é barrado em vez de deixar o post órfão.
+  has_many :posts, dependent: :restrict_with_error
 
   normalizes :email, with: ->(email) { email.to_s.strip.downcase }
 

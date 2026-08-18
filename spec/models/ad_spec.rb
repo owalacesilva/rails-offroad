@@ -233,6 +233,64 @@ RSpec.describe Ad, type: :model do
     it "não cobra fotos de rascunho" do
       expect(build(:ad, :draft)).to be_valid
     end
+
+    # É o que faz o bloqueio de foto ter consequência: aprovado com duas fotos
+    # no ar é um estado que a validação não aceita.
+    it "conta só as fotos liberadas" do
+      ad = create(:ad, image_count: 3)
+      ad.ad_images.first.update!(blocked_at: Time.current)
+
+      expect(ad.reload).not_to be_valid
+    end
+  end
+
+  describe "#block_image" do
+    let(:admin) { create(:admin) }
+
+    it "tira a foto do ar" do
+      ad = create(:ad, image_count: 4)
+      image = ad.ad_images.first
+
+      ad.block_image(image, admin)
+
+      expect(image.reload).to be_blocked
+    end
+
+    it "mantém o anúncio aprovado quando ainda sobra o mínimo" do
+      ad = create(:ad, image_count: 4)
+
+      ad.block_image(ad.ad_images.first, admin)
+
+      expect(ad.reload).to be_approved
+    end
+
+    it "devolve o aprovado para a fila quando sobra menos que o mínimo" do
+      ad = create(:ad, image_count: 3)
+
+      ad.block_image(ad.ad_images.first, admin, note: "Foto de catálogo.")
+
+      expect(ad.reload).to be_pending
+      expect(ad.moderation_note).to eq("Foto de catálogo.")
+    end
+
+    # Promover um rejeitado a pendente desfaria o que a moderação decidiu antes.
+    it "não muda o status de anúncio que já não estava no ar" do
+      ad = create(:ad, :rejected, image_count: 3)
+
+      ad.block_image(ad.ad_images.first, admin)
+
+      expect(ad.reload).to be_rejected
+    end
+  end
+
+  describe "#cover_image" do
+    it "pula a foto bloqueada" do
+      ad = create(:ad, image_count: 4)
+      first = ad.ad_images.first
+      first.update!(blocked_at: Time.current)
+
+      expect(ad.reload.cover_image).not_to eq(first)
+    end
   end
 
   describe "#approve" do

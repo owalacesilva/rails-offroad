@@ -21,6 +21,10 @@ Rails.application.routes.draw do
     resources :proposals, only: :create, path: "propostas"
   end
 
+  # Blog do portal. "blog" é a palavra usada em português também, então a rota
+  # não precisa de tradução. Só posts publicados chegam aqui.
+  resources :posts, only: %i[index show], path: "blog"
+
   # Páginas institucionais. Uma controller só (PagesController) porque não há
   # estado nenhum: cada action escolhe um template e o texto vem dos locales.
   get "sobre-nos",               to: "pages#about",            as: :about
@@ -64,7 +68,23 @@ Rails.application.routes.draw do
         patch :approve, path: "aprovar"
         patch :reject,  path: "rejeitar"
       end
+
+      # Bloqueio de foto avulsa: tira uma imagem do ar sem rejeitar o anúncio.
+      resources :images, only: %i[update destroy], path: "fotos", module: "ads"
     end
+
+    # Anunciantes: lista, busca e mudança de situação. Sem edição de dados
+    # pessoais — o perfil é do próprio anunciante.
+    resources :users, only: :index, path: "anunciantes" do
+      member { patch :status, path: "situacao" }
+    end
+
+    # Capa de evento e de post, enviada pelos formulários da gestão.
+    resources :uploads, only: :create
+
+    # Gestão do blog. Sem `show`: quem quer ver o post lê a página pública.
+    resources :posts, path: "blog", except: :show,
+                      path_names: { new: "novo", edit: "editar" }
 
     # Agenda da home. Sem `show`: a lista já mostra tudo que o evento tem, e a
     # página pública dele é o site do organizador.

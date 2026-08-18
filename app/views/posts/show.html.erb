@@ -1,0 +1,50 @@
+<% content_for :title, "#{@post.title} — OffRoad Classificados" %>
+
+<article class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:py-14">
+  <nav class="flex flex-wrap items-center gap-2 text-xs font-semibold text-stone-500" aria-label="Breadcrumb">
+    <%= link_to t("posts.index.title"), posts_path, class: "transition hover:text-brand-600" %>
+    <span aria-hidden="true">&rsaquo;</span>
+    <span class="text-brand-600"><%= @post.title %></span>
+  </nav>
+
+  <h1 class="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-stone-900 sm:text-4xl">
+    <%= @post.title %>
+  </h1>
+
+  <p class="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-stone-500">
+    <span><%= t("posts.by", name: @post.admin.name) %></span>
+    <span aria-hidden="true">&middot;</span>
+    <time datetime="<%= @post.published_at.to_date.iso8601 %>">
+      <%= l(@post.published_at.to_date, format: :long) %>
+    </time>
+  </p>
+
+  <% cover = @post.cover %>
+  <% if cover.present? %>
+    <%= image_tag cover, alt: "", class: "mt-8 aspect-[16/9] w-full rounded-2xl object-cover" %>
+  <% end %>
+
+  <% if @post.excerpt.present? %>
+    <p class="mt-8 border-l-4 border-brand-500 pl-4 text-base leading-relaxed text-stone-600">
+      <%= @post.excerpt %>
+    </p>
+  <% end %>
+
+  <%# .rich-text dá forma às tags que o editor produz: sem isso o reset do
+      Tailwind deixaria h3 e li sem tamanho, marcador e recuo. %>
+  <div class="rich-text mt-8 text-base leading-relaxed text-stone-700">
+    <%= rich_text(@post.body) %>
+  </div>
+</article>
+
+<% if @related.any? %>
+  <section class="border-t border-stone-200 bg-stone-50">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-extrabold tracking-tight text-stone-900"><%= t("posts.show.related") %></h2>
+
+      <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <%= render partial: "posts/card", collection: @related, as: :post %>
+      </div>
+    </div>
+  </section>
+<% end %>

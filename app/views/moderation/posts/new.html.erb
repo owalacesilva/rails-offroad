@@ -1,0 +1,16 @@
+<% content_for :title, "#{t('admin.posts.new.title')} — #{t('admin.title')}" %>
+
+<section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+  <nav class="text-xs font-semibold text-stone-500">
+    <%= link_to t("admin.posts.index.title"), admin_posts_path, class: "transition hover:text-brand-600" %>
+    <span aria-hidden="true">&rsaquo;</span>
+    <span class="text-brand-600"><%= t("admin.posts.new.title") %></span>
+  </nav>
+
+  <h1 class="mt-4 text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("admin.posts.new.title") %></h1>
+  <p class="mt-1 text-sm text-stone-500"><%= t("admin.posts.new.subtitle") %></p>
+
+  <div class="mt-6 rounded-xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+    <%= render "form", post: @post, submit_label: t("admin.posts.new.submit") %>
+  </div>
+</section>

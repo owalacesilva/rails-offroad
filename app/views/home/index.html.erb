@@ -1,8 +1,9 @@
 <%# Home. O Header e o Footer ficam no layout (app/views/layouts/application.html.erb).
 
-    A ordem das seções abaixo do hero é fixa e foi pedida assim: recentes,
-    galeria, mais vistos, agenda, newsletter e galeria de novo. Mexer na ordem
-    aqui é mexer no pedido, não no layout. %>
+    A ordem das seções abaixo do hero foi pedida assim: recentes, galeria, mais
+    vistos, agenda, newsletter e galeria de novo. O blog entrou depois, entre a
+    agenda e a newsletter — as duas seções vizinhas são conteúdo editorial do
+    portal, e a chamada da newsletter continua fechando a página. %>
 
 <%# ---------------------------------------------------------------- Hero %>
 <section class="relative overflow-hidden bg-stone-900">
@@ -56,7 +57,7 @@
 
     <%# Atalhos: veículos em cima, peças embaixo — cada um é uma busca real. %>
     <div class="mt-6 space-y-2" aria-label="<%= t('home.hero.quick_label') %>">
-      <% HomeController::QUICK_SEARCHES.each do |group, terms| %>
+      <% quick_searches.each do |group, terms| %>
         <div class="flex flex-wrap justify-center gap-2">
           <% terms.each do |term| %>
             <%= link_to term, ads_path(q: term), class: quick_search_class(group) %>
@@ -70,6 +71,12 @@
     </p>
   </div>
 </section>
+
+<%# Banner do evento em destaque, logo abaixo do hero. Só aparece quando a
+    gestão marcou um evento que ainda não passou. %>
+<% if @event_banner %>
+  <%= render "home/event_banner", event: @event_banner %>
+<% end %>
 
 <%# --------------------------------------------------- 1. Anúncios Recentes %>
 <section class="bg-stone-50">
@@ -139,9 +146,31 @@
   </div>
 </section>
 
-<%# ------------------------------------------------------------- 5. Newsletter %>
+<%# ------------------------------------------------------------ 5. Blog %>
+<%# Colocado entre a agenda e a newsletter: os dois blocos anteriores são
+    conteúdo editorial do portal, e a chamada da newsletter continua fechando a
+    página. Mover a seção é mexer numa linha. %>
+<section class="border-t border-stone-200 bg-stone-50">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+    <%= render "home/section_heading", title: t("home.posts.title"),
+          subtitle: t("home.posts.subtitle"), icon: :document,
+          link_path: posts_path, link_label: t("home.posts.see_all") %>
+
+    <% if @posts.any? %>
+      <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <%= render partial: "posts/card", collection: @posts, as: :post %>
+      </div>
+    <% else %>
+      <p class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center text-sm text-stone-500">
+        <%= t("home.posts.empty") %>
+      </p>
+    <% end %>
+  </div>
+</section>
+
+<%# ------------------------------------------------------------- 6. Newsletter %>
 <%= render "home/newsletter" %>
 
-<%# --------------------------------------------------- 6. Galeria de fotos (fim) %>
+<%# --------------------------------------------------- 7. Galeria de fotos (fim) %>
 <%= render "home/photo_gallery", images: @gallery_bottom,
       title: t("home.gallery.more_title"), subtitle: t("home.gallery.more_subtitle") %>

@@ -1,0 +1,50 @@
+<%# Formulário de post, compartilhado entre novo e edição. %>
+<% field_class = "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+<% label_class = "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
+
+<%= form_with model: [ :admin, post ], class: "space-y-6" do |form| %>
+  <% if post.errors.any? %>
+    <div role="alert" class="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-700">
+      <p class="font-bold"><%= t("admin.posts.form.errors", count: post.errors.count) %></p>
+      <ul class="mt-2 list-disc space-y-1 pl-5">
+        <% post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :title, class: label_class %>
+    <%= form.text_field :title, required: true, autofocus: true,
+          placeholder: t("admin.posts.form.title_placeholder"), class: field_class %>
+  </div>
+
+  <div>
+    <%= form.label :excerpt, class: label_class %>
+    <%= form.text_area :excerpt, rows: 2,
+          placeholder: t("admin.posts.form.excerpt_placeholder"), class: field_class %>
+    <p class="mt-1 text-xs text-stone-400"><%= t("admin.posts.form.excerpt_hint") %></p>
+  </div>
+
+  <%# Mesmo editor da descrição do anúncio: cinco controles, HTML limpo na entrada. %>
+  <%= render "shared/rich_text_field", form: form, field: :body,
+        label_class: label_class, field_class: field_class, rows: 12,
+        placeholder: t("admin.posts.form.body_placeholder") %>
+
+  <%= render "shared/cover_field", form: form, url_field: :cover_url,
+        current: post.cover, label_class: label_class, field_class: field_class %>
+
+  <div>
+    <%= form.label :published_at, class: label_class %>
+    <%= form.datetime_field :published_at, class: field_class %>
+    <p class="mt-1 text-xs text-stone-400"><%= t("admin.posts.form.published_at_hint") %></p>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3 border-t border-stone-200 pt-5">
+    <%= form.submit submit_label,
+          class: "cursor-pointer rounded-full bg-brand-500 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+    <%= link_to t("admin.posts.form.cancel"), admin_posts_path,
+          class: "text-xs font-bold uppercase tracking-wide text-stone-400 transition hover:text-stone-900" %>
+  </div>
+<% end %>

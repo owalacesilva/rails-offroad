@@ -1,4 +1,19 @@
 module HomeHelper
+  # Atalhos de busca do hero, em dois grupos como a vitrine sugere: primeiro o
+  # que se compra inteiro, depois o que se compra para montar. São nomes de
+  # modelo e de peça — nome próprio, por isso constante e não chave de tradução.
+  #
+  # Ficam no helper e não na controller: são dado de apresentação, e só a view
+  # os consome.
+  QUICK_SEARCHES = {
+    vehicles: %w[Defender Wrangler Hilux Ranger Troller Jimny Bandeirante Frontier].freeze,
+    parts: %w[Snorkel Guincho Suspensão Bloqueio Bagageiro Pneus].freeze
+  }.freeze
+
+  def quick_searches
+    QUICK_SEARCHES
+  end
+
   # Cores dos atalhos de busca do hero: veículo em escuro, peça em âmbar. A
   # distinção é o que deixa ler os dois grupos de relance.
   QUICK_SEARCH_STYLES = {
@@ -29,6 +44,10 @@ module HomeHelper
     ],
     calendar: [
       "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+    ],
+    document: [
+      "M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z",
+      "M8.25 13.5h7.5M8.25 17.25h4.5"
     ],
     envelope: [
       "M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"

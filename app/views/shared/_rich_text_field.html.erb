@@ -1,0 +1,54 @@
+<%# Campo de texto rico: negrito, itálico, as duas listas e H3 — exatamente os
+    cinco controles que ApplicationRecord::RICH_TEXT_TAGS deixa sobreviver.
+
+    Locais: form, field, label_class, field_class e, opcionais, placeholder e rows.
+
+    O <textarea> continua sendo o campo de verdade do formulário; o controller o
+    esconde, põe um contenteditable no lugar e devolve o HTML para ele. Sem
+    JavaScript sobra o textarea, e o servidor aceita texto puro igual.
+
+    Usado pela descrição do anúncio e pelo corpo do post do blog. %>
+<div data-controller="rich-text">
+  <%= form.label field, class: label_class %>
+
+  <div data-rich-text-target="toolbar"
+       class="mt-2 hidden flex-wrap items-center gap-1 rounded-t-lg border border-b-0 border-stone-300 bg-stone-50 p-1.5"
+       role="toolbar" aria-label="<%= t("shared.rich_text.label") %>">
+    <% [
+         { command: "bold", key: "bold", icon: "M6.5 4h5.25a3.5 3.5 0 0 1 0 7H6.5V4Zm0 7h6a3.5 3.5 0 0 1 0 7H6.5v-7Z" },
+         { command: "italic", key: "italic", icon: "M14.5 4h-5m3.5 0-3 16m3.5 0h-5" },
+         { command: "insertUnorderedList", key: "bullet_list", icon: "M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.008v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.008v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.008v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" },
+         { command: "insertOrderedList", key: "ordered_list", icon: "M8.25 6.75h12M8.25 12h12m-12 5.25h12M3 5.25h1.5v3.5M2.75 17.25h1.75m-1.75 0a.75.75 0 0 1 1.5-.9L2.75 18.5h1.75" },
+         { command: "formatBlock", value: "h3", key: "heading", icon: "M4 5.25v13.5M12 5.25v13.5M4 12h8m4.5 6.75V12h1.75a2 2 0 1 0 0-4H16.5" }
+       ].each do |control| %>
+      <%# tag.button e não <button> literal: assim o value-param sai de um hash
+          e o Rails simplesmente omite o atributo quando ele é nil. %>
+      <% control_label = t("shared.rich_text.#{control[:key]}") %>
+      <%= tag.button type: "button", title: control_label, "aria-pressed": "false",
+            data: { rich_text_target: "button", action: "rich-text#run",
+                    rich_text_command_param: control[:command],
+                    rich_text_value_param: control[:value] },
+            class: "cursor-pointer rounded-md p-2 text-stone-600 transition hover:bg-stone-200 hover:text-stone-900 aria-pressed:bg-brand-500 aria-pressed:text-stone-950" do %>
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="<%= control[:icon] %>" />
+        </svg>
+        <span class="sr-only"><%= control_label %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# O contenteditable é a camada de cima; o textarea abaixo é o campo de
+      verdade e o que sobra sem JavaScript. %>
+  <div data-rich-text-target="editor"
+       data-action="input->rich-text#sync blur->rich-text#sync paste->rich-text#paste keyup->rich-text#refresh mouseup->rich-text#refresh"
+       contenteditable="true"
+       role="textbox"
+       aria-multiline="true"
+       aria-label="<%= form.object.class.human_attribute_name(field) %>"
+       class="rich-text hidden min-h-40 w-full rounded-b-lg border border-stone-300 bg-white px-3 py-2.5 text-sm leading-relaxed text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"></div>
+
+  <%= form.text_area field, rows: local_assigns.fetch(:rows, 6),
+        placeholder: local_assigns[:placeholder],
+        data: { rich_text_target: "input" },
+        class: field_class %>
+</div>

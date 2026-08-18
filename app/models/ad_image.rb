@@ -13,20 +13,20 @@ class AdImage < ApplicationRecord
   validate :source_present
 
   scope :ordered, -> { order(:sort_order, :created_at) }
+  # Foto bloqueada pela moderação some do portal inteiro; a gestão continua
+  # vendo para poder desbloquear.
+  scope :visible, -> { where(blocked_at: nil) }
+  scope :blocked, -> { where.not(blocked_at: nil) }
 
   # De onde a foto é exibida.
-  #
-  # O blob sai pela rota de proxy do Active Storage, não por URL assinada direta
-  # do MinIO: dentro da rede do Compose o endpoint é http://minio:9000, endereço
-  # que o navegador do host não resolve. No proxy quem busca o arquivo é o Rails.
-  #
-  # only_path porque isto roda fora de uma requisição também (console, job): a
-  # rota do Active Storage é uma direct route e, sem a dica, tenta montar a URL
-  # absoluta e estoura por falta de host.
   def url
     return file_url unless file.attached?
 
-    Rails.application.routes.url_helpers.rails_storage_proxy_path(file, only_path: true)
+    attachment_path(file)
+  end
+
+  def blocked?
+    blocked_at.present?
   end
 
   private

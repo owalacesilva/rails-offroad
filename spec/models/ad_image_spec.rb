@@ -60,4 +60,21 @@ RSpec.describe AdImage, type: :model do
 
     expect { ad.destroy }.to change(described_class, :count).by(-Ad::IMAGE_COUNT.min)
   end
+
+  # Foto bloqueada pela moderação some do portal, mas continua no banco: a
+  # gestão precisa dela para poder liberar de volta.
+  describe "bloqueio" do
+    it "nasce liberada" do
+      expect(build(:ad_image)).not_to be_blocked
+    end
+
+    it "visible deixa de fora a bloqueada" do
+      ad = create(:ad, image_count: 4)
+      blocked = ad.ad_images.first
+      blocked.update!(blocked_at: Time.current)
+
+      expect(ad.ad_images.visible).not_to include(blocked)
+      expect(ad.ad_images.blocked).to eq([ blocked ])
+    end
+  end
 end

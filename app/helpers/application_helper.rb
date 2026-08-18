@@ -37,6 +37,33 @@ module ApplicationHelper
     "tel:+55#{phone.gsub(/\D/, '')}"
   end
 
+  # Texto rico já limpo, pronto para a página. Duas origens convivem: o HTML do
+  # editor e o texto puro com linhas em branco (o que o seed grava e o que sobra
+  # de quem escreve com o JavaScript desligado).
+  #
+  # Distinguir os dois é direto depois de sanitizar: o sanitizador escapa
+  # qualquer "<" que seja texto, então um "<" que sobrou é necessariamente tag.
+  # Texto puro segue pelo simple_format, que transforma linha em branco em
+  # parágrafo; sanitize: false porque a limpeza já aconteceu e escapar de novo
+  # viraria "&amp;amp;".
+  def rich_text(value)
+    html = sanitize(value.to_s, tags: ApplicationRecord::RICH_TEXT_TAGS, attributes: [])
+    return if html.blank?
+
+    html.include?("<") ? html : simple_format(html, {}, sanitize: false)
+  end
+
+  # Números da régua de paginação. Acima disso ela fica ilegível e sobra só
+  # anterior/próxima.
+  MAX_NUMBERED_PAGES = 9
+
+  def paginated_page_numbers(pagination)
+    total = pagination.total_pages
+    return [] if total > MAX_NUMBERED_PAGES
+
+    (1..total).to_a
+  end
+
   # Ícone de traço montado inline a partir dos seus paths. Os ícones do portal
   # são poucos e conhecidos em tempo de escrita: inline evita um sprite, uma
   # requisição e a dependência de um pacote de ícones. `currentColor` deixa a

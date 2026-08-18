@@ -1,10 +1,24 @@
 # Textos da interface em português do Brasil (locale padrão).
 # Traduções de Rails/Active Record vêm da gem rails-i18n.
 pt-BR:
+  # Peças reaproveitadas por mais de uma tela.
+  shared:
+    pagination:
+      previous: "Anterior"
+      next: "Próxima"
+    rich_text:
+      label: "Formatação"
+      bold: "Negrito"
+      italic: "Itálico"
+      bullet_list: "Lista com marcadores"
+      ordered_list: "Lista numerada"
+      heading: "Título"
+
   layout:
     nav:
       label: "Navegação principal"
       home: "Início"
+      blog: "Blog"
       classifieds: "Classificados"
       all_categories: "Ver todos"
       menu: "Menu"
@@ -44,6 +58,16 @@ pt-BR:
         terms: "Termos de uso"
         privacy: "Privacidade"
         cookies: "Cookies"
+
+  # Mensagens do upload de imagem, devolvidas em JSON. Compartilhadas pelo
+  # envio de foto de anúncio e pelo de capa de evento e post.
+  uploads:
+    errors:
+      missing: "Nenhum arquivo recebido."
+      type: "Envie uma imagem JPEG, PNG ou WebP."
+      size: "A foto passa de %{max} MB."
+      dimensions: "A foto passa de %{width} x %{height} pixels."
+      unreadable: "Não foi possível ler esta imagem."
 
   categories:
     veiculos-4x4:
@@ -102,13 +126,6 @@ pt-BR:
       specifications_counter: "%{count} de %{total} preenchidas"
       specifications_required: "Preencha todas as especificações da categoria."
       city_hint: "Escolha a UF primeiro; as sugestões vêm dos municípios daquele estado."
-      format:
-        label: "Formatação"
-        bold: "Negrito"
-        italic: "Itálico"
-        bullet_list: "Lista com marcadores"
-        ordered_list: "Lista numerada"
-        heading: "Título"
       submit: "Enviar para moderação"
       sending: "Enviando..."
       cancel: "Cancelar"
@@ -119,15 +136,6 @@ pt-BR:
     ads:
       create:
         success: "\"%{title}\" enviado para moderação. Ele aparece no portal assim que for aprovado."
-    # Mensagens do upload de foto, devolvidas em JSON para o Dropzone mostrar
-    # embaixo da miniatura recusada.
-    ad_photos:
-      errors:
-        missing: "Nenhum arquivo recebido."
-        type: "Envie uma imagem JPEG, PNG ou WebP."
-        size: "A foto passa de %{max} MB."
-        dimensions: "A foto passa de %{width} x %{height} pixels."
-        unreadable: "Não foi possível ler esta imagem."
     ads_index:
       title: "Meus Anúncios"
       subtitle: "Só anúncio aprovado aparece no portal. Aqui você vê em que pé está cada um."
@@ -141,6 +149,10 @@ pt-BR:
         other: "%{count} fotos"
       view: "Ver no portal"
       not_public: "Fora do ar"
+      moderation_note: "Recado da moderação"
+      blocked_images:
+        one: "1 foto bloqueada pela moderação"
+        other: "%{count} fotos bloqueadas pela moderação"
       hints:
         pending: "Aguardando avaliação da moderação."
         rejected: "Rejeitado na moderação. Ajuste o anúncio e envie de novo."
@@ -220,6 +232,14 @@ pt-BR:
       views:
         one: "1 visualização"
         other: "%{count} visualizações"
+    posts:
+      title: "Do Blog"
+      subtitle: "Preparação, trilha e manutenção por quem roda fora do asfalto."
+      see_all: "Ver todas"
+      empty: "Nenhuma publicação ainda. Em breve tem texto novo aqui."
+    event_banner:
+      label: "Evento em destaque"
+      cta: "Saiba mais"
     events:
       title: "Próximos Eventos"
       subtitle: "Trilhas, encontros e feiras do calendário off-road."
@@ -234,6 +254,20 @@ pt-BR:
       submit: "Quero receber"
       privacy_link: "Política de Privacidade"
       privacy_html: "Só usamos seu e-mail para enviar a newsletter, e você pode cancelar quando quiser. Veja a %{policy}."
+
+  posts:
+    by: "Por %{name}"
+    index:
+      title: "Blog"
+      subtitle: "Preparação, trilha, manutenção e o que mais aparece no caminho de quem sai do asfalto."
+      count:
+        one: "1 publicação"
+        other: "%{count} publicações"
+      empty:
+        title: "Nada publicado ainda"
+        subtitle: "Assim que sair o primeiro texto, ele aparece aqui."
+    show:
+      related: "Leia também"
 
   ads:
     title: "Anúncios"
@@ -276,8 +310,6 @@ pt-BR:
       subtitle: "Tente remover um filtro ou ampliar a busca para outra cidade."
     pagination:
       showing: "Mostrando %{from}–%{to} de %{total}"
-      previous: "Anterior"
-      next: "Próxima"
     show:
       back: "Voltar para os anúncios"
       published_at: "Publicado em %{date}"
@@ -516,6 +548,8 @@ pt-BR:
     nav:
       queue: "Fila"
       events: "Eventos"
+      users: "Anunciantes"
+      posts: "Blog"
       sign_out: "Sair"
     sessions:
       required: "Entre como moderador para continuar."
@@ -528,6 +562,55 @@ pt-BR:
         failure: "E-mail ou senha incorretos."
       destroy:
         success: "Sessão encerrada."
+    posts:
+      scopes:
+        published: "Publicados"
+        scheduled: "Agendados"
+        drafts: "Rascunhos"
+      index:
+        title: "Blog"
+        subtitle: "Os textos do portal. Publicado é o que aparece em /blog e na home."
+        filter_label: "Filtrar publicações"
+        new: "Novo post"
+        edit: "Editar"
+        view: "Ver publicado"
+        destroy: "Apagar"
+        destroy_confirm: "Apagar \"%{title}\"? Não há como desfazer."
+        empty:
+          published:
+            title: "Nenhum post publicado"
+            subtitle: "Escreva o primeiro e marque a data de publicação."
+          scheduled:
+            title: "Nada agendado"
+            subtitle: "Post com data futura espera aqui até a hora chegar."
+          drafts:
+            title: "Nenhum rascunho"
+            subtitle: "Post sem data de publicação fica guardado aqui."
+      form:
+        title_placeholder: "Ex.: Como escolher pneu de trilha"
+        excerpt_placeholder: "Uma ou duas linhas que resumem o texto."
+        excerpt_hint: "Aparece nos cards. Em branco, o resumo sai do começo do texto."
+        body_placeholder: "O texto do post..."
+        cover_url_hint: "Imagem de capa dos cards e do topo do post. Opcional."
+        published_at_hint: "Em branco é rascunho. Data no futuro agenda a publicação."
+        cancel: "Cancelar"
+        errors:
+          one: "Corrija 1 problema para continuar:"
+          other: "Corrija %{count} problemas para continuar:"
+      new:
+        title: "Novo Post"
+        subtitle: "Salve como rascunho e publique quando quiser."
+        submit: "Salvar post"
+      edit:
+        title: "Editar post"
+        subtitle: "As mudanças valem no portal assim que salvas."
+        submit: "Salvar alterações"
+      create:
+        success: "\"%{title}\" salvo."
+      update:
+        success: "\"%{title}\" atualizado."
+      destroy:
+        success: "\"%{title}\" apagado."
     events:
       scopes:
         upcoming: "Próximos"
@@ -553,7 +636,7 @@ pt-BR:
         description_placeholder: "O que acontece, para quem é, como se inscrever..."
         ends_on_hint: "Deixe vazio se o evento dura um dia só."
         url_hint: "Site ou inscrição do organizador. Abre em nova aba."
-        image_url_hint: "Imagem de capa do card na home. Opcional."
+        featured_hint: "Marca este evento como o destaque do banner da home. Só um por vez."
         cancel: "Cancelar"
         errors:
           one: "Corrija 1 problema para continuar:"
@@ -572,6 +655,57 @@ pt-BR:
         success: "\"%{title}\" atualizado."
       destroy:
         success: "\"%{title}\" removido da agenda."
+    users:
+      statuses:
+        active: "Ativo"
+        inactive: "Inativo"
+        blocked: "Bloqueado"
+      actions:
+        active: "Reativar"
+        inactive: "Desativar"
+        blocked: "Bloquear"
+        confirm:
+          active: "Reativar %{name}? Os anúncios dele voltam ao portal."
+          inactive: "Desativar %{name}? Ele deixa de entrar e os anúncios saem do ar."
+          blocked: "Bloquear %{name}? Ele deixa de entrar e os anúncios saem do portal."
+      index:
+        title: "Anunciantes"
+        subtitle: "Quem anuncia no portal. Bloquear ou desativar tira os anúncios do ar sem mexer em cada um."
+        filter_label: "Filtrar por situação"
+        all: "Todos"
+        search: "Buscar"
+        search_placeholder: "Nome ou e-mail"
+        member_since: "No portal desde %{date}"
+        ads:
+          one: "1 anúncio"
+          other: "%{count} anúncios"
+        published:
+          one: "1 publicado"
+          other: "%{count} publicados"
+        empty:
+          title: "Nenhum anunciante por aqui"
+          subtitle: "Ajuste a busca ou troque de aba."
+      status:
+        success: "%{name} agora está %{status}."
+    images:
+      block: "Bloquear"
+      unblock: "Liberar"
+      blocked: "Bloqueada"
+      block_confirm: "Bloquear esta foto? Ela sai do portal na hora."
+      default_note: "Uma das fotos foi bloqueada pela moderação. Envie outra no lugar."
+      blocked_count:
+        one: "1 bloqueada"
+        other: "%{count} bloqueadas"
+      block:
+        success: "Foto de \"%{title}\" bloqueada."
+      unblock:
+        success: "Foto de \"%{title}\" liberada."
+    cover:
+      label: "Imagem de destaque"
+      hint: "Enviada do seu computador. Máximo de %{width} x %{height} pixels."
+      sending: "Enviando..."
+      remove: "Remover imagem"
+      by_url: "Ou usar o endereço de uma imagem já hospedada"
     ads:
       statuses:
         draft: "Rascunhos"
@@ -584,6 +718,13 @@ pt-BR:
       reject:
         success: "\"%{title}\" rejeitado."
         failure: "Não foi possível rejeitar: %{errors}"
+      reject_modal:
+        title: "Rejeitar anúncio"
+        note: "Motivo"
+        placeholder: "Explique o que precisa ser corrigido para o anúncio ser aprovado."
+        hint: "O anunciante vê este texto no painel dele."
+        cancel: "Cancelar"
+        submit: "Rejeitar"
       index:
         title: "Fila de moderação"
         subtitle: "Anúncios aguardando avaliação antes de aparecer no portal."
@@ -593,6 +734,7 @@ pt-BR:
           one: "1 foto"
           other: "%{count} fotos"
         reviewed_by: "Avaliado por %{name}"
+        note: "Recado"
         view: "Ver"
         approve: "Aprovar"
         reject: "Rejeitar"

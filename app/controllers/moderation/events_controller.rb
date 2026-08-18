@@ -3,7 +3,9 @@ module Moderation
   # quem cria, edita e apaga é a moderação, e não há fila de aprovação — o que
   # a equipe publica já vale.
   class EventsController < BaseController
-    EVENT_FIELDS = %i[title description starts_on ends_on city state venue url image_url].freeze
+    include CoverAttachment
+
+    EVENT_FIELDS = %i[title description starts_on ends_on city state venue url image_url featured].freeze
 
     # As duas listas da tela. "Próximos" é o que a home mostra; "Realizados"
     # existe para consultar e reaproveitar, não some do banco.
@@ -26,6 +28,8 @@ module Moderation
 
       return render :new, status: :unprocessable_content unless @event.save
 
+      attach_cover(@event)
+
       redirect_to admin_events_path, notice: t("admin.events.create.success", title: @event.title)
     end
 
@@ -37,6 +41,8 @@ module Moderation
       @event = find_event
 
       return render :edit, status: :unprocessable_content unless @event.update(event_params)
+
+      attach_cover(@event)
 
       redirect_to admin_events_path(scope: requested_scope),
                   notice: t("admin.events.update.success", title: @event.title)

@@ -1,0 +1,33 @@
+<%# Card de post, compartilhado entre a home e a listagem do blog. %>
+<article class="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white transition hover:-translate-y-1 hover:border-brand-400 hover:shadow-lg hover:shadow-stone-900/10">
+  <div class="relative aspect-[16/9] overflow-hidden bg-stone-100">
+    <% cover = post.cover %>
+    <% if cover.present? %>
+      <%= image_tag cover, alt: "", loading: "lazy",
+            class: "h-full w-full object-cover transition duration-300 group-hover:scale-105" %>
+    <% else %>
+      <div class="flex h-full w-full items-center justify-center text-stone-300">
+        <%= home_section_icon(:document, css_class: "h-10 w-10") %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex flex-1 flex-col p-5">
+    <p class="text-[11px] font-bold uppercase tracking-wide text-brand-600">
+      <%= l(post.published_at.to_date, format: :long) %>
+    </p>
+
+    <h3 class="mt-2 text-sm font-bold leading-snug text-stone-900 transition group-hover:text-brand-600">
+      <%# after:inset-0 estende a área clicável para o card inteiro. %>
+      <%= link_to post.title, post_path(post), class: "after:absolute after:inset-0" %>
+    </h3>
+
+    <p class="mt-2 line-clamp-3 flex-1 text-xs leading-relaxed text-stone-500">
+      <%= post.summary %>
+    </p>
+
+    <p class="mt-4 text-[11px] font-semibold text-stone-400">
+      <%= t("posts.by", name: post.admin.name) %>
+    </p>
+  </div>
+</article>
