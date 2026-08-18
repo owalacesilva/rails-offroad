@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_18_160001) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_090002) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -173,6 +173,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_160001) do
     t.index ["email"], name: "index_newsletter_subscriptions_on_email", unique: true
   end
 
+  create_table "oauth_identities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["provider", "uid"], name: "index_oauth_identities_on_provider_and_uid", unique: true
+    t.index ["user_id", "provider"], name: "index_oauth_identities_on_user_id_and_provider", unique: true
+    t.index ["user_id"], name: "index_oauth_identities_on_user_id"
+    t.check_constraint "`provider` in (_utf8mb4'google',_utf8mb4'facebook')", name: "oauth_identities_provider_valid"
+  end
+
   create_table "posts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "admin_id", null: false
     t.text "body", null: false
@@ -225,6 +237,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_160001) do
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "ads_count", default: 0, null: false
     t.string "city", null: false
+    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.date "member_since", null: false
@@ -250,6 +263,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_160001) do
   add_foreign_key "ads", "users"
   add_foreign_key "attribute_categories", "attributes"
   add_foreign_key "attribute_categories", "categories"
+  add_foreign_key "oauth_identities", "users"
   add_foreign_key "posts", "admins"
   add_foreign_key "proposals", "ads"
   add_foreign_key "proposals", "users"

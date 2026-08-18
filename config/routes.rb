@@ -16,6 +16,23 @@ Rails.application.routes.draw do
   get    "cadastrar", to: "registrations#new", as: :signup
   post   "cadastrar", to: "registrations#create"
 
+  # Confirmação de e-mail. O :token vem assinado pelo Rails, sem coluna no
+  # banco; a rota sem token é o reenvio, para quem perdeu ou deixou vencer.
+  get    "confirmar", to: "confirmations#new",    as: :new_email_confirmation
+  post   "confirmar", to: "confirmations#create", as: :email_confirmations
+  get    "confirmar/:token", to: "confirmations#show", as: :email_confirmation
+
+  # Entrar com Google ou Facebook. O início é POST porque o botão precisa do
+  # token de CSRF: com GET, outro site conseguiria disparar o login e deixar a
+  # vítima dentro da conta de quem atacou. O retorno é GET porque quem redireciona
+  # o navegador de volta é o provedor.
+  #
+  # A constraint deixa a rota existir só para os provedores que o portal conhece.
+  scope constraints: { provider: /google|facebook/ } do
+    post "entrar/:provider",         to: "oauth#create",   as: :oauth_authorization
+    get  "entrar/:provider/retorno", to: "oauth#callback", as: :oauth_callback
+  end
+
   # Vitrine de anúncios com filtros. Rota em português, código em inglês.
   resources :ads, only: %i[index show], path: "anuncios" do
     resources :proposals, only: :create, path: "propostas"

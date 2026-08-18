@@ -107,6 +107,12 @@ services:
       SOCIAL_YOUTUBE_URL: ${SOCIAL_YOUTUBE_URL:-}
       SOCIAL_FACEBOOK_URL: ${SOCIAL_FACEBOOK_URL:-}
       SOCIAL_WHATSAPP_URL: ${SOCIAL_WHATSAPP_URL:-}
+      # Login por provedor (lib/oauth_provider.rb). Default vazio de propósito:
+      # sem as duas variáveis do par, o botão não aparece e a rota não existe.
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      FACEBOOK_APP_ID: ${FACEBOOK_APP_ID:-}
+      FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET:-}
     volumes:
       - .:/app
       - bundle:/bundle

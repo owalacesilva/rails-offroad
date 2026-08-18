@@ -85,6 +85,10 @@ The four institutional routes follow the same split: `/sobre-nos`, `/como-anunci
 the `GET`, so without that Rails would invent an `anuncios_path` helper out of the
 Portuguese segment — a route helper in the wrong language.
 
+**Mail templates are locale keys too.** `UserMailer#confirmation` and `ProposalMailer` render
+an HTML *and* a text part, and a spec asserts the text part carries the link — a mail client
+that shows only text does not render the anchor.
+
 **Locale keys must be added to both `config/locales/pt-BR.yml` and `en-US.yml`.**
 Several request specs assert `response.body` does not include `"translation missing"`,
 so a one-sided key fails the suite.
@@ -530,6 +534,77 @@ digits means area code + number — because `55` is also the area code for Santa
 The 27-state whitelist is enforced twice: `User::BRAZILIAN_STATES` in the model and a check
 constraint on `users.state`, so a direct SQL write cannot slip past it.
 
+### Email confirmation
+
+**`users.confirmed_at` is a column of its own, not a fourth `users.status`.** The two are
+independent: moderation blocks accounts that confirmed long ago, and a confirmed account can
+be blocked later. Nil means "has not proved the address is theirs".
+
+**There is no token column.** `User.generates_token_for :email_confirmation` signs the id
+together with the email and a two-day window (`User::CONFIRMATION_WINDOW`), so the link
+expires on its own and **changing the email invalidates a link still sitting in the old
+inbox**. `ConfirmationsController#show` is idempotent — mail clients that prefetch links open
+them twice, and the second visit must not be an error.
+
+Registration no longer signs anyone in: `RegistrationsController` mails the link and sends
+the person to `/entrar`. The gate is in two places — `SessionsController#create` refuses an
+unconfirmed login, and `Authentication#find_session_by_cookie` merges `User.active.confirmed`
+so a confirmation that stops being valid ends the session already open, the same way blocking
+does.
+
+**The "unconfirmed" message is the one exception to the deliberately vague login failure.**
+It appears only *after* the right password, which is proof of possession — there is nothing
+left to reveal. Wrong password and blocked account still share the generic text. The resend
+form (`/confirmar`) answers the same way whether or not the address exists, which is what
+keeps it from being a "who is registered here" oracle.
+
+`spec/factories/users.rb` sets `confirmed_at` by default and offers `:unconfirmed`, because
+confirmed is where an advertiser spends their whole life; the seed confirms too, since there
+the address was typed by us.
+
+### Sign in with Google or Facebook
+
+Hand-written in `lib/oauth_provider.rb`, no OmniAuth. The portal already writes its own
+authentication instead of using Devise, and the confidential-client authorization code flow
+is two HTTP calls: trade the code for a token, ask who owns the token.
+
+**Credentials come from the environment, like the footer links.** A provider without both
+`*_CLIENT_ID`/`*_APP_ID` and its secret does not exist: the button is not rendered and the
+route 404s. An install that only wants password login shows no buttons rather than one that
+would fail. Unknown provider and unconfigured provider return the same 404 — from outside
+they are the same thing.
+
+**Starting the flow is `POST /entrar/:provider`, not `GET`.** The button needs the CSRF
+token: over GET, a third-party page can start the flow and land the victim inside the
+attacker's account. The callback is GET because the provider is the one redirecting back.
+
+**`state` is single-use and lives in the session.** `OauthController#callback` consumes it
+before anything else — including when the person cancelled at the provider — because leaving
+it behind would keep it valid for a later callback. A mismatch is refused with the same
+message as any other failure.
+
+**Only a verified email is accepted.** `OauthProfile.from_provider` requires Google's
+`email_verified`; Facebook omits the field and only returns `email` for an address it already
+confirmed, so a missing field counts as verified. This check is what stops someone opening a
+provider account with another person's address and signing in as them here.
+
+**Signing up through a provider takes two steps.** Google gives a name and an email; a
+classifieds portal also needs phone, city and state, which no provider knows. The callback
+parks the profile in `session[:oauth]` and sends the person to the ordinary signup form,
+which then hides the password fields and marks the email read-only. **The email is read back
+out of the session, never out of the POST** — trusting the form would let someone sign in
+with one Google address and come out registered, already confirmed, under someone else's.
+
+`oauth_identities` holds the link, never a token: the portal acts on nobody's behalf at
+Google or Facebook, so the access token dies with the request. Two unique indexes carry the
+rules — `(provider, uid)` stops two portal accounts pointing at the same Google, and
+`(user_id, provider)` stops one account collecting several. `OauthAuthentication#connect`
+returns `false` for that second case instead of guessing which one wins.
+
+Provider-only accounts still need a value in the `NOT NULL` `password_hash`, so they get
+`User.random_password` — unguessable and told to no one. Whoever also wants a password sets
+one in their own profile.
+
 ### Storage and mail
 
 **`ad_images` rows own the ordering; Active Storage owns the bytes.** The row keeps
@@ -613,6 +688,16 @@ with a written justification.
 `spec/factories/ads.rb` draws photo URLs from a shared `:ad_photo_url` sequence, so two ads
 never share a `file_url`; the home gallery specs rely on telling one ad's photo from
 another's.
+
+**`:oauth` on an example puts provider credentials in the environment.**
+`spec/support/oauth.rb` sets and restores the four variables around the example, because
+`OauthProvider` reads `ENV` — without them the provider does not exist and the routes 404,
+which is itself worth a couple of examples. The HTTP is stubbed with plain `stub_request`;
+no cassette, since the request bodies carry the client secret.
+
+**`travel` / `freeze_time` come from `spec/support/time_helpers.rb`**, not from rspec-rails —
+the same friction as `have_enqueued_mail`: the project mocks with Mocha, so what rspec-rails
+wires up by itself is thin.
 
 **Upload specs need real image bytes.** `spec/support/photo_uploads.rb` builds them with the
 same `PlaceholderImage` the seed uses — `AdPhotosController` measures the file with libvips,

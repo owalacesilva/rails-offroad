@@ -11,19 +11,25 @@ class SessionsController < ApplicationController
     # por timing se o e-mail existe ou não.
     user = User.authenticate_by(email: params[:email], password: params[:password])
 
-    if user&.active?
-      start_new_session_for user
-      redirect_to after_authentication_url, notice: t(".success", name: user.name)
-    else
-      # A mensagem é a mesma da senha errada de propósito: dizer "sua conta
-      # está bloqueada" para quem só chutou um e-mail revela que ele existe.
-      flash.now[:alert] = t(".failure")
-      render :new, status: :unprocessable_content
-    end
+    # A mensagem de falha é a mesma da senha errada de propósito: dizer "sua
+    # conta está bloqueada" para quem só chutou um e-mail revela que ele existe.
+    return deny unless user&.active?
+    # Já a de e-mail não confirmado só aparece depois da senha certa, que é
+    # prova de posse — aí não há o que revelar a quem apenas chutou.
+    return redirect_to new_email_confirmation_path(email: user.email), alert: t(".unconfirmed") unless user.confirmed?
+
+    start_new_session_for user
+    redirect_to after_authentication_url, notice: t(".success", name: user.name)
   end
 
   def destroy
     terminate_session
     redirect_to root_path, notice: t(".success")
   end
+
+  private
+    def deny
+      flash.now[:alert] = t("sessions.create.failure")
+      render :new, status: :unprocessable_content
+    end
 end

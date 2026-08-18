@@ -6,6 +6,10 @@ en-US:
       previous: "Previous"
       next: "Next"
       showing: "Showing %{from}–%{to} of %{total}"
+    oauth:
+      divider: "or"
+      sign_in: "Sign in with %{provider}"
+      sign_up: "Sign up with %{provider}"
     rich_text:
       label: "Formatting"
       bold: "Bold"
@@ -378,6 +382,7 @@ en-US:
     create:
       success: "Welcome back, %{name}!"
       failure: "Wrong email or password."
+      unconfirmed: "Your email is not confirmed yet. Ask below and we will send the link again."
     destroy:
       success: "Signed out."
 
@@ -389,11 +394,34 @@ en-US:
       submit: "Create account"
       have_account: "Already have an account?"
       login: "Sign in"
+      oauth_abandon: "I would rather sign up with email and password"
+      oauth_intro_html: "We signed you in with your %{provider} account (%{email}). We still need your phone and city, which the portal uses so buyers can reach you."
       errors:
         one: "1 error kept the account from being created"
         other: "%{count} errors kept the account from being created"
     create:
       success: "Account created. Welcome, %{name}!"
+      confirmation_sent: "Account created. We sent a confirmation link to %{email} — confirm it to sign in."
+
+  confirmations:
+    new:
+      title: "Confirm your email"
+      subtitle: "Enter the address you signed up with and we will send a new confirmation link."
+      submit: "Resend link"
+      back: "Back to sign in"
+    create:
+      sent: "If an account with that address is waiting for confirmation, the link is on its way."
+    show:
+      success: "Email confirmed. Now just sign in."
+      invalid: "This confirmation link is no longer valid. Ask for a new one below."
+
+  oauth:
+    callback:
+      success: "Welcome back, %{name}!"
+      failure: "We could not sign you in with that provider. Try again."
+      denied: "You cancelled the authorization."
+      complete: "Almost there: finish your registration to advertise. We signed you in with your %{provider} account."
+      already_linked: "This portal account is already linked to a different %{provider}."
 
   proposals:
     create:
@@ -537,6 +565,16 @@ en-US:
           body: "These Terms may be revised. The revision date sits at the top of this page, and material changes are announced by email to account holders. Continuing to use the portal after a change means accepting it."
         - heading: "Governing law and contact"
           body: "Brazilian law applies, and the consumer's home jurisdiction is the agreed venue for any dispute.\n\nQuestions about these Terms: contato@offroadclassificados.com.br."
+
+  user_mailer:
+    confirmation:
+      subject: "Confirm your email at OffRoad Classificados"
+      greeting: "Hello, %{name}!"
+      intro: "One step left to finish your advertiser account: confirm that this address is yours."
+      action: "Confirm my email"
+      expires: "The link is valid for %{hours} hours."
+      fallback: "If the button does not work, copy the address below into your browser:"
+      ignore: "If you did not sign up, just ignore this email."
 
   proposal_mailer:
     received:

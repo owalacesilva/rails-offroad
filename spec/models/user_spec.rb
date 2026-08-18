@@ -107,4 +107,75 @@ RSpec.describe User, type: :model do
       expect(described_class.active).to eq([ active ])
     end
   end
+
+  # Coluna à parte de status de propósito: as duas coisas são independentes — a
+  # moderação bloqueia quem já confirmou, e quem confirmou pode ser bloqueado.
+  describe "confirmação de e-mail" do
+    it "nasce sem confirmação" do
+      expect(create(:user, :unconfirmed)).not_to be_confirmed
+    end
+
+    it "confirm_email marca a data" do
+      user = create(:user, :unconfirmed)
+
+      expect { user.confirm_email }.to change(user, :confirmed?).from(false).to(true)
+    end
+
+    # Cliente de e-mail que pré-carrega links abre o mesmo link duas vezes
+    # sozinho: a segunda não pode virar erro.
+    it "confirm_email não muda a data de quem já confirmou" do
+      user = create(:user, confirmed_at: 3.days.ago)
+
+      expect { user.confirm_email }.not_to change { user.reload.confirmed_at }
+    end
+
+    it "o escopo confirmed deixa de fora quem não confirmou" do
+      confirmed = create(:user)
+      create(:user, :unconfirmed)
+
+      expect(described_class.confirmed).to eq([ confirmed ])
+    end
+
+    describe "token do link" do
+      let(:user) { create(:user, :unconfirmed) }
+
+      it "encontra o anunciante" do
+        token = user.generate_token_for(:email_confirmation)
+
+        expect(described_class.find_by_token_for(:email_confirmation, token)).to eq(user)
+      end
+
+      it "não encontra nada com token adulterado" do
+        expect(described_class.find_by_token_for(:email_confirmation, "nao-e-token")).to be_nil
+      end
+
+      # O e-mail vai dentro do token: trocar de endereço derruba o link que
+      # ainda estivesse na caixa de entrada do endereço antigo.
+      it "deixa de valer quando o e-mail muda" do
+        token = user.generate_token_for(:email_confirmation)
+        user.update!(email: "outro@exemplo.com.br")
+
+        expect(described_class.find_by_token_for(:email_confirmation, token)).to be_nil
+      end
+
+      it "deixa de valer depois do prazo" do
+        token = user.generate_token_for(:email_confirmation)
+
+        travel(described_class::CONFIRMATION_WINDOW + 1.hour) do
+          expect(described_class.find_by_token_for(:email_confirmation, token)).to be_nil
+        end
+      end
+    end
+  end
+
+  # Quem entra por Google ou Facebook não digitou senha nenhuma, e a coluna é
+  # NOT NULL.
+  describe ".random_password" do
+    it "gera senha longa e diferente a cada chamada" do
+      first = described_class.random_password
+
+      expect(first.length).to be >= 32
+      expect(first).not_to eq(described_class.random_password)
+    end
+  end
 end

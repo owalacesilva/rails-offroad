@@ -1,0 +1,30 @@
+<%# Entrar/cadastrar por provedor. Local: label_key (a chave do texto do botão,
+    porque a mesma dupla aparece como "Entrar com" no login e "Cadastrar com" no
+    cadastro).
+
+    Provedor sem CLIENT_ID e CLIENT_SECRET no ambiente não aparece aqui, e sua
+    rota não existe (lib/oauth_provider.rb): uma instalação que só quer login por
+    senha não mostra botão nenhum, em vez de mostrar um que daria erro. %>
+<% providers = oauth_providers %>
+
+<% if providers.any? %>
+  <div class="mt-6">
+    <div class="flex items-center gap-3">
+      <span class="h-px flex-1 bg-stone-200"></span>
+      <span class="text-[11px] font-bold uppercase tracking-wide text-stone-400"><%= t("shared.oauth.divider") %></span>
+      <span class="h-px flex-1 bg-stone-200"></span>
+    </div>
+
+    <div class="mt-4 grid gap-2 <%= "sm:grid-cols-2" if providers.many? %>">
+      <% providers.each do |provider| %>
+        <%# button_to e não link_to: o início do fluxo é POST para carregar o
+            token de CSRF. Sem ele, outro site dispara o login da vítima. %>
+        <%= button_to oauth_authorization_path(provider: provider.key),
+              class: "flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-stone-300 bg-white px-5 py-3 text-sm font-bold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50" do %>
+          <%= oauth_icon(provider.key) %>
+          <span><%= t(label_key, provider: provider.label) %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

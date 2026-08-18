@@ -333,7 +333,9 @@ moderator = admins.first
 
 users = USERS.map do |attributes|
   user = User.find_or_initialize_by(email: attributes[:email])
-  user.update!(attributes.merge(password: SEED_PASSWORD))
+  # Semeado já confirmado: o e-mail de confirmação existe para provar que o
+  # endereço é de quem digitou, e aqui quem digitou fomos nós.
+  user.update!(attributes.merge(password: SEED_PASSWORD, confirmed_at: Time.current))
   user
 end
 

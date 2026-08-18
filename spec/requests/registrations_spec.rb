@@ -53,14 +53,26 @@ RSpec.describe "Cadastro", type: :request do
       expect(User.last.member_since).to eq(Date.current)
     end
 
-    it "já deixa a pessoa autenticada" do
-      expect { register(valid_attributes) }.to change(Session, :count).by(1)
-    end
-
-    it "leva para a home" do
+    it "nasce sem e-mail confirmado" do
       register(valid_attributes)
 
-      expect(response).to redirect_to(root_path)
+      expect(User.last).not_to be_confirmed
+    end
+
+    # Cadastrar não autentica mais: quem entra é quem provou ter o endereço.
+    it "não abre sessão antes da confirmação" do
+      expect { register(valid_attributes) }.not_to change(Session, :count)
+    end
+
+    it "envia o e-mail de confirmação" do
+      expect { register(valid_attributes) }.to have_enqueued_mail(UserMailer, :confirmation)
+    end
+
+    it "leva para o login avisando que o link foi enviado" do
+      register(valid_attributes)
+
+      expect(response).to redirect_to(login_path)
+      expect(flash[:notice]).to include("walace@oficina.com.br")
     end
   end
 

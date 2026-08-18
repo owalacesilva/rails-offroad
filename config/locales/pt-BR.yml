@@ -7,6 +7,10 @@ pt-BR:
       previous: "Anterior"
       next: "Próxima"
       showing: "Mostrando %{from}–%{to} de %{total}"
+    oauth:
+      divider: "ou"
+      sign_in: "Entrar com %{provider}"
+      sign_up: "Cadastrar com %{provider}"
     rich_text:
       label: "Formatação"
       bold: "Negrito"
@@ -384,6 +388,7 @@ pt-BR:
     create:
       success: "Bem-vindo de volta, %{name}!"
       failure: "E-mail ou senha incorretos."
+      unconfirmed: "Falta confirmar seu e-mail. Reenviamos o link se você pedir abaixo."
     destroy:
       success: "Sessão encerrada."
 
@@ -395,11 +400,36 @@ pt-BR:
       submit: "Criar conta"
       have_account: "Já tem conta?"
       login: "Entrar"
+      oauth_abandon: "Prefiro criar conta com e-mail e senha"
+      oauth_intro_html: "Entramos com sua conta %{provider} (%{email}). Falta só o telefone e a cidade, que o portal precisa para o comprador falar com você."
       errors:
         one: "1 erro impediu o cadastro"
         other: "%{count} erros impediram o cadastro"
     create:
       success: "Conta criada. Bem-vindo, %{name}!"
+      confirmation_sent: "Conta criada. Enviamos um link de confirmação para %{email} — confirme para entrar."
+
+  confirmations:
+    new:
+      title: "Confirmar e-mail"
+      subtitle: "Informe o endereço que você usou no cadastro e enviamos um novo link de confirmação."
+      submit: "Reenviar link"
+      back: "Voltar para entrar"
+    create:
+      # Mesma resposta exista ou não a conta: o contrário faria do formulário um
+      # verificador de quem é cadastrado no portal.
+      sent: "Se houver uma conta com esse endereço aguardando confirmação, o link já está a caminho."
+    show:
+      success: "E-mail confirmado. Agora é só entrar."
+      invalid: "Este link de confirmação não vale mais. Peça um novo abaixo."
+
+  oauth:
+    callback:
+      success: "Bem-vindo de volta, %{name}!"
+      failure: "Não foi possível entrar pelo provedor. Tente de novo."
+      denied: "Você cancelou a autorização."
+      complete: "Quase lá: complete o cadastro para anunciar. Entramos com sua conta %{provider}."
+      already_linked: "Esta conta do portal já está ligada a outro %{provider}."
 
   proposals:
     create:
@@ -544,6 +574,16 @@ pt-BR:
           body: "Estes Termos podem ser revisados. A data de revisão fica no topo desta página, e mudanças relevantes são comunicadas por e-mail a quem tem cadastro. Continuar usando o portal depois da mudança significa aceitá-la."
         - heading: "Lei aplicável e contato"
           body: "Aplica-se a lei brasileira, e fica eleito o foro do domicílio do consumidor para resolver qualquer controvérsia.\n\nDúvidas sobre estes Termos: contato@offroadclassificados.com.br."
+
+  user_mailer:
+    confirmation:
+      subject: "Confirme seu e-mail no OffRoad Classificados"
+      greeting: "Olá, %{name}!"
+      intro: "Falta um passo para sua conta de anunciante ficar pronta: confirme que este endereço é seu."
+      action: "Confirmar meu e-mail"
+      expires: "O link vale por %{hours} horas."
+      fallback: "Se o botão não funcionar, copie o endereço abaixo no navegador:"
+      ignore: "Se não foi você quem se cadastrou, ignore este e-mail."
 
   proposal_mailer:
     received:

@@ -1,0 +1,14 @@
+<h1><%= t(".greeting", name: @user.name) %></h1>
+
+<p><%= t(".intro") %></p>
+
+<p><%= link_to t(".action"), @url %></p>
+
+<p><%= t(".expires", hours: @hours) %></p>
+
+<%# O endereço aparece à vista porque cliente de e-mail que só mostra texto não
+    renderiza o link acima — e porque um link de confirmação que ninguém pode
+    conferir antes de clicar é justamente o que o phishing imita. %>
+<p><%= t(".fallback") %><br><%= @url %></p>
+
+<p><%= t(".ignore") %></p>

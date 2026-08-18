@@ -11,6 +11,32 @@ module SocialHelper
     telegram: "M21.94 4.6 18.9 19.02c-.23 1.01-.83 1.26-1.68.79l-4.64-3.42-2.24 2.15c-.25.25-.45.45-.93.45l.33-4.72 8.6-7.77c.37-.33-.08-.52-.58-.19L7.13 12.03 2.55 10.6c-1-.31-1.01-1 .21-1.48l17.9-6.9c.83-.31 1.56.2 1.28 2.38Z"
   }.freeze
 
+  # Marcas dos provedores de login. Coloridas e com fill próprio, não
+  # currentColor: o "G" do Google é quatro cores por definição, e as duas marcas
+  # só são reconhecíveis na cor delas — é o que faz o botão ser lido como
+  # "entrar com o Google" antes de alguém ler o texto.
+  OAUTH_ICON_PATHS = {
+    google: [
+      { fill: "#4285F4", d: "M23.52 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82z" },
+      { fill: "#34A853", d: "M12 24c3.24 0 5.96-1.08 7.95-2.91l-3.88-3.01c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.11C3.26 21.3 7.31 24 12 24z" },
+      { fill: "#FBBC05", d: "M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.61H1.29A11.99 11.99 0 0 0 0 12c0 1.94.46 3.77 1.29 5.39l3.98-3.11z" },
+      { fill: "#EA4335", d: "M12 4.76c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.98 3.11C6.22 6.87 8.87 4.76 12 4.76z" }
+    ],
+    facebook: [ { fill: "#1877F2", d: SOCIAL_ICON_PATHS[:facebook] } ]
+  }.freeze
+
+  def oauth_icon(key, css_class: "h-5 w-5")
+    paths = OAUTH_ICON_PATHS.fetch(key.to_sym).map { |path| tag.path(**path) }
+
+    tag.svg(safe_join(paths), class: css_class, viewBox: "0 0 24 24", "aria-hidden": "true")
+  end
+
+  # Provedores configurados no ambiente. Nenhum configurado devolve lista vazia,
+  # e o bloco de botões some — em vez de mostrar um botão que daria 404.
+  def oauth_providers
+    OauthProvider.all
+  end
+
   def social_icon(key, css_class: "h-4 w-4")
     tag.svg(
       tag.path(d: SOCIAL_ICON_PATHS.fetch(key.to_sym)),

@@ -34,10 +34,11 @@ module Authentication
       Current.session ||= find_session_by_cookie
     end
 
-    # Só sessão de anunciante ativo é retomada: bloquear alguém tem de valer
-    # para quem já estava logado, não só no próximo login.
+    # Só sessão de anunciante ativo e com e-mail confirmado é retomada: bloquear
+    # alguém tem de valer para quem já estava logado, não só no próximo login, e
+    # o mesmo vale para uma confirmação que deixe de valer.
     def find_session_by_cookie
-      Session.joins(:user).merge(User.active).find_by(id: cookies.signed[:session_id])
+      Session.joins(:user).merge(User.active.confirmed).find_by(id: cookies.signed[:session_id])
     end
 
     # Quem já tem sessão não precisa ver login nem cadastro.
