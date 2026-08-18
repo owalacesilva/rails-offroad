@@ -5,7 +5,7 @@ class ProposalsController < ApplicationController
   def create
     @ad = Ad.published
             .with_photos.includes(:category, :user, technical_spec_values: :spec_attribute)
-            .find(params[:ad_id])
+            .find_by!(slug: params[:ad_id])
     @proposal = @ad.proposals.new(proposal_params)
     # Quem já está logado fica ligado à proposta; anônimo segue com user_id nulo.
     @proposal.user = current_user if authenticated?

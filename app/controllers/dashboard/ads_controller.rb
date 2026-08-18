@@ -22,6 +22,7 @@ module Dashboard
       # Quem publica é a moderação, não o anunciante: nasce na fila.
       @ad.status = :pending
       build_images(@ad)
+      build_specifications(@ad)
 
       # O contexto :submission é o que cobra as 3 a 10 fotos já na criação.
       return render :new, status: :unprocessable_content unless @ad.save(context: :submission)
@@ -54,6 +55,27 @@ module Dashboard
         Array(params[:photo_signed_ids])
           .filter_map { |signed_id| ActiveStorage::Blob.find_signed(signed_id) }
           .first(Ad::IMAGE_COUNT.max)
+      end
+
+      # As especificações chegam como { attribute_id => valor }. O formulário
+      # mostra as da categoria escolhida e pede todas; quem cobra de fato é a
+      # validação do modelo no contexto :submission, porque o formulário pode
+      # ser contornado.
+      def build_specifications(ad)
+        submitted_specifications.each do |attribute_id, value|
+          next if value.blank?
+
+          ad.technical_spec_values.build(attribute_id: attribute_id, value: value)
+        end
+      end
+
+      # A lista branca são os ids de atributo que existem: permit! aceitaria
+      # qualquer chave, e uma inventada só estouraria lá na chave estrangeira.
+      #
+      # O try cobre `specs` vindo como texto em vez de hash, que é o que um POST
+      # montado à mão manda: String não responde a permit e a coisa vira {}.
+      def submitted_specifications
+        params[:specs].try(:permit, *SpecAttribute.ids.map(&:to_s))&.to_h || {}
       end
 
       def ad_params

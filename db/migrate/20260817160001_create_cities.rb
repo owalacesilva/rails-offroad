@@ -7,10 +7,10 @@ class CreateCities < ActiveRecord::Migration[8.1]
     # Os 5.570 municípios brasileiros mais Fernando de Noronha, que o IBGE lista
     # junto embora seja distrito estadual de PE. Dado de referência: não pertence
     # a anunciante nenhum e é populado na inicialização (ver lib/brazilian_cities.rb).
-    create_table :cities, id: :string, limit: 36 do |t|
+    create_table :cities do |t|
       # Código do IBGE, sempre com 7 dígitos. É a chave natural do município e o
       # que sobrevive a uma mudança de nome — mas a chave primária segue sendo o
-      # UUID, como em todas as outras tabelas.
+      # bigint sequencial, como em todas as outras tabelas.
       t.string :ibge_code, limit: 7, null: false
       t.string :name, null: false
       t.string :state, limit: 2, null: false

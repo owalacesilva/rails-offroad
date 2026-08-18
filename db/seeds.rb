@@ -1,7 +1,8 @@
 require "stringio"
 
 # Idempotente: rodar `bin/rails db:seed` mais de uma vez não duplica registros
-# nem reescreve fotos. Preços em reais (DECIMAL), sem conversão para centavos.
+# nem reescreve fotos. Os preços abaixo estão em reais; quem converte para os
+# centavos inteiros da coluna é o próprio modelo (ver ApplicationRecord).
 
 # Banco de teste não recebe seed. Não é preferência: `db:prepare` chama este
 # arquivo sozinho quando cria o banco, e é exatamente o que a CI roda antes do
@@ -197,20 +198,33 @@ ADMINS = [
 
 # Lado "Attribute" do EAV. A ordem de exibição é a coluna position — antes era
 # uma constante no modelo, porque jsonb não preservava a ordem das chaves.
+#
+# Não há mais coluna de obrigatoriedade: quem diz o que é exigido é o vínculo
+# com a categoria, logo abaixo.
 SPEC_ATTRIBUTES = [
-  { name: "condition",    data_type: "STRING", position: 1,  is_required: true },
-  { name: "mileage_km",   data_type: "INT",    position: 2,  is_required: false },
-  { name: "engine",       data_type: "STRING", position: 3,  is_required: false },
-  { name: "power",        data_type: "STRING", position: 4,  is_required: false },
-  { name: "transmission", data_type: "STRING", position: 5,  is_required: false },
-  { name: "traction",     data_type: "STRING", position: 6,  is_required: false },
-  { name: "fuel",         data_type: "STRING", position: 7,  is_required: false },
-  { name: "doors",        data_type: "INT",    position: 8,  is_required: false },
-  { name: "color",        data_type: "STRING", position: 9,  is_required: false },
-  { name: "brand",        data_type: "STRING", position: 10, is_required: false },
-  { name: "material",     data_type: "STRING", position: 11, is_required: false },
-  { name: "warranty",     data_type: "STRING", position: 12, is_required: false }
+  { name: "condition",    data_type: "STRING", position: 1 },
+  { name: "mileage_km",   data_type: "INT",    position: 2 },
+  { name: "engine",       data_type: "STRING", position: 3 },
+  { name: "power",        data_type: "STRING", position: 4 },
+  { name: "transmission", data_type: "STRING", position: 5 },
+  { name: "traction",     data_type: "STRING", position: 6 },
+  { name: "fuel",         data_type: "STRING", position: 7 },
+  { name: "doors",        data_type: "INT",    position: 8 },
+  { name: "color",        data_type: "STRING", position: 9 },
+  { name: "brand",        data_type: "STRING", position: 10 },
+  { name: "material",     data_type: "STRING", position: 11 },
+  { name: "warranty",     data_type: "STRING", position: 12 }
 ].freeze
+
+# O conjunto que cada categoria pede. Estar na lista é ser obrigatório: o
+# formulário de anúncio exige todos os atributos da categoria escolhida, e é por
+# isso que peça não aparece com "portas" nem 4x4 com "material".
+CATEGORY_ATTRIBUTES = {
+  "veiculos-4x4" => %w[condition mileage_km engine power transmission traction fuel doors color],
+  "motos-quadriciclos" => %w[condition mileage_km engine power transmission fuel color],
+  "utvs" => %w[condition mileage_km engine power transmission traction fuel color],
+  "pecas-acessorios" => %w[condition brand material warranty]
+}.freeze
 
 # Propostas recebidas. `ad` é o título do anúncio; `user` é o e-mail de um
 # anunciante já semeado, para o caso de quem envia estar logado — aí nome e
@@ -334,6 +348,14 @@ spec_attributes = SPEC_ATTRIBUTES.each_with_object({}) do |attributes, memo|
   memo[attributes[:name]] = record
 end
 
+CATEGORY_ATTRIBUTES.each do |slug, names|
+  category = categories.fetch(slug)
+
+  names.each do |name|
+    AttributeCategory.find_or_create_by!(category: category, spec_attribute: spec_attributes.fetch(name))
+  end
+end
+
 ADS.each_with_index do |attributes, index|
   slug = attributes[:category]
   variants = DESCRIPTIONS.fetch(slug)
@@ -432,4 +454,5 @@ puts "Seed: #{cities_count} municípios, #{Category.count} categorias, #{SpecAtt
      "#{Ad.count} anúncios (#{Ad.published.count} aprovados), " \
      "#{AdImage.count} fotos, #{TechnicalSpecValue.count} especificações, " \
      "#{Proposal.count} propostas (#{Proposal.where(user: nil).count} anônimas), " \
+     "#{AttributeCategory.count} vínculos atributo-categoria, " \
      "#{Event.count} eventos (#{Event.upcoming.count} próximos)."

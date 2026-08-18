@@ -93,6 +93,14 @@ pt-BR:
       photos_no_js: "O envio de fotos precisa de JavaScript ativado."
       photo_remove: "Remover foto"
       city_placeholder: "Comece a digitar o município"
+      specifications: "Especificações técnicas"
+      specifications_hint: "Cada categoria pede o seu conjunto, e todos os campos são obrigatórios."
+      specifications_empty: "Escolha uma categoria acima para ver quais especificações ela pede."
+      specifications_fill: "Preencher especificações"
+      specifications_edit: "Editar especificações"
+      specifications_done: "Concluir"
+      specifications_counter: "%{count} de %{total} preenchidas"
+      specifications_required: "Preencha todas as especificações da categoria."
       city_hint: "Escolha a UF primeiro; as sugestões vêm dos municípios daquele estado."
       format:
         label: "Formatação"
@@ -147,8 +155,15 @@ pt-BR:
         one: "1 proposta"
         other: "%{count} propostas"
       received_at: "Recebida em %{date}"
+      received: "Recebida em"
       contact: "Contato"
       message: "Mensagem"
+      no_message: "O interessado não escreveu mensagem."
+      no_phone: "Não informado"
+      details: "Ver detalhes"
+      details_title: "Detalhes da proposta"
+      reply: "Responder por e-mail"
+      reply_subject: "Sobre a sua proposta para %{title}"
       empty:
         title: "Nenhuma proposta ainda"
         subtitle: "Quando alguém enviar uma proposta pelos seus anúncios, ela aparece aqui."
@@ -275,6 +290,14 @@ pt-BR:
       advertiser: "Anunciante"
       member_since: "No portal desde %{date}"
       whatsapp: "Chamar no WhatsApp"
+      share:
+        title: "Compartilhar"
+        # "on" seria lido como booleano pelo YAML: chave renomeada de propósito.
+        network: "Compartilhar no %{network}"
+        copy: "Copiar link"
+        copied: "Link copiado!"
+        native: "Compartilhar"
+        message: "Achei este anúncio no OffRoad Classificados: %{title}"
       whatsapp_message: "Olá! Tenho interesse no anúncio \"%{title}\" — %{url}"
       propose: "Enviar proposta"
       gallery:
@@ -492,6 +515,7 @@ pt-BR:
     title: "Moderação"
     nav:
       queue: "Fila"
+      events: "Eventos"
       sign_out: "Sair"
     sessions:
       required: "Entre como moderador para continuar."
@@ -504,6 +528,50 @@ pt-BR:
         failure: "E-mail ou senha incorretos."
       destroy:
         success: "Sessão encerrada."
+    events:
+      scopes:
+        upcoming: "Próximos"
+        past: "Realizados"
+      index:
+        title: "Agenda de Eventos"
+        subtitle: "Trilhas, encontros e feiras que aparecem na home. O que está em \"Próximos\" é o que o portal mostra."
+        filter_label: "Filtrar a agenda"
+        new: "Novo evento"
+        edit: "Editar"
+        destroy: "Apagar"
+        destroy_confirm: "Apagar \"%{title}\"? Não há como desfazer."
+        empty:
+          upcoming:
+            title: "Nenhum evento marcado"
+            subtitle: "Cadastre o próximo e ele aparece na home na hora."
+          past:
+            title: "Nada no histórico"
+            subtitle: "Eventos que já aconteceram ficam guardados aqui."
+      form:
+        title_placeholder: "Ex.: Trilhão da Serra Catarinense"
+        venue_placeholder: "Ex.: Serra do Rio do Rastro"
+        description_placeholder: "O que acontece, para quem é, como se inscrever..."
+        ends_on_hint: "Deixe vazio se o evento dura um dia só."
+        url_hint: "Site ou inscrição do organizador. Abre em nova aba."
+        image_url_hint: "Imagem de capa do card na home. Opcional."
+        cancel: "Cancelar"
+        errors:
+          one: "Corrija 1 problema para continuar:"
+          other: "Corrija %{count} problemas para continuar:"
+      new:
+        title: "Novo Evento"
+        subtitle: "O evento entra na agenda assim que for salvo — não passa por fila."
+        submit: "Salvar evento"
+      edit:
+        title: "Editar evento"
+        subtitle: "As mudanças valem na home imediatamente."
+        submit: "Salvar alterações"
+      create:
+        success: "\"%{title}\" entrou na agenda."
+      update:
+        success: "\"%{title}\" atualizado."
+      destroy:
+        success: "\"%{title}\" removido da agenda."
     ads:
       statuses:
         draft: "Rascunhos"
@@ -568,6 +636,7 @@ pt-BR:
         phone: "WhatsApp"
         city: "Cidade"
         state: "UF"
+        status: "Situação"
         password: "Senha"
         password_confirmation: "Confirmar senha"
       admin:
@@ -576,6 +645,7 @@ pt-BR:
         password: "Senha"
       ad:
         title: "Título"
+        slug: "Endereço"
         price: "Preço"
         year: "Ano"
         city: "Cidade"
@@ -588,7 +658,6 @@ pt-BR:
       spec_attribute:
         name: "Nome"
         data_type: "Tipo de dado"
-        is_required: "Obrigatório"
       event:
         title: "Título"
         description: "Descrição"
@@ -607,6 +676,8 @@ pt-BR:
           attributes:
             ad_images:
               invalid_count: "devem ser entre %{min} e %{max}"
+            base:
+              missing_specifications: "Preencha todas as especificações da categoria: %{names}"
         ad_image:
           attributes:
             base:

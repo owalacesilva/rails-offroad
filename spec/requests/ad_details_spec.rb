@@ -116,4 +116,45 @@ RSpec.describe "Detalhe do anúncio", type: :request do
       expect(response.body).to include(I18n.t("ads.show.propose", locale: :"en-US"))
     end
   end
+
+  describe "compartilhar" do
+    before { get ad_path(ad) }
+
+    # Âncoras montadas no servidor: funcionam sem JavaScript.
+    it "oferece as redes com a URL do anúncio embutida" do
+      expect(response.body).to include(
+        ERB::Util.html_escape("https://wa.me/?text="),
+        ERB::Util.html_escape("https://www.facebook.com/sharer/sharer.php?u="),
+        ERB::Util.html_escape("https://twitter.com/intent/tweet?"),
+        ERB::Util.html_escape("https://t.me/share/url?")
+      )
+    end
+
+    it "compartilha o endereço público do anúncio, que é a slug" do
+      expect(response.body).to include(ERB::Util.html_escape(CGI.escape(ad_url(ad))))
+      expect(ad_url(ad)).to end_with(ad.slug)
+    end
+
+    it "traz o copiar link" do
+      expect(response.body).to include('data-share-target="copy"', I18n.t("ads.show.share.copy"))
+    end
+
+    # Só existe onde o navegador tem navigator.share, então nasce escondido.
+    it "esconde o compartilhamento nativo até o controller liberá-lo" do
+      expect(response.body).to match(/data-share-target="native"[^>]*/)
+      expect(response.body).to include("hidden cursor-pointer items-center gap-1.5 rounded-full")
+    end
+  end
+
+  describe "máscaras do formulário de proposta" do
+    before { get ad_path(ad) }
+
+    it "põe máscara de moeda no valor" do
+      expect(response.body).to include('data-mask-type-value="currency"')
+    end
+
+    it "põe máscara de telefone no contato" do
+      expect(response.body).to include('data-mask-type-value="phone"')
+    end
+  end
 end

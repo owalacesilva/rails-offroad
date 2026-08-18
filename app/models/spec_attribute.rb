@@ -8,6 +8,12 @@ class SpecAttribute < ApplicationRecord
   has_many :technical_spec_values, foreign_key: :attribute_id,
                                    inverse_of: :spec_attribute, dependent: :destroy
 
+  # Em quais categorias este atributo é pedido. Não há coluna de
+  # obrigatoriedade: o vínculo com a categoria é que a define.
+  has_many :attribute_categories, foreign_key: :attribute_id,
+                                  inverse_of: :spec_attribute, dependent: :destroy
+  has_many :categories, through: :attribute_categories
+
   # case_sensitive: false pelo mesmo motivo de Category#slug: a collation padrão
   # do MySQL ignora caixa, e o índice único da coluna também.
   validates :name, presence: true, uniqueness: { case_sensitive: false }
@@ -17,7 +23,6 @@ class SpecAttribute < ApplicationRecord
   # A ordem de exibição virou coluna: antes vinha de uma constante no modelo
   # porque jsonb não preservava a ordem das chaves.
   scope :ordered, -> { order(:position, :name) }
-  scope :required, -> { where(is_required: true) }
 
   # O rótulo exibido continua traduzível, indexado pelo nome do atributo.
   def label

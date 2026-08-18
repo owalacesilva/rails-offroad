@@ -80,4 +80,31 @@ RSpec.describe User, type: :model do
       expect(build(:user, city: "Cuiabá", state: "MT").location).to eq("Cuiabá, MT")
     end
   end
+
+  # active / inactive / blocked. Inativo é quem saiu; bloqueado é quem a
+  # moderação tirou do ar. Os dois somem do portal.
+  describe "situação" do
+    it "nasce ativo" do
+      expect(described_class.new.status).to eq("active")
+    end
+
+    it "aceita as três situações" do
+      expect(described_class.statuses.keys).to contain_exactly("active", "inactive", "blocked")
+    end
+
+    it "barra situação fora da lista no próprio banco" do
+      user = create(:user)
+
+      expect { described_class.connection.execute("UPDATE users SET status = 'sumido' WHERE id = #{user.id}") }
+        .to raise_error(ActiveRecord::StatementInvalid, /users_status_valid/)
+    end
+
+    it "o escopo active traz só quem está ativo" do
+      active = create(:user)
+      create(:user, status: :blocked)
+      create(:user, status: :inactive)
+
+      expect(described_class.active).to eq([ active ])
+    end
+  end
 end

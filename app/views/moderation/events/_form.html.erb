@@ -1,0 +1,88 @@
+<%# Formulário de evento, compartilhado entre novo e edição. %>
+<% field_class = "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+<% label_class = "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
+
+<%= form_with model: [ :admin, event ], class: "space-y-6" do |form| %>
+  <% if event.errors.any? %>
+    <div role="alert" class="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-700">
+      <p class="font-bold"><%= t("admin.events.form.errors", count: event.errors.count) %></p>
+      <ul class="mt-2 list-disc space-y-1 pl-5">
+        <% event.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :title, class: label_class %>
+    <%= form.text_field :title, required: true, autofocus: true,
+          placeholder: t("admin.events.form.title_placeholder"), class: field_class %>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= form.label :starts_on, class: label_class %>
+      <%= form.date_field :starts_on, required: true, class: field_class %>
+    </div>
+
+    <div>
+      <%= form.label :ends_on, class: label_class %>
+      <%= form.date_field :ends_on, class: field_class %>
+      <p class="mt-1 text-xs text-stone-400"><%= t("admin.events.form.ends_on_hint") %></p>
+    </div>
+  </div>
+
+  <%# Mesmo autocomplete do formulário de anúncio: os municípios chegam por UF,
+      em vez de os 5.571 saírem no HTML. %>
+  <div class="grid gap-5 sm:grid-cols-3"
+       data-controller="city-autocomplete"
+       data-city-autocomplete-url-value="<%= cities_path %>">
+    <div>
+      <%= form.label :state, class: label_class %>
+      <%= form.select :state, User::BRAZILIAN_STATES, { include_blank: "—" }, required: true,
+            class: field_class,
+            data: { city_autocomplete_target: "state", action: "change->city-autocomplete#stateChanged" } %>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :city, class: label_class %>
+      <%= form.text_field :city, required: true, autocomplete: "off", list: "event-city-options",
+            placeholder: t("dashboard.ads_new.city_placeholder"), class: field_class,
+            data: { city_autocomplete_target: "city", action: "input->city-autocomplete#typed" } %>
+      <datalist id="event-city-options" data-city-autocomplete-target="list"></datalist>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :venue, class: label_class %>
+    <%= form.text_field :venue, placeholder: t("admin.events.form.venue_placeholder"), class: field_class %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: label_class %>
+    <%= form.text_area :description, rows: 4,
+          placeholder: t("admin.events.form.description_placeholder"), class: field_class %>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= form.label :url, class: label_class %>
+      <%= form.url_field :url, placeholder: "https://exemplo.com.br/evento", class: field_class %>
+      <p class="mt-1 text-xs text-stone-400"><%= t("admin.events.form.url_hint") %></p>
+    </div>
+
+    <div>
+      <%= form.label :image_url, class: label_class %>
+      <%= form.url_field :image_url, placeholder: "https://exemplo.com.br/foto.jpg", class: field_class %>
+      <p class="mt-1 text-xs text-stone-400"><%= t("admin.events.form.image_url_hint") %></p>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3 border-t border-stone-200 pt-5">
+    <%= form.submit submit_label,
+          class: "cursor-pointer rounded-full bg-brand-500 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+    <%= link_to t("admin.events.form.cancel"), admin_events_path,
+          class: "text-xs font-bold uppercase tracking-wide text-stone-400 transition hover:text-stone-900" %>
+  </div>
+<% end %>

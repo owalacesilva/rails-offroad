@@ -66,6 +66,11 @@ Rails.application.routes.draw do
       end
     end
 
+    # Agenda da home. Sem `show`: a lista já mostra tudo que o evento tem, e a
+    # página pública dele é o site do organizador.
+    resources :events, path: "eventos", except: :show,
+                       path_names: { new: "novo", edit: "editar" }
+
     root "ads#index"
   end
 

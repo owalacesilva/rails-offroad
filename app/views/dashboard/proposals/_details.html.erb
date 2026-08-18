@@ -1,0 +1,75 @@
+<%# Detalhe da proposta. O <dialog> nativo já dá Esc e prisão de foco; o
+    Stimulus só abre e fecha, como no modal de envio de proposta. %>
+<dialog data-modal-target="dialog"
+        data-action="click->modal#closeOnBackdrop"
+        aria-labelledby="proposal-<%= proposal.id %>-title"
+        class="w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-stone-300 bg-white p-0 text-stone-900 backdrop:bg-stone-950/80 backdrop:backdrop-blur-sm">
+  <div class="flex items-start justify-between gap-4 border-b border-stone-200 p-6">
+    <div class="min-w-0">
+      <h2 id="proposal-<%= proposal.id %>-title" class="text-lg font-bold text-stone-900">
+        <%= t("dashboard.proposals_index.details_title") %>
+      </h2>
+      <p class="mt-1 truncate text-sm text-stone-500"><%= proposal.ad.title %></p>
+    </div>
+
+    <button type="button" data-action="modal#close"
+            aria-label="<%= t("ads.proposal_modal.close") %>"
+            class="shrink-0 cursor-pointer rounded-full p-1.5 text-stone-500 transition hover:bg-stone-100 hover:text-stone-900">
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="space-y-5 p-6">
+    <div class="rounded-xl bg-brand-50 px-4 py-3">
+      <p class="text-xs font-semibold uppercase tracking-wide text-stone-500"><%= Proposal.human_attribute_name(:offered_value) %></p>
+      <p class="mt-1 text-2xl font-extrabold tabular-nums text-stone-900"><%= ad_price(proposal.offered_value) %></p>
+    </div>
+
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-stone-400"><%= Proposal.human_attribute_name(:name) %></dt>
+        <dd class="mt-1 text-sm font-semibold text-stone-800"><%= proposal.name %></dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-stone-400"><%= Proposal.human_attribute_name(:email) %></dt>
+        <dd class="mt-1 text-sm text-stone-600">
+          <%= mail_to proposal.email, proposal.email, class: "transition hover:text-brand-600" %>
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-stone-400"><%= Proposal.human_attribute_name(:phone) %></dt>
+        <dd class="mt-1 text-sm text-stone-600">
+          <%= proposal.phone.presence || t("dashboard.proposals_index.no_phone") %>
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-stone-400"><%= t("dashboard.proposals_index.received") %></dt>
+        <dd class="mt-1 text-sm text-stone-600"><%= l(proposal.created_at, format: :long) %></dd>
+      </div>
+    </dl>
+
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-stone-400"><%= t("dashboard.proposals_index.message") %></p>
+      <p class="mt-1 whitespace-pre-line text-sm leading-relaxed text-stone-600">
+        <%= proposal.message.presence || t("dashboard.proposals_index.no_message") %>
+      </p>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-end gap-3 border-t border-stone-200 p-6 pt-5">
+    <button type="button" data-action="modal#close"
+            class="cursor-pointer rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-500 transition hover:text-stone-700">
+      <%= t("ads.proposal_modal.close") %>
+    </button>
+
+    <%# Responder é o que o anunciante faz em seguida: o assunto já vem pronto. %>
+    <%= mail_to proposal.email, t("dashboard.proposals_index.reply"),
+          subject: t("dashboard.proposals_index.reply_subject", title: proposal.ad.title),
+          class: "rounded-full bg-brand-500 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+  </div>
+</dialog>

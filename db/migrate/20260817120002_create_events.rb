@@ -6,7 +6,7 @@ class CreateEvents < ActiveRecord::Migration[8.1]
   def change
     # Agenda do off-road: trilhas, encontros e feiras. Não pertence a nenhum
     # anunciante — é conteúdo do portal, editado por quem o mantém.
-    create_table :events, id: :string, limit: 36 do |t|
+    create_table :events do |t|
       t.string :title, null: false
       t.text :description
       # Data, não datetime: a agenda mostra o dia, e uma hora em UTC só criaria

@@ -26,7 +26,9 @@ module Moderation
       end
 
       def review(action)
-        ad = Ad.find(params[:id])
+        # Pela slug, e não pelo id: Ad#to_param devolve a slug, então é ela que
+        # os helpers de rota colocam na URL, inclusive aqui na moderação.
+        ad = Ad.find_by!(slug: params[:id])
         reviewed = ad.public_send(action, current_admin)
         # Depois da avaliação o status mudou: a fila de destino é a nova.
         queue = admin_ads_path(status: ad.status)

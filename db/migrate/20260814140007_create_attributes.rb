@@ -4,10 +4,12 @@ class CreateAttributes < ActiveRecord::Migration[8.1]
   DATA_TYPES = %w[STRING INT DECIMAL].freeze
 
   def change
-    create_table :attributes, id: :string, limit: 36 do |t|
+    create_table :attributes do |t|
       t.string :name, null: false
       t.string :data_type, null: false, default: "STRING"
-      t.boolean :is_required, null: false, default: false
+      # Não há coluna de obrigatoriedade: quem define o que é exigido é o
+      # vínculo com a categoria (attribute_categories). Atributo ligado a uma
+      # categoria é obrigatório para ela — o formulário pede todos.
       # JSON não preservava ordem e a ordem vinha de constante; agora é coluna.
       t.integer :position, null: false, default: 0
 

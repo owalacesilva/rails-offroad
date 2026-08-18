@@ -30,7 +30,7 @@ RSpec.describe ProposalMailer, type: :mailer do
   end
 
   it "leva o link do anúncio" do
-    expect(mail.text_part.decoded).to include(ad.id.to_s)
+    expect(mail.text_part.decoded).to include(ad.slug)
   end
 
   it "manda também a versão HTML" do

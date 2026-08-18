@@ -11,10 +11,12 @@ class SessionsController < ApplicationController
     # por timing se o e-mail existe ou não.
     user = User.authenticate_by(email: params[:email], password: params[:password])
 
-    if user
+    if user&.active?
       start_new_session_for user
       redirect_to after_authentication_url, notice: t(".success", name: user.name)
     else
+      # A mensagem é a mesma da senha errada de propósito: dizer "sua conta
+      # está bloqueada" para quem só chutou um e-mail revela que ele existe.
       flash.now[:alert] = t(".failure")
       render :new, status: :unprocessable_content
     end

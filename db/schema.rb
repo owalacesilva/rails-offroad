@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_175056) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
-    t.string "record_id", limit: 36, null: false
+    t.bigint "record_id", null: false
     t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
@@ -39,8 +39,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "ad_images", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "ad_id", limit: 36, null: false
+  create_table "ad_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "ad_id", null: false
     t.datetime "created_at", null: false
     t.string "file_url"
     t.integer "sort_order", default: 0, null: false
@@ -49,8 +49,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.index ["ad_id"], name: "index_ad_images_on_ad_id"
   end
 
-  create_table "admin_sessions", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "admin_id", limit: 36, null: false
+  create_table "admin_sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "admin_id", null: false
     t.datetime "created_at", null: false
     t.string "ip_address"
     t.datetime "updated_at", null: false
@@ -58,7 +58,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.index ["admin_id"], name: "index_admin_sessions_on_admin_id"
   end
 
-  create_table "admins", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "admins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "name", null: false
@@ -67,41 +67,52 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.index ["email"], name: "index_admins_on_email", unique: true
   end
 
-  create_table "ads", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "admin_id", limit: 36
+  create_table "ads", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "admin_id"
     t.integer "badge"
-    t.string "category_id", limit: 36, null: false
+    t.bigint "category_id", null: false
     t.string "city", null: false
     t.datetime "created_at", null: false
     t.text "description"
-    t.decimal "price", precision: 12, scale: 2, null: false
+    t.integer "price_cents", null: false
     t.datetime "published_at"
     t.datetime "reviewed_at"
+    t.string "slug", null: false
     t.string "state", limit: 2, null: false
     t.string "status", default: "pending", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.string "user_id", limit: 36, null: false
+    t.bigint "user_id", null: false
     t.integer "views_count", default: 0, null: false
     t.integer "year"
     t.index ["admin_id"], name: "index_ads_on_admin_id"
     t.index ["category_id"], name: "index_ads_on_category_id"
-    t.index ["price"], name: "index_ads_on_price"
+    t.index ["price_cents"], name: "index_ads_on_price_cents"
     t.index ["published_at"], name: "index_ads_on_published_at"
+    t.index ["slug"], name: "index_ads_on_slug", unique: true
     t.index ["state", "city"], name: "index_ads_on_state_and_city"
     t.index ["status"], name: "index_ads_on_status"
     t.index ["user_id"], name: "index_ads_on_user_id"
     t.index ["views_count"], name: "index_ads_on_views_count"
     t.index ["year"], name: "index_ads_on_year"
-    t.check_constraint "`price` > 0", name: "ads_price_positive"
+    t.check_constraint "`price_cents` > 0", name: "ads_price_positive"
     t.check_constraint "`status` in (_utf8mb4'draft',_utf8mb4'pending',_utf8mb4'approved',_utf8mb4'rejected')", name: "ads_status_valid"
     t.check_constraint "`views_count` >= 0", name: "ads_views_count_not_negative"
   end
 
-  create_table "attributes", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "attribute_categories", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "attribute_id", null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attribute_id"], name: "index_attribute_categories_on_attribute_id"
+    t.index ["category_id", "attribute_id"], name: "index_attribute_categories_on_category_id_and_attribute_id", unique: true
+    t.index ["category_id"], name: "index_attribute_categories_on_category_id"
+  end
+
+  create_table "attributes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "data_type", default: "STRING", null: false
-    t.boolean "is_required", default: false, null: false
     t.string "name", null: false
     t.integer "position", default: 0, null: false
     t.datetime "updated_at", null: false
@@ -110,7 +121,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.check_constraint "`data_type` in (_utf8mb4'STRING',_utf8mb4'INT',_utf8mb4'DECIMAL')", name: "attributes_data_type_valid"
   end
 
-  create_table "categories", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "categories", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "position", default: 0, null: false
     t.string "slug", null: false
@@ -119,7 +130,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
-  create_table "cities", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "cities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ibge_code", limit: 7, null: false
     t.string "name", null: false
@@ -131,7 +142,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.check_constraint "regexp_like(`ibge_code`,_utf8mb4'^[1-9][0-9]{6}$')", name: "cities_ibge_code_valid"
   end
 
-  create_table "events", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "city", null: false
     t.datetime "created_at", null: false
     t.text "description"
@@ -149,7 +160,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.check_constraint "`state` in (_utf8mb4'AC',_utf8mb4'AL',_utf8mb4'AP',_utf8mb4'AM',_utf8mb4'BA',_utf8mb4'CE',_utf8mb4'DF',_utf8mb4'ES',_utf8mb4'GO',_utf8mb4'MA',_utf8mb4'MT',_utf8mb4'MS',_utf8mb4'MG',_utf8mb4'PA',_utf8mb4'PB',_utf8mb4'PR',_utf8mb4'PE',_utf8mb4'PI',_utf8mb4'RJ',_utf8mb4'RN',_utf8mb4'RS',_utf8mb4'RO',_utf8mb4'RR',_utf8mb4'SC',_utf8mb4'SP',_utf8mb4'SE',_utf8mb4'TO')", name: "events_state_valid"
   end
 
-  create_table "newsletter_subscriptions", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "newsletter_subscriptions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "source"
@@ -157,41 +168,41 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.index ["email"], name: "index_newsletter_subscriptions_on_email", unique: true
   end
 
-  create_table "proposals", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "ad_id", limit: 36, null: false
+  create_table "proposals", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "ad_id", null: false
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.text "message"
     t.string "name", null: false
-    t.decimal "offered_value", precision: 12, scale: 2, null: false
+    t.integer "offered_value_cents", null: false
     t.string "phone"
     t.datetime "updated_at", null: false
-    t.string "user_id", limit: 36
+    t.bigint "user_id"
     t.index ["ad_id"], name: "index_proposals_on_ad_id"
     t.index ["created_at"], name: "index_proposals_on_created_at"
     t.index ["user_id"], name: "index_proposals_on_user_id"
-    t.check_constraint "`offered_value` > 0", name: "proposals_offered_value_positive"
+    t.check_constraint "`offered_value_cents` > 0", name: "proposals_offered_value_positive"
   end
 
-  create_table "sessions", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
     t.datetime "updated_at", null: false
     t.string "user_agent"
-    t.string "user_id", limit: 36, null: false
+    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
   create_table "technical_spec_values", primary_key: ["ad_id", "attribute_id"], charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "ad_id", limit: 36, null: false
-    t.string "attribute_id", limit: 36, null: false
+    t.bigint "ad_id", null: false
+    t.bigint "attribute_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "value", null: false
     t.index ["attribute_id"], name: "index_technical_spec_values_on_attribute_id"
   end
 
-  create_table "users", id: { type: :string, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "city", null: false
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -200,9 +211,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
     t.string "password_hash", null: false
     t.string "phone", null: false
     t.string "state", limit: 2, null: false
+    t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["status"], name: "index_users_on_status"
     t.check_constraint "`state` in (_utf8mb4'AC',_utf8mb4'AL',_utf8mb4'AP',_utf8mb4'AM',_utf8mb4'BA',_utf8mb4'CE',_utf8mb4'DF',_utf8mb4'ES',_utf8mb4'GO',_utf8mb4'MA',_utf8mb4'MT',_utf8mb4'MS',_utf8mb4'MG',_utf8mb4'PA',_utf8mb4'PB',_utf8mb4'PR',_utf8mb4'PE',_utf8mb4'PI',_utf8mb4'RJ',_utf8mb4'RN',_utf8mb4'RS',_utf8mb4'RO',_utf8mb4'RR',_utf8mb4'SC',_utf8mb4'SP',_utf8mb4'SE',_utf8mb4'TO')", name: "users_state_valid"
+    t.check_constraint "`status` in (_utf8mb4'active',_utf8mb4'inactive',_utf8mb4'blocked')", name: "users_status_valid"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -212,6 +226,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_175100) do
   add_foreign_key "ads", "admins"
   add_foreign_key "ads", "categories"
   add_foreign_key "ads", "users"
+  add_foreign_key "attribute_categories", "attributes"
+  add_foreign_key "attribute_categories", "categories"
   add_foreign_key "proposals", "ads"
   add_foreign_key "proposals", "users"
   add_foreign_key "sessions", "users"

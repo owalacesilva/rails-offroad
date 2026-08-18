@@ -159,6 +159,67 @@ RSpec.describe "Meus Anúncios", type: :request do
       end
     end
 
+    describe "especificações por categoria" do
+      let(:engine) { create(:spec_attribute, name: "engine", position: 3) }
+      let(:material) { create(:spec_attribute, name: "material", position: 11) }
+      let(:parts) { create(:category, :parts) }
+
+      before do
+        create(:attribute_category, category: vehicles, spec_attribute: engine)
+        create(:attribute_category, category: parts, spec_attribute: material)
+        get new_account_ad_path
+      end
+
+      # Cada categoria pede o seu conjunto: 4x4 não tem material, peça não tem motor.
+      it "monta um bloco por categoria" do
+        expect(response.body).to include(
+          %(data-category-id="#{vehicles.id}"),
+          %(data-category-id="#{parts.id}")
+        )
+      end
+
+      it "pede o atributo da categoria" do
+        expect(response.body).to include(%(name="specs[#{engine.id}]"))
+      end
+
+      # Os campos moram num <dialog>, aberto pelo botão de preencher.
+      it "põe os campos dentro do modal" do
+        modal = response.body[/<dialog\b.*?<\/dialog>/m]
+
+        expect(modal).to include("specs-modal-title", %(name="specs[#{engine.id}]"))
+      end
+
+      it "oferece o botão que abre o modal" do
+        expect(response.body).to include(
+          I18n.t("dashboard.ads_new.specifications_fill"),
+          'data-category-specs-target="open"'
+        )
+      end
+
+      # Obrigatório dentro de diálogo fechado trava a submissão no Chrome
+      # ("not focusable"): quem cobra é o modelo, com o botão de publicar travado.
+      it "não marca os campos como required" do
+        modal = response.body[/<dialog\b.*?<\/dialog>/m]
+
+        expect(modal).not_to include("required")
+      end
+
+      it "não mistura o atributo de uma categoria no bloco da outra" do
+        vehicles_block = response.body[/data-category-id="#{vehicles.id}".*?data-category-id="#{parts.id}"/m]
+
+        expect(vehicles_block).to include(%(name="specs[#{engine.id}]"))
+        expect(vehicles_block).not_to include(%(name="specs[#{material.id}]"))
+      end
+    end
+
+    describe "máscara de moeda no preço" do
+      it "põe a máscara no campo de preço" do
+        get new_account_ad_path
+
+        expect(response.body).to include('data-mask-type-value="currency"')
+      end
+    end
+
     describe "descrição com formatação" do
       before { get new_account_ad_path }
 
@@ -276,6 +337,29 @@ RSpec.describe "Meus Anúncios", type: :request do
       submit({ title: "" })
 
       expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    describe "especificações obrigatórias" do
+      let(:engine) { create(:spec_attribute, name: "engine", position: 3) }
+
+      before { create(:attribute_category, category: vehicles, spec_attribute: engine) }
+
+      it "recusa a submissão sem os atributos da categoria" do
+        expect { submit }.not_to change(Ad, :count)
+      end
+
+      it "explica qual especificação falta" do
+        submit
+
+        expect(response.body).to include(engine.label)
+      end
+
+      it "grava as especificações enviadas" do
+        post account_ads_path, params: { ad: valid_attributes, photo_signed_ids: signed_ids,
+                                         specs: { engine.id.to_s => "3.6 V6" } }
+
+        expect(Ad.last.ordered_specifications).to eq([ [ "engine", "3.6 V6" ] ])
+      end
     end
 
     it "ignora um user_id vindo do formulário" do

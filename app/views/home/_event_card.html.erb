@@ -1,10 +1,22 @@
 <%# Card da agenda. O evento é do organizador, não do portal: quando há site,
     o título leva para lá em aba nova; sem site, o card é só informativo. %>
 <article class="group relative flex gap-4 rounded-2xl border border-stone-200 bg-white p-5 transition hover:-translate-y-1 hover:border-brand-400 hover:shadow-lg hover:shadow-stone-900/10">
-  <div class="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl bg-brand-500/15 text-brand-700">
-    <span class="text-xl font-extrabold leading-none"><%= l(event.starts_on, format: :event_card_day) %></span>
-    <span class="mt-1 text-[10px] font-bold uppercase tracking-wide"><%= l(event.starts_on, format: :event_card_month) %></span>
-  </div>
+  <%# Capa quando o organizador tem uma; o bloco de data quando não tem. Um dos
+      dois sempre aparece, para os cards não ficarem desalinhados. %>
+  <% cover = event.cover_url %>
+  <% if cover.present? %>
+    <div class="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-stone-100">
+      <%= image_tag cover, alt: "", loading: "lazy", class: "h-full w-full object-cover" %>
+      <span class="absolute inset-x-0 bottom-0 bg-stone-950/75 py-0.5 text-center text-[10px] font-bold uppercase leading-tight text-white">
+        <%= l(event.starts_on, format: :event_card_day) %> <%= l(event.starts_on, format: :event_card_month) %>
+      </span>
+    </div>
+  <% else %>
+    <div class="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl bg-brand-500/15 text-brand-700">
+      <span class="text-xl font-extrabold leading-none"><%= l(event.starts_on, format: :event_card_day) %></span>
+      <span class="mt-1 text-[10px] font-bold uppercase tracking-wide"><%= l(event.starts_on, format: :event_card_month) %></span>
+    </div>
+  <% end %>
 
   <div class="min-w-0 flex-1">
     <h3 class="text-sm font-bold leading-snug text-stone-900 transition group-hover:text-brand-600">

@@ -29,9 +29,14 @@ class Ad < ApplicationRecord
   enum :badge, BADGES, prefix: true
   enum :status, STATUSES
 
+  before_validation :assign_slug
+
   validates :title, presence: true
+  validates :slug, presence: true, uniqueness: { case_sensitive: false }
   validates :city, presence: true
   validates :state, presence: true, length: { is: 2 }
+  # A validação fica no leitor em reais, e não em price_cents, para a mensagem
+  # de erro falar a língua do formulário.
   validates :price, numericality: { greater_than: 0 }
   # Ano no futuro não é aceito: o teto é o ano corrente. Antes o limite era
   # ano + 1, para o modelo-ano adiantado que a indústria automotiva usa; a regra
@@ -51,9 +56,12 @@ class Ad < ApplicationRecord
   # As duas condições moram no mesmo `validate` de propósito: registrar o mesmo
   # método duas vezes não soma callbacks, a segunda chamada substitui a primeira.
   validate :image_count_within_bounds, if: -> { approved? || validation_context == :submission }
+  validate :category_specifications_complete, if: -> { validation_context == :submission }
 
-  # Só anúncio aprovado aparece publicamente. É o ponto do fluxo de moderação.
-  scope :published, -> { where(status: STATUSES[:approved]) }
+  # Só anúncio aprovado, e só de anunciante ativo, aparece publicamente:
+  # bloquear um anunciante tira os anúncios dele do ar sem mexer em cada um.
+  # Subconsulta em vez de joins, para não conflitar com o includes das listagens.
+  scope :published, -> { where(status: STATUSES[:approved], user: User.active) }
   scope :recent, -> { order(published_at: :desc) }
   # A régua "Mais Vistos" da home. O desempate por data evita que um acervo novo,
   # em que todo mundo ainda está zerado, saia em ordem indefinida do MySQL.
@@ -76,9 +84,19 @@ class Ad < ApplicationRecord
     technical_spec_values.includes(:spec_attribute).sort_by(&:position).map(&:to_pair)
   end
 
-  # Vírgula do formulário vira ponto antes do cast (ver ApplicationRecord).
+  # A coluna é price_cents (inteiro); a aplicação inteira fala em reais.
+  def price
+    self.class.amount_or_input(price_cents, @price_input)
+  end
+
   def price=(value)
-    super(self.class.normalize_decimal(value))
+    @price_input = value
+    self.price_cents = self.class.to_cents(value)
+  end
+
+  # A URL usa a slug, não o id.
+  def to_param
+    slug
   end
 
   # A descrição chega como HTML do editor do formulário e é limpa na entrada,
@@ -135,7 +153,40 @@ class Ad < ApplicationRecord
         .limit(limit)
   end
 
+  # Slug livre a partir de uma base, com sufixo numérico quando já existe.
+  # Corrida entre dois INSERTs simultâneos ainda esbarra no índice único — que
+  # é justamente quem garante a unicidade de verdade.
+  def self.unique_slug(base)
+    return base unless exists?(slug: base)
+
+    suffix = 2
+    suffix += 1 while exists?(slug: "#{base}-#{suffix}")
+
+    "#{base}-#{suffix}"
+  end
+
   private
+    # Gerada uma vez e nunca mais: mudar o título de um anúncio publicado não
+    # pode quebrar o link que ele já espalhou por aí.
+    def assign_slug
+      return if slug.present? || title.blank?
+
+      self.slug = self.class.unique_slug(title.parameterize.presence || "anuncio")
+    end
+
+    # "Selecione todos os atributos": o conjunto exigido é o da categoria
+    # escolhida. Cobrado só na submissão pelo formulário — rascunho e seed
+    # seguem podendo ficar incompletos, como no caso das fotos.
+    def category_specifications_complete
+      return if category.blank?
+
+      filled = technical_spec_values.filter_map { |spec| spec.attribute_id if spec.value.present? }
+      missing = category.spec_attributes.ordered.reject { |attribute| filled.include?(attribute.id) }
+      return if missing.empty?
+
+      errors.add(:base, :missing_specifications, names: missing.map(&:label).to_sentence)
+    end
+
     def image_count_within_bounds
       return if IMAGE_COUNT.cover?(ad_images.size)
 

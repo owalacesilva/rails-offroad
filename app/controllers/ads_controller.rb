@@ -10,7 +10,7 @@ class AdsController < ApplicationController
   def show
     @ad = Ad.published
             .with_photos.includes(:category, :user, technical_spec_values: :spec_attribute)
-            .find(params[:id])
+            .find_by!(slug: params[:id])
     @related = @ad.related
     @proposal = @ad.proposals.new
 

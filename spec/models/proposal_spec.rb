@@ -41,11 +41,14 @@ RSpec.describe Proposal, type: :model do
       expect(build(:proposal, offered_value: "combino depois")).not_to be_valid
     end
 
+    # A coluna é offered_value_cents: quando o texto não vira número, o leitor
+    # devolve o que foi digitado, senão o formulário voltaria com o campo vazio.
     it "devolve o valor cru digitado para o campo não esvaziar no erro" do
       proposal = build(:proposal, offered_value: "combino depois")
       proposal.valid?
 
-      expect(proposal.offered_value_before_type_cast).to eq("combino depois")
+      expect(proposal.offered_value).to eq("combino depois")
+      expect(proposal.offered_value_cents).to be_nil
     end
 
     it "recusa valor zero" do

@@ -2,7 +2,7 @@
 # autenticação do anunciante fica intocada.
 class CreateAdmins < ActiveRecord::Migration[8.1]
   def change
-    create_table :admins, id: :string, limit: 36 do |t|
+    create_table :admins do |t|
       t.string :name, null: false
       t.string :email, null: false
       t.string :password_hash, null: false

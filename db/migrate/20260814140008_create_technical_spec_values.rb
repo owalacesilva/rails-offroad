@@ -3,8 +3,8 @@
 class CreateTechnicalSpecValues < ActiveRecord::Migration[8.1]
   def change
     create_table :technical_spec_values, primary_key: %i[ad_id attribute_id] do |t|
-      t.string :ad_id, limit: 36, null: false
-      t.string :attribute_id, limit: 36, null: false
+      t.bigint :ad_id, null: false
+      t.bigint :attribute_id, null: false
       # Sempre texto; o data_type do atributo diz como interpretar.
       t.string :value, null: false
 

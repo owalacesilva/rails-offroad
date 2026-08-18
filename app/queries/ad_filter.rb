@@ -6,8 +6,8 @@ class AdFilter
   # o menor valor, então o DESC já o joga para o final.
   SORTS = {
     "recent" => ->(scope) { scope.order(published_at: :desc) },
-    "price_asc" => ->(scope) { scope.order(price: :asc) },
-    "price_desc" => ->(scope) { scope.order(price: :desc) },
+    "price_asc" => ->(scope) { scope.order(price_cents: :asc) },
+    "price_desc" => ->(scope) { scope.order(price_cents: :desc) },
     "year_desc" => ->(scope) { scope.order(year: :desc) }
   }.freeze
 

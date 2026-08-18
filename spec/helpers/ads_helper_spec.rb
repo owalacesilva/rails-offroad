@@ -38,23 +38,29 @@ RSpec.describe AdsHelper, type: :helper do
   end
 
   describe "#ad_price" do
-    it "formata em reais sem centavos usando os separadores do pt-BR" do
-      expect(helper.ad_price(389_900)).to eq("R$ 389.900")
+    # Duas casas desde que o valor virou centavo inteiro no banco: os centavos
+    # existem de verdade e arredondá-los mostraria um preço que não é o cobrado.
+    it "formata em reais com centavos usando os separadores do pt-BR" do
+      expect(helper.ad_price(389_900)).to eq("R$ 389.900,00")
+    end
+
+    it "mostra os centavos que o valor tem" do
+      expect(helper.ad_price(BigDecimal("45000.50"))).to eq("R$ 45.000,50")
     end
 
     it "segue os separadores do locale em en-US" do
       I18n.with_locale(:"en-US") do
-        expect(helper.ad_price(389_900)).to eq("R$389,900")
+        expect(helper.ad_price(389_900)).to eq("R$389,900.00")
       end
     end
 
     # Exemplo de mock com Mocha (substitui o rspec-mocks neste projeto).
     it "delega a formatação para o number_to_currency do Rails" do
       helper.expects(:number_to_currency)
-            .with(389_900, unit: "R$", precision: 0)
-            .returns("R$ 389.900")
+            .with(389_900, unit: "R$", precision: 2)
+            .returns("R$ 389.900,00")
 
-      expect(helper.ad_price(389_900)).to eq("R$ 389.900")
+      expect(helper.ad_price(389_900)).to eq("R$ 389.900,00")
     end
   end
 

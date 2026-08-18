@@ -51,6 +51,58 @@ RSpec.describe Event, type: :model do
     end
   end
 
+  # A gestão da agenda usa as duas listas; a home só usa upcoming.
+  describe ".past" do
+    it "traz o que já terminou" do
+      expect(described_class.past).to include(create(:event, :past))
+    end
+
+    it "deixa de fora o que ainda vem" do
+      expect(described_class.past).not_to include(create(:event))
+    end
+
+    it "deixa de fora o que começou e ainda não terminou" do
+      expect(described_class.past).not_to include(create(:event, :ongoing))
+    end
+
+    # Ordem invertida: na gestão o que acabou de terminar é o que interessa.
+    it "ordena do mais recente para o mais antigo" do
+      older = create(:event, starts_on: 60.days.ago.to_date)
+      recent = create(:event, starts_on: 5.days.ago.to_date)
+
+      expect(described_class.past).to eq([ recent, older ])
+    end
+
+    it "não divide evento nenhum com upcoming" do
+      create(:event)
+      create(:event, :past)
+      create(:event, :ongoing)
+
+      expect(described_class.past.ids & described_class.upcoming.ids).to be_empty
+    end
+  end
+
+  # Capa opcional do card na home, no mesmo esquema de #external_url.
+  describe "#cover_url" do
+    it "aceita imagem http(s)" do
+      expect(build(:event, image_url: "https://exemplo.com.br/foto.jpg").cover_url)
+        .to eq("https://exemplo.com.br/foto.jpg")
+    end
+
+    it "recusa esquema fora de http(s) na validação" do
+      expect(build(:event, image_url: "javascript:alert(1)")).not_to be_valid
+    end
+
+    # Segunda barreira: vale para linha gravada por fora do modelo.
+    it "devolve nil para qualquer outro esquema" do
+      expect(build(:event, image_url: "data:image/png;base64,AAAA").cover_url).to be_nil
+    end
+
+    it "devolve nil quando não há imagem" do
+      expect(build(:event, image_url: nil).cover_url).to be_nil
+    end
+  end
+
   describe "#single_day?" do
     it "é verdadeiro sem data de término" do
       expect(build(:event, ends_on: nil)).to be_single_day

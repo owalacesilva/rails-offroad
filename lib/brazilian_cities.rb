@@ -58,12 +58,11 @@ class BrazilianCities
   end
 
   private
-    # O UUID é gerado aqui e não em `entries` porque upsert_all não passa pelos
-    # callbacks do ApplicationRecord — ninguém preencheria a chave primária. Em
-    # linha já existente ele é descartado: `id` não está em update_only.
+    # Sem `id` no hash: a chave primária é bigint com auto_increment, e o banco
+    # a preenche. Em linha já existente o INSERT cai no ON DUPLICATE KEY do
+    # índice de ibge_code e só nome e UF são reescritos — o id não muda.
     def upsert(batch)
-      City.upsert_all(batch.map { |entry| entry.merge(id: SecureRandom.uuid) },
-                      update_only: %i[name state], record_timestamps: true)
+      City.upsert_all(batch, update_only: %i[name state], record_timestamps: true)
     end
 
     def entry_from(line, number)

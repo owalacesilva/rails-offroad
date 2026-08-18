@@ -89,6 +89,14 @@ en-US:
       photos_no_js: "Uploading photos needs JavaScript enabled."
       photo_remove: "Remove photo"
       city_placeholder: "Start typing the city"
+      specifications: "Technical specifications"
+      specifications_hint: "Each category asks for its own set, and every field is required."
+      specifications_empty: "Pick a category above to see which specifications it asks for."
+      specifications_fill: "Fill in specifications"
+      specifications_edit: "Edit specifications"
+      specifications_done: "Done"
+      specifications_counter: "%{count} of %{total} filled in"
+      specifications_required: "Fill in every specification for the category."
       city_hint: "Pick the state first; suggestions come from that state's municipalities."
       format:
         label: "Formatting"
@@ -143,8 +151,15 @@ en-US:
         one: "1 proposal"
         other: "%{count} proposals"
       received_at: "Received on %{date}"
+      received: "Received on"
       contact: "Contact"
       message: "Message"
+      no_message: "The buyer left no message."
+      no_phone: "Not provided"
+      details: "View details"
+      details_title: "Offer details"
+      reply: "Reply by email"
+      reply_subject: "About your offer for %{title}"
       empty:
         title: "No proposals yet"
         subtitle: "When someone sends a proposal through your listings, it shows up here."
@@ -271,6 +286,14 @@ en-US:
       advertiser: "Advertiser"
       member_since: "On the portal since %{date}"
       whatsapp: "Message on WhatsApp"
+      share:
+        title: "Share"
+        # A bare "on" key parses as a YAML boolean: renamed on purpose.
+        network: "Share on %{network}"
+        copy: "Copy link"
+        copied: "Link copied!"
+        native: "Share"
+        message: "Found this listing on OffRoad Classificados: %{title}"
       whatsapp_message: "Hi! I am interested in the listing \"%{title}\" — %{url}"
       propose: "Send an offer"
       gallery:
@@ -487,6 +510,7 @@ en-US:
     title: "Moderation"
     nav:
       queue: "Queue"
+      events: "Events"
       sign_out: "Sign out"
     sessions:
       required: "Sign in as a moderator to continue."
@@ -499,6 +523,50 @@ en-US:
         failure: "Wrong email or password."
       destroy:
         success: "Signed out."
+    events:
+      scopes:
+        upcoming: "Upcoming"
+        past: "Past"
+      index:
+        title: "Event Calendar"
+        subtitle: "Trail rides, meetups and shows shown on the home page. Whatever is under \"Upcoming\" is what the portal displays."
+        filter_label: "Filter the calendar"
+        new: "New event"
+        edit: "Edit"
+        destroy: "Delete"
+        destroy_confirm: "Delete \"%{title}\"? This cannot be undone."
+        empty:
+          upcoming:
+            title: "No events scheduled"
+            subtitle: "Add the next one and it shows up on the home page right away."
+          past:
+            title: "Nothing in the history"
+            subtitle: "Events that already happened are kept here."
+      form:
+        title_placeholder: "E.g. Trilhão da Serra Catarinense"
+        venue_placeholder: "E.g. Serra do Rio do Rastro"
+        description_placeholder: "What happens, who it is for, how to sign up..."
+        ends_on_hint: "Leave empty for a single-day event."
+        url_hint: "The organizer's site or sign-up page. Opens in a new tab."
+        image_url_hint: "Cover image for the home page card. Optional."
+        cancel: "Cancel"
+        errors:
+          one: "Fix 1 problem to continue:"
+          other: "Fix %{count} problems to continue:"
+      new:
+        title: "New Event"
+        subtitle: "The event joins the calendar as soon as it is saved — there is no queue."
+        submit: "Save event"
+      edit:
+        title: "Edit event"
+        subtitle: "Changes take effect on the home page immediately."
+        submit: "Save changes"
+      create:
+        success: "\"%{title}\" added to the calendar."
+      update:
+        success: "\"%{title}\" updated."
+      destroy:
+        success: "\"%{title}\" removed from the calendar."
     ads:
       statuses:
         draft: "Drafts"
@@ -561,6 +629,7 @@ en-US:
         phone: "WhatsApp"
         city: "City"
         state: "State"
+        status: "Status"
         password: "Password"
         password_confirmation: "Confirm password"
       admin:
@@ -569,6 +638,7 @@ en-US:
         password: "Password"
       ad:
         title: "Title"
+        slug: "Address"
         price: "Price"
         year: "Year"
         city: "City"
@@ -581,7 +651,6 @@ en-US:
       spec_attribute:
         name: "Name"
         data_type: "Data type"
-        is_required: "Required"
       event:
         title: "Title"
         description: "Description"
@@ -600,6 +669,8 @@ en-US:
           attributes:
             ad_images:
               invalid_count: "must be between %{min} and %{max}"
+            base:
+              missing_specifications: "Fill in every specification for the category: %{names}"
         ad_image:
           attributes:
             base:

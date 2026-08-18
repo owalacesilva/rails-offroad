@@ -18,13 +18,66 @@ RSpec.describe Ad, type: :model do
     expect(described_class.badges.keys).to contain_exactly("prepared", "featured", "new_arrival")
   end
 
+  # A coluna é price_cents (inteiro); a aplicação inteira fala em reais.
   describe "#price" do
-    it "guarda o valor em reais, sem conversão para centavos" do
+    it "lê de volta em reais o que foi gravado em reais" do
       expect(build(:ad, price: 389_900).price).to eq(389_900)
+    end
+
+    it "guarda centavos inteiros na coluna" do
+      expect(build(:ad, price: 389_900).price_cents).to eq(38_990_000)
     end
 
     it "preserva as duas casas decimais" do
       expect(create(:ad, price: 8_790.50).reload.price).to eq(8_790.50)
+    end
+
+    it "aceita o formato brasileiro que o formulário manda" do
+      expect(build(:ad, price: "45.000,50").price_cents).to eq(4_500_050)
+    end
+
+    # Sem isso o formulário voltaria com o campo vazio depois do erro.
+    it "devolve o texto cru quando ele não vira número" do
+      ad = build(:ad, price: "a combinar")
+
+      expect(ad).not_to be_valid
+      expect(ad.price).to eq("a combinar")
+    end
+  end
+
+  # A URL do anúncio é a slug, derivada do título.
+  describe "slug" do
+    it "deriva do título" do
+      expect(create(:ad, title: "Jeep Wrangler Rubicon 3.6 V6").slug).to eq("jeep-wrangler-rubicon-3-6-v6")
+    end
+
+    it "vai para a URL no lugar do id" do
+      ad = create(:ad, title: "Troller T4 3.2")
+
+      expect(ad.to_param).to eq("troller-t4-3-2")
+    end
+
+    it "desempata título repetido com sufixo" do
+      create(:ad, title: "Jeep Wrangler")
+
+      expect(create(:ad, title: "Jeep Wrangler").slug).to eq("jeep-wrangler-2")
+    end
+
+    # Gerada uma vez: renomear um anúncio publicado não pode quebrar o link
+    # que ele já espalhou.
+    it "não muda quando o título muda" do
+      ad = create(:ad, title: "Jeep Wrangler")
+
+      ad.update!(title: "Jeep Wrangler Rubicon")
+
+      expect(ad.reload.slug).to eq("jeep-wrangler")
+    end
+
+    it "é única no próprio banco" do
+      create(:ad, title: "Jeep Wrangler")
+      duplicate = build(:ad, title: "Outro", slug: "jeep-wrangler")
+
+      expect { duplicate.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 
@@ -86,8 +139,49 @@ RSpec.describe Ad, type: :model do
     end
   end
 
+  # "Selecione todos os atributos": o conjunto exigido é o da categoria.
+  describe "especificações obrigatórias" do
+    let(:category) { create(:category, :vehicles) }
+    let(:engine) { create(:spec_attribute, name: "engine", position: 3) }
+
+    before { create(:attribute_category, category: category, spec_attribute: engine) }
+
+    def submit(ad)
+      ad.valid?(:submission)
+      ad
+    end
+
+    it "recusa a submissão sem a especificação que a categoria pede" do
+      ad = build(:ad, category: category)
+
+      expect(submit(ad).errors[:base].join).to include(engine.label)
+    end
+
+    it "aceita a submissão com todas preenchidas" do
+      ad = build(:ad, category: category)
+      ad.technical_spec_values.build(spec_attribute: engine, value: "3.6 V6")
+
+      expect(ad.valid?(:submission)).to be(true)
+    end
+
+    it "não aceita valor em branco como preenchido" do
+      ad = build(:ad, category: category)
+      ad.technical_spec_values.build(spec_attribute: engine, value: "")
+
+      expect(submit(ad).errors[:base]).not_to be_empty
+    end
+
+    # Fora da submissão pelo formulário nada disso é cobrado — é o que deixa o
+    # seed e a moderação trabalharem com anúncio incompleto.
+    it "não cobra nada fora do contexto de submissão" do
+      expect(build(:ad, category: category)).to be_valid
+    end
+  end
+
   it "barra preço não positivo no próprio banco" do
-    ad = build(:ad, price: 0)
+    # A slug vem de um before_validation, que save!(validate: false) pula: sem
+    # ela o INSERT esbarraria no NOT NULL antes de chegar à check constraint.
+    ad = build(:ad, price: 0, slug: "preco-invalido")
 
     expect { ad.save!(validate: false) }.to raise_error(ActiveRecord::StatementInvalid, /ads_price_positive/)
   end
@@ -111,6 +205,19 @@ RSpec.describe Ad, type: :model do
       create(:ad, :rejected)
 
       expect(described_class.published).to eq([ approved ])
+    end
+
+    # Bloquear um anunciante tira os anúncios dele do ar sem mexer em cada um.
+    it "published deixa de fora o anúncio de anunciante bloqueado" do
+      create(:ad, user: create(:user, status: :blocked))
+
+      expect(described_class.published).to be_empty
+    end
+
+    it "published deixa de fora o anúncio de anunciante inativo" do
+      create(:ad, user: create(:user, status: :inactive))
+
+      expect(described_class.published).to be_empty
     end
   end
 

@@ -1,6 +1,11 @@
 class Category < ApplicationRecord
   has_many :ads, dependent: :restrict_with_error
 
+  # As especificações que esta categoria pede. Estar na lista é o mesmo que ser
+  # obrigatória: o formulário de anúncio exige todas (ver Ad).
+  has_many :attribute_categories, dependent: :destroy
+  has_many :spec_attributes, through: :attribute_categories
+
   # case_sensitive: false acompanha o banco. A collation padrão do MySQL
   # (utf8mb4_0900_ai_ci) ignora caixa, então o índice único já trataria
   # "veiculos-4x4" e "Veiculos-4X4" como a mesma slug; sem isto o modelo

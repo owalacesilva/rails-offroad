@@ -2,8 +2,29 @@ module AdsHelper
   # A unidade é fixa (o portal negocia em BRL em qualquer idioma), mas separadores
   # e espaçamento seguem o locale via rails-i18n — daí "R$" sem espaço à direita:
   # o format do pt-BR ("%u %n") já insere o separador.
+  #
+  # Duas casas, e não zero: desde que o valor virou centavo inteiro no banco, os
+  # centavos existem de verdade e arredondá-los na tela mostraria um preço que
+  # não é o cobrado.
   def ad_price(amount)
-    number_to_currency(amount, unit: "R$", precision: 0)
+    number_to_currency(amount, unit: "R$", precision: 2)
+  end
+
+  # Redes onde o anúncio pode ser compartilhado. Chave (para o ícone e o rótulo)
+  # e a URL de compartilhamento de cada uma, já com título e endereço embutidos.
+  def ad_share_links(ad)
+    url = ad_url(ad)
+    text = t("ads.show.share.message", title: ad.title)
+    escaped_url = CGI.escape(url)
+    escaped_text = CGI.escape(text)
+
+    {
+      # O WhatsApp aceita um parâmetro só, então título e endereço vão juntos.
+      whatsapp: "https://wa.me/?text=#{CGI.escape("#{text} #{url}")}",
+      facebook: "https://www.facebook.com/sharer/sharer.php?u=#{escaped_url}",
+      x: "https://twitter.com/intent/tweet?text=#{escaped_text}&url=#{escaped_url}",
+      telegram: "https://t.me/share/url?url=#{escaped_url}&text=#{escaped_text}"
+    }
   end
 
   # Mantém os filtros atuais ao trocar de página.

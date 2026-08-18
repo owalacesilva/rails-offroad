@@ -3,6 +3,11 @@ class User < ApplicationRecord
     AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO
   ].freeze
 
+  # Situação do anunciante. `inactive` é quem saiu por vontade própria;
+  # `blocked` é quem a moderação tirou do ar. Os dois são barrados no login e
+  # somem da vitrine junto com seus anúncios (ver Ad.published).
+  STATUSES = { active: "active", inactive: "inactive", blocked: "blocked" }.freeze
+
   # A coluna se chama password_hash (dicionário de dados), mas has_secure_password
   # exige password_digest. O alias liga os dois sem coluna extra.
   alias_attribute :password_digest, :password_hash
@@ -14,6 +19,8 @@ class User < ApplicationRecord
   # Proposta é preservada quando quem enviou some: o anunciante ainda precisa
   # do contato, que fica gravado na própria proposta.
   has_many :proposals, dependent: :nullify
+
+  enum :status, STATUSES
 
   normalizes :email, with: ->(email) { email.to_s.strip.downcase }
   # O formulário aceita "(41) 98877-0011"; o wa.me precisa de "5541988770011".

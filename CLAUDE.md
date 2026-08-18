@@ -109,18 +109,39 @@ assembles all four, so a new section is a YAML entry in both locale files — ne
 "Last updated" comes from `PagesController::LAST_UPDATED_ON`, not from the locale, so the
 two languages cannot drift apart on the date.
 
-**Money is `DECIMAL(12,2)` in reais** (`ads.price`, `proposals.offered_value`), with `> 0`
-check constraints in the database, not just model validations. There are no `_cents`
-columns — the form takes reais and `Proposal#offered_value=` only swaps a decimal comma
-for a dot before Rails casts it.
+**Money is stored in integer cents** — `ads.price_cents` and
+`proposals.offered_value_cents`, both `int` (the "int(11)" of the data dictionary; MySQL
+8.4 stopped printing the display width, but it is the same four-byte signed integer, good
+to R$ 21.474.836,47). Both carry `> 0` check constraints in the database, not just model
+validations.
 
-**Every primary key is a UUID**, including join and moderation tables. A spec that
-hardcodes an integer id will not match anything. MySQL has no `uuid` column type and no
-`RETURNING`, so the key is a `VARCHAR(36)` and **`ApplicationRecord` generates the value in
-a `before_create`** — a database-side default would be invisible to Rails and leave
-`record.id` empty after `create`. Migrations therefore write `id: :string, limit: 36` and
-`t.references ..., type: :string, limit: 36`, never `id: :uuid`, which the MySQL adapter
-does not understand.
+**The application still speaks reais everywhere.** `Ad#price` and `Proposal#offered_value`
+are hand-written accessors over the `_cents` columns, and every view, form and spec uses
+them; `ApplicationRecord.to_cents` / `.to_amount` are the only places the two units meet.
+Validations sit on the reais reader, not the cents column, so the error message talks about
+the number the person typed. Text that does not convert comes back out of the reader
+unchanged (`ApplicationRecord.amount_or_input`) — that is what stops the form returning
+with an emptied field after a validation error, which `_before_type_cast` used to do.
+
+**Every primary key is a `bigint`.** They were `VARCHAR(36)` UUIDs generated in an
+`ApplicationRecord` `before_create`; that hook is gone and the database assigns ids again.
+`spec/models/schema_spec.rb` asserts it across every table, so a new migration that
+reintroduces a string key fails the suite rather than passing unnoticed.
+
+**An ad is addressed by its slug, not its id.** `ads.slug` is derived from the title
+(`parameterize`, with a `-2`, `-3` suffix on collision) in a `before_validation`, and
+`Ad#to_param` returns it — so every route helper puts the slug in the URL and every lookup
+must be `find_by!(slug: params[:id])`, including the moderation queue. `Ad.find(params[:id])`
+now silently means "id 0" on MySQL. The slug is generated once and never regenerated:
+renaming a published ad must not break links already out in the world.
+
+**`users.status` is `active` / `inactive` / `blocked`**, with an enum and a check
+constraint. It reaches three places, and all three matter: login refuses anyone not active,
+`Authentication#find_session_by_cookie` joins `User.active` so blocking someone ends the
+session they already have open, and `Ad.published` filters by `User.active` so their ads
+leave the catalog without touching a single ad row. The login failure message is
+deliberately the same one a wrong password gets — saying "your account is blocked" to
+someone who merely guessed an address confirms that the address exists.
 
 **The default collation is case-insensitive** (`utf8mb4_0900_ai_ci`). Unique indexes and
 every `where` on a string follow it, so `Category#slug` and `SpecAttribute#name` validate
@@ -201,6 +222,37 @@ inputs are `peer sr-only` and Tailwind's `peer-checked:` styles the label. Keybo
 screen reader still see an ordinary radio group. `peer-checked:` only reaches siblings of
 the input, so the colour lives on the label and the icon inherits it via `currentColor`.
 
+**Specifications are filled in a modal.** All four categories render a block of spec
+fields inside one `<dialog>`; `category_specs_controller.js` shows the selected category's
+block and **disables** every other, because a disabled field is neither submitted nor
+validated by the browser. The same attribute (`condition`) appears in several blocks under
+the same `specs[<id>]` name — only the enabled copy travels. A closed `<dialog>` is merely
+`display: none`, so its inputs still submit.
+
+**Nothing in that dialog may be `required`.** Chrome refuses to submit a form containing a
+required control it cannot focus, and a required field inside a closed dialog is exactly
+that — the submit would fail silently with no message anywhere. Completeness is enforced
+the same way the photo minimum is: `Ad`'s `:submission` validation decides, and the publish
+button stays disabled until `category-specs` reports the set is full.
+
+`submit_controller.js` gates on **two** signals now (photos and specs), each with its own
+hint line. It has to be connected before either child dispatches on `connect`, which is why
+it is listed first in the form's `data-controller` and why the photo controller sits on a
+descendant — both give Stimulus the connection order this depends on.
+
+**Input masks are comfort, never validation.** `mask_controller.js` formats currency
+(`45.000,50`, typed as cents) and phone (`(11) 9 8765-4321`, falling back to the 8-digit
+landline shape). What actually normalizes is `User.normalize_phone` and
+`ApplicationRecord.to_cents`. Money fields are `text_field`, not `number_field` — a number
+input rejects `45.000,50` outright.
+
+**Sharing is server-rendered anchors first.** `AdsHelper#ad_share_links` builds the
+WhatsApp / Facebook / X / Telegram URLs, so sharing works with JavaScript off;
+`share_controller.js` only adds what needs it — `navigator.share` on touch devices and
+copy-to-clipboard. It also adds the display class itself rather than toggling `hidden`
+against `inline-flex` in the HTML, since which of the two wins depends on the order
+Tailwind happens to emit them.
+
 **Ad year may not be in the future** — `less_than_or_equal_to: Date.current.year`. This
 tightened an earlier rule of `year + 1`, which existed for the industry's habit of selling
 next model year early; a 2027 truck listed in 2026 is now rejected.
@@ -228,7 +280,7 @@ It is the only seeded table that also belongs in production, which is why it loa
 `db/seeds.rb`. The data is versioned at `db/cities.csv` so initialization never depends on
 the IBGE API being up.
 
-The primary key is a UUID like everywhere else; `ibge_code` is the **natural** key and
+The primary key is a bigint like everywhere else; `ibge_code` is the **natural** key and
 carries the unique index, so `import` is an upsert that only touches `name` and `state` —
 a municipality renamed by IBGE is corrected without its `id` changing under anything that
 already referenced it. The second unique index is `(state, name)`, not `name`: 240 names
@@ -248,9 +300,15 @@ is a separate change with a data migration for existing rows. The accent- and
 case-insensitive collation is what lets `q=sao` find "São Paulo" with no normalized column.
 
 `Event` and `NewsletterSubscription` hang off nothing: they are portal content, not an
-advertiser's. `Event` is the home calendar (`Event.upcoming` uses
+advertiser's. **Events are managed from the moderation area** (`Moderation::EventsController`,
+`/admin/eventos`) — full CRUD with no approval queue, because what the portal's own team
+publishes is already trusted, unlike an advertiser's ad. The list has two tabs backed by the
+`upcoming` and `past` scopes, which partition the table between them; only `upcoming` reaches
+the home page. `Event` is the home calendar (`Event.upcoming` uses
 `COALESCE(ends_on, starts_on) >= today`, so a three-day meet stays listed on its second
-day). `Event#external_url` whitelists `http(s)` before the card turns it into an `href`.
+day). `Event#external_url` and `#cover_url` whitelist `http(s)` before the card turns them into an
+`href` and an `img src`; `Event::HTTP_URL` validates the same thing on write, so the scheme is
+checked twice — a row written by hand in SQL still cannot put `javascript:` on the home page.
 
 ### Home page section order is a requirement, not a layout choice
 
@@ -289,10 +347,16 @@ is skipped unless the ad is approved, so a draft can be incomplete.
 ### Specifications are EAV, not jsonb
 
 `attributes` (model `SpecAttribute` — the constant cannot be `Attribute`, which collides
-with `ActiveModel::Attribute`) defines the vocabulary: `name`, `data_type`, `is_required`
-and `position`. `technical_spec_values` holds one row per ad/attribute pair with a
-**composite primary key** `(ad_id, attribute_id)`, which is what stops an ad repeating an
-attribute.
+with `ActiveModel::Attribute`) defines the vocabulary: `name`, `data_type` and `position`.
+`technical_spec_values` holds one row per ad/attribute pair with a **composite primary key**
+`(ad_id, attribute_id)`, which is what stops an ad repeating an attribute.
+
+**Which specs an ad must carry is a property of its category, not of the attribute.**
+`attribute_categories` joins the two, and being joined *is* the requirement — the ad form
+asks for every attribute of the chosen category and `Ad` enforces it in the `:submission`
+context. There is no `attributes.is_required` column any more: it was global, so it could
+never say "4x4 needs an engine, a part needs a material". An attribute that does not apply
+to a category simply is not linked to it.
 
 Values are always stored as text; `TechnicalSpecValue#typed_value` casts on read using the
 attribute's `data_type` and falls back to the raw string when the value does not convert.
@@ -355,12 +419,6 @@ the object instead (`config.active_storage.resolve_model_to_route = :rails_stora
 `AdImage#url` must pass `only_path: true`: Active Storage's route is a direct route, and
 outside a request (console, job) it otherwise tries to build an absolute URL and raises
 "Missing host to link to".
-
-**`active_storage_attachments.record_id` is `VARCHAR(36)`, not bigint.** The generated
-migration was edited: this project's primary keys are UUID strings, and the stock bigint
-column cannot hold one. The Active Storage tables themselves keep bigint primary keys on
-purpose — the framework generates those ids, and its models inherit from
-`ActiveRecord::Base`, so they never reach our `before_create` UUID hook.
 
 **Preload with `Ad.with_photos`**, not `includes(:ad_images)`. `AdImage#url` asks whether a
 blob is attached, so without `includes(ad_images: { file_attachment: :blob })` every listing
