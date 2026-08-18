@@ -1,22 +1,29 @@
-<%# Rejeição com recado. O motivo é obrigatório: rejeitar em silêncio deixa o
-    anunciante sem saber o que corrigir, e é ele que aparece no painel dele. %>
+<%# Rejeição em lote: o mesmo motivo obrigatório, aplicado às linhas marcadas.
+
+    O campo do motivo pertence ao formulário em lote (`form=`), e não a um
+    formulário próprio: as caixas de seleção da tabela apontam para aquele, e um
+    input só pode pertencer a um form.
+
+    Por isso o campo **não** é `required`: ele vive dentro de um <dialog>, que
+    fechado é `display: none`, e o botão de aprovar envia o mesmo formulário com
+    o diálogo fechado — o Chrome recusaria o envio em silêncio, reclamando de um
+    campo que não dá para focar. Quem cobra o motivo é a controller. %>
 <dialog data-modal-target="dialog"
         data-action="click->modal#closeOnBackdrop"
-        aria-labelledby="reject-<%= ad.id %>-title"
+        aria-labelledby="bulk-reject-title"
         class="w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-stone-300 bg-white p-0 text-stone-900 backdrop:bg-stone-950/80 backdrop:backdrop-blur-sm">
   <div class="border-b border-stone-200 p-6">
-    <h2 id="reject-<%= ad.id %>-title" class="text-lg font-bold text-stone-900">
-      <%= t("admin.ads.reject_modal.title") %>
+    <h2 id="bulk-reject-title" class="text-lg font-bold text-stone-900">
+      <%= t("admin.ads.bulk.reject_title") %>
     </h2>
-    <p class="mt-1 truncate text-sm text-stone-500"><%= ad.title %></p>
+    <p class="mt-1 text-sm text-stone-500"><%= t("admin.ads.bulk.reject_subtitle") %></p>
   </div>
 
-  <%= form_with url: reject_admin_ad_path(ad, list: local_assigns[:list_state]), method: :patch,
-        class: "space-y-4 p-6" do %>
+  <div class="space-y-4 p-6">
     <div>
-      <%= label_tag "note_#{ad.id}", t("admin.ads.reject_modal.note"),
+      <%= label_tag :bulk_note, t("admin.ads.reject_modal.note"),
             class: "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
-      <%= text_area_tag :note, nil, id: "note_#{ad.id}", rows: 4, required: true,
+      <%= text_area_tag :note, nil, id: "bulk_note", rows: 4, form: "bulk-review-form",
             placeholder: t("admin.ads.reject_modal.placeholder"),
             class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
       <p class="mt-1 text-xs text-stone-400"><%= t("admin.ads.reject_modal.hint") %></p>
@@ -28,10 +35,10 @@
         <%= t("admin.ads.reject_modal.cancel") %>
       </button>
 
-      <button type="submit"
+      <button type="submit" form="bulk-review-form" name="to" value="reject"
               class="cursor-pointer rounded-full bg-red-600 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-red-500">
         <%= t("admin.ads.reject_modal.submit") %>
       </button>
     </div>
-  <% end %>
+  </div>
 </dialog>

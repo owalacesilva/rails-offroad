@@ -1,0 +1,163 @@
+<%# Uma linha de anúncio na fila, mais a linha de detalhe logo abaixo.
+
+    Locais: ad, list_state (o estado da fila que toda ação devolve) e open.
+
+    São sempre dois <tr>: a de detalhe fica `hidden` quando fechada, em vez de
+    não existir. É o que mantém a zebra regular e o que permite abrir a linha por
+    link — sem JavaScript, `?open=<slug>` recarrega a página com ela aberta. %>
+<% blocked = ad.ad_images.count(&:blocked?) %>
+<% visible = ad.visible_images.size %>
+
+<tr class="transition hover:bg-brand-50/50" data-controller="modal">
+  <td class="px-4 py-2 align-top">
+    <%= check_box_tag "ad_ids[]", ad.id, false, form: "bulk-review-form", id: "ad_#{ad.id}",
+          "aria-label": ad.title,
+          data: { bulk_select_target: "row", action: "change->bulk-select#refresh" },
+          class: "mt-1 size-4 cursor-pointer accent-brand-500" %>
+  </td>
+
+  <%# ------------------------------------------------------------- Anúncio %>
+  <td class="px-4 py-2">
+    <div class="flex items-start gap-2.5">
+      <% cover = ad.cover_image %>
+      <% if cover %>
+        <%= image_tag cover.url, alt: "", loading: "lazy",
+              class: "size-10 shrink-0 rounded-lg border border-stone-200 object-cover" %>
+      <% else %>
+        <span aria-hidden="true"
+              class="flex size-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-stone-300 text-stone-300">
+          <%= ui_icon(:document) %>
+        </span>
+      <% end %>
+
+      <div class="min-w-0">
+        <p class="font-semibold text-stone-900"><%= ad.title %></p>
+        <p class="mt-0.5 text-xs text-stone-500">
+          <%= ad.city %>, <%= ad.state %><%= " · #{ad.year}" if ad.year %>
+        </p>
+      </div>
+    </div>
+  </td>
+
+  <td class="px-4 py-2 whitespace-nowrap text-stone-600"><%= ad.category.name %></td>
+
+  <%# ---------------------------------------------------------- Anunciante %>
+  <td class="px-4 py-2">
+    <p class="font-medium text-stone-900"><%= ad.user.name %></p>
+    <p class="text-xs text-stone-500"><%= ad.user.email %></p>
+  </td>
+
+  <td class="px-4 py-2 text-right tabular-nums font-semibold whitespace-nowrap text-stone-900">
+    <%= ad_price(ad.price) %>
+  </td>
+
+  <%# --------------------------------------------------------------- Fotos %>
+  <td class="px-4 py-2 whitespace-nowrap">
+    <%# O link abre a linha de detalhe, que é onde a foto é bloqueada — não dá
+        para julgar uma imagem por uma miniatura de 40px. %>
+    <%= link_to admin_ads_path(list_state.merge(open: open ? nil : ad.slug).compact),
+          class: "inline-flex items-center gap-1.5 rounded-full border border-stone-300 px-2.5 py-1 text-xs font-semibold text-stone-600 transition hover:border-stone-900 hover:text-stone-900",
+          "aria-expanded": open.to_s, "aria-controls": "ad-detail-#{ad.id}" do %>
+      <%= ui_icon(open ? :chevron_down : :grid, css_class: "h-3.5 w-3.5 #{'rotate-180' if open}") %>
+      <%= t("admin.ads.index.images", count: visible) %>
+    <% end %>
+
+    <% if blocked.positive? %>
+      <span class="ml-1.5 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-bold text-red-700 ring-1 ring-red-200">
+        <%= t("admin.images.blocked_count", count: blocked) %>
+      </span>
+    <% end %>
+  </td>
+
+  <td class="px-4 py-2 text-right tabular-nums text-stone-600"><%= ad.views_count %></td>
+
+  <td class="px-4 py-2"><%= moderation_status_badge(ad) %></td>
+
+  <td class="px-4 py-2 whitespace-nowrap text-stone-500"><%= l(ad.created_at.to_date, format: :long) %></td>
+
+  <%# --------------------------------------------------------------- Ações %>
+  <td class="px-4 py-2">
+    <div class="flex justify-end gap-1.5">
+      <%= link_to t("admin.ads.index.view"), ad_path(ad), target: "_blank", rel: "noopener",
+            class: "whitespace-nowrap rounded-full border border-stone-300 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
+
+      <% unless ad.approved? %>
+        <%= button_to t("admin.ads.index.approve"), approve_admin_ad_path(ad, list: list_state), method: :patch,
+              class: "cursor-pointer whitespace-nowrap rounded-full border border-emerald-300 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-emerald-700 transition hover:bg-emerald-600 hover:text-white" %>
+      <% end %>
+
+      <% unless ad.rejected? %>
+        <%# Rejeitar abre o modal: o motivo é obrigatório, e é ele que o
+            anunciante vê no painel dele. %>
+        <button type="button" data-action="modal#open"
+                class="cursor-pointer whitespace-nowrap rounded-full border border-red-300 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-600 hover:text-white">
+          <%= t("admin.ads.index.reject") %>
+        </button>
+      <% end %>
+    </div>
+
+    <%= render "moderation/ads/reject", ad: ad, list_state: list_state %>
+  </td>
+</tr>
+
+<%# ------------------------------------------------------- Linha de detalhe %>
+<tr id="ad-detail-<%= ad.id %>" <%= "hidden" unless open %>>
+  <td colspan="10" class="px-4 pb-5 pt-1">
+    <div class="rounded-xl border border-stone-200 bg-white p-4">
+      <% if ad.ad_images.any? %>
+        <%# É aqui que uma imagem imprópria é barrada sem derrubar o anúncio. %>
+        <div class="grid grid-cols-3 gap-3 sm:grid-cols-6 lg:grid-cols-8">
+          <% ad.ad_images.each do |image| %>
+            <figure class="relative overflow-hidden rounded-lg border border-stone-200">
+              <%= image_tag image.url, alt: "", loading: "lazy",
+                    class: "aspect-[4/3] w-full object-cover #{'opacity-30 grayscale' if image.blocked?}" %>
+
+              <% if image.blocked? %>
+                <figcaption class="absolute inset-x-0 top-0 bg-red-600/90 py-0.5 text-center text-[10px] font-bold uppercase text-white">
+                  <%= t("admin.images.blocked") %>
+                </figcaption>
+                <%= button_to t("admin.images.unblock"), admin_ad_image_path(ad, image, list: list_state), method: :delete,
+                      class: "absolute inset-x-0 bottom-0 cursor-pointer bg-stone-900/80 py-1 text-[10px] font-bold uppercase text-white transition hover:bg-stone-900" %>
+              <% else %>
+                <%= button_to admin_ad_image_path(ad, image, list: list_state), method: :patch,
+                      params: { note: t("admin.images.default_note") },
+                      form: { data: { turbo_confirm: t("admin.images.block_confirm") } },
+                      class: "absolute inset-x-0 bottom-0 cursor-pointer bg-stone-900/70 py-1 text-[10px] font-bold uppercase text-white transition hover:bg-red-600" do %>
+                  <%= t("admin.images.block") %>
+                <% end %>
+              <% end %>
+            </figure>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-xs text-stone-500"><%= t("admin.ads.index.no_images") %></p>
+      <% end %>
+
+      <dl class="mt-4 grid gap-3 border-t border-stone-100 pt-4 text-xs sm:grid-cols-3">
+        <div>
+          <dt class="font-bold uppercase tracking-wide text-stone-500"><%= t("admin.ads.index.note") %></dt>
+          <dd class="mt-1 text-stone-600">
+            <%= ad.moderation_note.presence || t("admin.ads.index.no_note") %>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="font-bold uppercase tracking-wide text-stone-500"><%= t("admin.ads.index.review") %></dt>
+          <dd class="mt-1 text-stone-600">
+            <% if ad.reviewed_at %>
+              <%= t("admin.ads.index.reviewed_by", name: ad.admin&.name || "—") %>
+              &middot; <%= l(ad.reviewed_at.to_date, format: :long) %>
+            <% else %>
+              <%= t("admin.ads.index.not_reviewed") %>
+            <% end %>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="font-bold uppercase tracking-wide text-stone-500"><%= Ad.human_attribute_name(:description) %></dt>
+          <dd class="mt-1 line-clamp-3 text-stone-600"><%= truncate(strip_tags(ad.description.to_s), length: 220) %></dd>
+        </div>
+      </dl>
+    </div>
+  </td>
+</tr>

@@ -147,21 +147,26 @@
                       class: "size-4 cursor-pointer accent-brand-500" %>
               </th>
 
-              <%= render "moderation/users/heading", filter: @filter, key: "name",
-                    label: User.human_attribute_name(:name) %>
-              <%= render "moderation/users/heading", filter: @filter, key: "email",
-                    label: User.human_attribute_name(:email) %>
+              <%= render "moderation/heading", filter: @filter, key: "name",
+                    label: User.human_attribute_name(:name),
+                    path: ->(params) { admin_users_path(params) } %>
+              <%= render "moderation/heading", filter: @filter, key: "email",
+                    label: User.human_attribute_name(:email),
+                    path: ->(params) { admin_users_path(params) } %>
 
               <th scope="col" class="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-stone-500">
                 <%= User.human_attribute_name(:phone) %>
               </th>
 
-              <%= render "moderation/users/heading", filter: @filter, key: "ads",
-                    label: t("admin.users.index.ads_column"), align: "text-right" %>
-              <%= render "moderation/users/heading", filter: @filter, key: "status",
-                    label: User.human_attribute_name(:status) %>
-              <%= render "moderation/users/heading", filter: @filter, key: "joined",
-                    label: t("admin.users.index.joined_column") %>
+              <%= render "moderation/heading", filter: @filter, key: "ads",
+                    label: t("admin.users.index.ads_column"), align: "text-right",
+                    path: ->(params) { admin_users_path(params) } %>
+              <%= render "moderation/heading", filter: @filter, key: "status",
+                    label: User.human_attribute_name(:status),
+                    path: ->(params) { admin_users_path(params) } %>
+              <%= render "moderation/heading", filter: @filter, key: "joined",
+                    label: t("admin.users.index.joined_column"),
+                    path: ->(params) { admin_users_path(params) } %>
 
               <th scope="col" class="px-4 py-2.5 text-right text-[11px] font-bold uppercase tracking-wider text-stone-500">
                 <%= t("admin.users.index.actions_column") %>

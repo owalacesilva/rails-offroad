@@ -753,6 +753,7 @@ pt-BR:
       status:
         success: "%{name} agora está %{status}."
     images:
+      # Rótulos dos botões da fila.
       block: "Bloquear"
       unblock: "Liberar"
       blocked: "Bloqueada"
@@ -761,10 +762,12 @@ pt-BR:
       blocked_count:
         one: "1 bloqueada"
         other: "%{count} bloqueadas"
-      block:
-        success: "Foto de \"%{title}\" bloqueada."
-      unblock:
-        success: "Foto de \"%{title}\" liberada."
+      # Mensagens da ação, e não "block.success"/"unblock.success": aquelas
+      # repetiam as chaves dos rótulos acima, e em YAML a última chave repetida
+      # vence — o rótulo do botão sumia sem erro nenhum, e o <button> saía com o
+      # hash inteiro dentro.
+      blocked_notice: "Foto de \"%{title}\" bloqueada."
+      unblocked_notice: "Foto de \"%{title}\" liberada."
     cover:
       label: "Imagem de destaque"
       hint: "Enviada do seu computador. Máximo de %{width} x %{height} pixels."
@@ -777,6 +780,51 @@ pt-BR:
         pending: "Pendentes"
         approved: "Aprovados"
         rejected: "Rejeitados"
+        all: "Todos"
+      # No singular, para o selo da linha: a aba conta um grupo, a linha mostra
+      # um anúncio.
+      status_labels:
+        draft: "Rascunho"
+        pending: "Pendente"
+        approved: "Aprovado"
+        rejected: "Rejeitado"
+      filters:
+        title: "Filtros"
+        toggle: "Filtros"
+        applied:
+          one: "1 filtro"
+          other: "%{count} filtros"
+        query: "Título"
+        query_placeholder: "Buscar no título"
+        advertiser: "Anunciante"
+        advertiser_placeholder: "Nome ou e-mail"
+        any_category: "Todas"
+        any_state: "Todas"
+        price_range: "Faixa de preço"
+        min: "Mínimo"
+        max: "Máximo"
+        apply: "Aplicar"
+        clear: "Limpar filtros"
+      bulk:
+        selected: "%{count} selecionado(s)"
+        select_all: "Selecionar todos os anúncios da página"
+        approve: "Aprovar selecionados"
+        reject: "Rejeitar selecionados"
+        clear: "Limpar seleção"
+        reject_title: "Rejeitar anúncios selecionados"
+        reject_subtitle: "O mesmo motivo vai para todos os anúncios marcados."
+        note_required: "Informe o motivo para rejeitar."
+        none: "Nenhum anúncio selecionado."
+        approved:
+          one: "1 anúncio aprovado e publicado."
+          other: "%{count} anúncios aprovados e publicados."
+        rejected:
+          one: "1 anúncio rejeitado."
+          other: "%{count} anúncios rejeitados."
+        failed:
+          one: "1 anúncio não pôde ser avaliado. Anúncio aprovado precisa de 3 a 10 fotos."
+          other: "%{count} anúncios não puderam ser avaliados. Anúncio aprovado precisa de 3 a 10 fotos."
+        partial: "%{count} avaliados; %{failed} não passaram (anúncio aprovado precisa de 3 a 10 fotos)."
       approve:
         success: "\"%{title}\" aprovado e publicado."
         failure: "Não foi possível aprovar: %{errors}"
@@ -794,12 +842,24 @@ pt-BR:
         title: "Fila de moderação"
         subtitle: "Anúncios aguardando avaliação antes de aparecer no portal."
         filter_label: "Filtrar por situação"
+        count:
+          one: "1 anúncio"
+          other: "%{count} anúncios"
         by: "por %{name}"
         images:
           one: "1 foto"
           other: "%{count} fotos"
+        no_images: "Este anúncio ainda não tem foto."
+        advertiser_column: "Anunciante"
+        photos_column: "Fotos"
+        views_column: "Visitas"
+        sent_column: "Enviado em"
+        actions_column: "Ações"
         reviewed_by: "Avaliado por %{name}"
+        review: "Avaliação"
+        not_reviewed: "Ainda não avaliado"
         note: "Recado"
+        no_note: "Sem recado da moderação."
         view: "Ver"
         approve: "Aprovar"
         reject: "Rejeitar"

@@ -752,10 +752,8 @@ en-US:
       blocked_count:
         one: "1 blocked"
         other: "%{count} blocked"
-      block:
-        success: "Photo on \"%{title}\" blocked."
-      unblock:
-        success: "Photo on \"%{title}\" unblocked."
+      blocked_notice: "Photo on \"%{title}\" blocked."
+      unblocked_notice: "Photo on \"%{title}\" unblocked."
     cover:
       label: "Featured image"
       hint: "Uploaded from your computer. At most %{width} x %{height} pixels."
@@ -768,6 +766,49 @@ en-US:
         pending: "Pending"
         approved: "Approved"
         rejected: "Rejected"
+        all: "All"
+      status_labels:
+        draft: "Draft"
+        pending: "Pending"
+        approved: "Approved"
+        rejected: "Rejected"
+      filters:
+        title: "Filters"
+        toggle: "Filters"
+        applied:
+          one: "1 filter"
+          other: "%{count} filters"
+        query: "Title"
+        query_placeholder: "Search the title"
+        advertiser: "Advertiser"
+        advertiser_placeholder: "Name or email"
+        any_category: "All"
+        any_state: "All"
+        price_range: "Price range"
+        min: "Minimum"
+        max: "Maximum"
+        apply: "Apply"
+        clear: "Clear filters"
+      bulk:
+        selected: "%{count} selected"
+        select_all: "Select every ad on this page"
+        approve: "Approve selected"
+        reject: "Reject selected"
+        clear: "Clear selection"
+        reject_title: "Reject selected ads"
+        reject_subtitle: "The same reason goes to every ad you checked."
+        note_required: "Give a reason to reject."
+        none: "No ad selected."
+        approved:
+          one: "1 ad approved and published."
+          other: "%{count} ads approved and published."
+        rejected:
+          one: "1 ad rejected."
+          other: "%{count} ads rejected."
+        failed:
+          one: "1 ad could not be reviewed. An approved ad needs 3 to 10 photos."
+          other: "%{count} ads could not be reviewed. An approved ad needs 3 to 10 photos."
+        partial: "%{count} reviewed; %{failed} did not pass (an approved ad needs 3 to 10 photos)."
       approve:
         success: "\"%{title}\" approved and published."
         failure: "Could not approve: %{errors}"
@@ -785,12 +826,24 @@ en-US:
         title: "Moderation queue"
         subtitle: "Listings awaiting review before they appear on the portal."
         filter_label: "Filter by status"
+        count:
+          one: "1 listing"
+          other: "%{count} listings"
         by: "by %{name}"
         images:
           one: "1 photo"
           other: "%{count} photos"
+        no_images: "This listing has no photo yet."
+        advertiser_column: "Advertiser"
+        photos_column: "Photos"
+        views_column: "Views"
+        sent_column: "Submitted"
+        actions_column: "Actions"
         reviewed_by: "Reviewed by %{name}"
+        review: "Review"
+        not_reviewed: "Not reviewed yet"
         note: "Note"
+        no_note: "No note from moderation."
         view: "View"
         approve: "Approve"
         reject: "Reject"

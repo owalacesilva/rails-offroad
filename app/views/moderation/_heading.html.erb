@@ -1,4 +1,9 @@
-<%# Cabeçalho ordenável. Locais: filter, key, label e — opcional — align.
+<%# Cabeçalho ordenável das tabelas da gestão. Locais: filter, key, label, path
+    — uma lambda que recebe os parâmetros e devolve o caminho — e, opcional,
+    align.
+
+    A lambda existe porque cada tabela tem a sua rota e o seu conjunto de
+    parâmetros a preservar; o resto do comportamento é idêntico.
 
     O link leva a mesma consulta com a coluna e a direção trocadas; a seta só
     aparece na coluna que está ordenando, e aria-sort conta a mesma coisa para
@@ -7,7 +12,7 @@
 <th scope="col"
     aria-sort="<%= sorted ? (filter.direction == "asc" ? "ascending" : "descending") : "none" %>"
     class="px-4 py-2.5 <%= local_assigns[:align] %>">
-  <%= link_to admin_users_path(filter.to_params.merge(sort: key, dir: filter.next_direction(key))),
+  <%= link_to path.call(filter.to_params.merge(sort: key, dir: filter.next_direction(key))),
         class: "inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider transition #{sorted ? 'text-stone-900' : 'text-stone-500 hover:text-stone-900'}" do %>
     <%= label %>
     <% if sorted %>

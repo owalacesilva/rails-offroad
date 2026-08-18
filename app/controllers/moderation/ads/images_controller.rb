@@ -13,8 +13,7 @@ module Moderation
         image = ad.ad_images.find(params[:id])
         ad.block_image(image, current_admin, note: params[:note].presence)
 
-        redirect_to admin_ads_path(status: ad.reload.status),
-                    notice: t("admin.images.block.success", title: ad.title)
+        redirect_back_to_queue t("admin.images.blocked_notice", title: ad.title)
       end
 
       # DELETE: desbloqueia. Devolver a foto ao ar é "apagar o bloqueio".
@@ -22,13 +21,18 @@ module Moderation
         ad = find_ad
         ad.ad_images.find(params[:id]).update!(blocked_at: nil)
 
-        redirect_to admin_ads_path(status: ad.status),
-                    notice: t("admin.images.unblock.success", title: ad.title)
+        redirect_back_to_queue t("admin.images.unblocked_notice", title: ad.title)
       end
 
       private
         def find_ad
           Ad.with_all_photos.find_by!(slug: params[:ad_id])
+        end
+
+        # Volta para a fila como ela estava — aba, filtro, ordenação e página —,
+        # e com a linha do anúncio aberta, que é onde as fotos estão.
+        def redirect_back_to_queue(notice)
+          redirect_to admin_ads_path(params.fetch(:list, {}).permit!.to_h), notice: notice
         end
     end
   end

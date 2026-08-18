@@ -1,116 +1,245 @@
 <% content_for :title, "#{t('admin.ads.index.title')} — #{t('admin.title')}" %>
 
-<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<% field_class = "mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+<% label_class = "block text-[11px] font-bold uppercase tracking-wide text-stone-500" %>
+<%# O estado da fila que toda ação precisa devolver: aba, filtro, ordenação,
+    página e a linha aberta. %>
+<% list_state = @filter.to_params.merge(page: @pagination.page, open: params[:open]).compact_blank %>
+<% queue_path = ->(params) { admin_ads_path(params) } %>
+
+<%# Mesma largura da tabela de anunciantes: são dez colunas, e o max-w-7xl das
+    outras telas da gestão espremeria os dados sem ganhar nada. %>
+<section class="mx-auto max-w-full px-4 py-10 sm:px-6 lg:px-8">
   <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("admin.ads.index.title") %></h1>
   <p class="mt-1 text-sm text-stone-500"><%= t("admin.ads.index.subtitle") %></p>
 
-  <%# Abas por status: a fila é o motivo de status e admin_id existirem. %>
+  <%# ---------------------------------------------------------------- Abas %>
+  <%# A situação é aba, e não campo do filtro: é por ela que a moderação
+      começa o dia, e a contagem ao lado é metade da informação. A ordenação
+      escolhida viaja junto para trocar de fila não desfazer a coluna. %>
   <nav class="mt-6 flex flex-wrap gap-2" aria-label="<%= t("admin.ads.index.filter_label") %>">
-    <% Ad::STATUSES.each_value do |status| %>
-      <% current = status == @status %>
-      <%= link_to admin_ads_path(status: status),
+    <% (Ad::STATUSES.values + [ AdQueueFilter::ALL ]).each do |status| %>
+      <% current = status == @filter.status %>
+      <% count = status == AdQueueFilter::ALL ? @counts.values.sum : @counts.fetch(status, 0) %>
+      <%= link_to admin_ads_path(@filter.sort_params.merge(status: status)),
             "aria-current": current ? "page" : nil,
             class: "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition #{current ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 bg-white text-stone-600 hover:border-stone-900 hover:text-stone-900'}" do %>
-        <%= t("admin.ads.statuses.#{status}") %>
+        <%= status == AdQueueFilter::ALL ? t("admin.ads.statuses.all") : t("admin.ads.statuses.#{status}") %>
         <span class="rounded-full <%= current ? "bg-white/20" : "bg-stone-100" %> px-1.5 py-0.5 text-[10px]">
-          <%= @counts.fetch(status, 0) %>
+          <%= count %>
         </span>
       <% end %>
     <% end %>
   </nav>
 
-  <% if @ads.any? %>
-    <div class="mt-6 space-y-3">
-      <% @ads.each do |ad| %>
-        <%# data-controller="modal" por card: o recado da rejeição é pedido num
-            <dialog> próprio, logo abaixo. %>
-        <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm" data-controller="modal">
-          <div class="flex flex-wrap items-start justify-between gap-4">
-            <div class="min-w-0 flex-1">
-              <h2 class="text-sm font-bold text-stone-900"><%= ad.title %></h2>
-              <p class="mt-1 text-xs text-stone-500">
-                <%= ad.category.name %> &middot; <%= ad.city %>, <%= ad.state %> &middot;
-                <%= t("admin.ads.index.by", name: ad.user.name) %>
-              </p>
-              <p class="mt-2 flex flex-wrap items-center gap-3 text-xs text-stone-500">
-                <span class="font-bold text-stone-900"><%= ad_price(ad.price) %></span>
-                <span><%= t("admin.ads.index.images", count: ad.visible_images.size) %></span>
-                <% blocked = ad.ad_images.count(&:blocked?) %>
-                <% if blocked.positive? %>
-                  <span class="rounded-full bg-red-50 px-2 py-0.5 font-bold text-red-700">
-                    <%= t("admin.images.blocked_count", count: blocked) %>
-                  </span>
-                <% end %>
-                <% if ad.reviewed_at.present? %>
-                  <span><%= t("admin.ads.index.reviewed_by", name: ad.admin&.name || "—") %></span>
-                <% end %>
-              </p>
-            </div>
+  <%# ------------------------------------------------------------- Filtros %>
+  <%# Mesmo controller de recolher da vitrine e da tabela de anunciantes:
+      aberto a partir de lg, fechado no mobile. O HTML renderiza aberto, então
+      sem JavaScript o filtro continua utilizável. %>
+  <div data-controller="filters" class="mt-4 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between gap-4 px-5 py-4">
+      <div class="flex items-center gap-3">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-stone-900"><%= t("admin.ads.filters.title") %></h2>
 
-            <div class="flex shrink-0 flex-wrap items-center gap-2">
-              <%= link_to t("admin.ads.index.view"), ad_path(ad), target: "_blank", rel: "noopener",
-                    class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
+        <% if @filter.applied? %>
+          <span class="rounded-full bg-brand-500/15 px-2.5 py-1 text-[11px] font-bold text-brand-700 ring-1 ring-brand-500/30">
+            <%= t("admin.ads.filters.applied", count: @filter.applied_count) %>
+          </span>
+        <% end %>
+      </div>
 
-              <% unless ad.approved? %>
-                <%= button_to t("admin.ads.index.approve"), approve_admin_ad_path(ad), method: :patch,
-                      class: "cursor-pointer rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-emerald-500" %>
-              <% end %>
+      <button type="button"
+              data-action="filters#toggle"
+              data-filters-target="toggle"
+              aria-expanded="true"
+              aria-controls="ad-queue-filters"
+              class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900">
+        <%= t("admin.ads.filters.toggle") %>
+        <svg data-filters-target="chevron" class="h-4 w-4 transition-transform" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+    </div>
 
-              <% unless ad.rejected? %>
-                <%# Rejeitar abre o modal: o motivo é obrigatório, e é ele que o
-                    anunciante vê no painel dele. %>
-                <button type="button" data-action="modal#open"
-                        class="cursor-pointer rounded-full border border-red-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-50">
-                  <%= t("admin.ads.index.reject") %>
-                </button>
-              <% end %>
-            </div>
+    <div id="ad-queue-filters" data-filters-target="panel" class="border-t border-stone-200">
+      <%= form_with url: admin_ads_path, method: :get do %>
+        <%# A aba e a ordenação viajam escondidas: filtrar não pode trocar a fila
+            nem desfazer a coluna que o moderador escolheu. %>
+        <%= hidden_field_tag :status, @filter.status %>
+        <%= hidden_field_tag :sort, @filter.sort %>
+        <%= hidden_field_tag :dir, @filter.direction %>
+
+        <div class="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-5">
+          <div>
+            <%= label_tag :q, t("admin.ads.filters.query"), class: label_class %>
+            <%= search_field_tag :q, @filter.query, autocomplete: "off",
+                  placeholder: t("admin.ads.filters.query_placeholder"), class: field_class %>
           </div>
 
-          <%# ------------------------------------------------------- Fotos %>
-          <%# A fila mostra as fotos porque é aqui que uma imagem imprópria é
-              barrada sem derrubar o anúncio inteiro. %>
-          <% if ad.ad_images.any? %>
-            <div class="mt-4 grid grid-cols-3 gap-3 border-t border-stone-100 pt-4 sm:grid-cols-6">
-              <% ad.ad_images.each do |image| %>
-                <figure class="relative overflow-hidden rounded-lg border border-stone-200">
-                  <%= image_tag image.url, alt: "", loading: "lazy",
-                        class: "aspect-[4/3] w-full object-cover #{'opacity-30 grayscale' if image.blocked?}" %>
+          <div>
+            <%= label_tag :advertiser, t("admin.ads.filters.advertiser"), class: label_class %>
+            <%= search_field_tag :advertiser, @filter.advertiser, autocomplete: "off",
+                  placeholder: t("admin.ads.filters.advertiser_placeholder"), class: field_class %>
+          </div>
 
-                  <% if image.blocked? %>
-                    <figcaption class="absolute inset-x-0 top-0 bg-red-600/90 py-0.5 text-center text-[10px] font-bold uppercase text-white">
-                      <%= t("admin.images.blocked") %>
-                    </figcaption>
-                    <%= button_to t("admin.images.unblock"), admin_ad_image_path(ad, image), method: :delete,
-                          class: "absolute inset-x-0 bottom-0 cursor-pointer bg-stone-900/80 py-1 text-[10px] font-bold uppercase text-white transition hover:bg-stone-900" %>
-                  <% else %>
-                    <%= button_to admin_ad_image_path(ad, image), method: :patch,
-                          params: { note: t("admin.images.default_note") },
-                          form: { data: { turbo_confirm: t("admin.images.block_confirm") } },
-                          class: "absolute inset-x-0 bottom-0 cursor-pointer bg-stone-900/70 py-1 text-[10px] font-bold uppercase text-white transition hover:bg-red-600" do %>
-                      <%= t("admin.images.block") %>
-                    <% end %>
-                  <% end %>
-                </figure>
-              <% end %>
+          <div>
+            <%= label_tag :category, Ad.human_attribute_name(:category), class: label_class %>
+            <%= select_tag :category,
+                  options_for_select([ [ t("admin.ads.filters.any_category"), "" ] ] + @filter.category_options, @filter.category),
+                  class: field_class %>
+          </div>
+
+          <div>
+            <%= label_tag :state, Ad.human_attribute_name(:state), class: label_class %>
+            <%= select_tag :state,
+                  options_for_select([ [ t("admin.ads.filters.any_state"), "" ] ] + User::BRAZILIAN_STATES, @filter.state),
+                  class: field_class %>
+          </div>
+
+          <div>
+            <span class="<%= label_class %>"><%= t("admin.ads.filters.price_range") %></span>
+            <div class="mt-1.5 flex items-center gap-2">
+              <%= text_field_tag :min_price, @filter.to_params[:min_price], inputmode: "numeric",
+                    placeholder: t("admin.ads.filters.min"),
+                    data: { controller: "mask", mask_type_value: "currency", action: "input->mask#format" },
+                    class: "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+              <span class="text-xs text-stone-400">&ndash;</span>
+              <%= text_field_tag :max_price, @filter.to_params[:max_price], inputmode: "numeric",
+                    placeholder: t("admin.ads.filters.max"),
+                    data: { controller: "mask", mask_type_value: "currency", action: "input->mask#format" },
+                    class: "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
             </div>
-          <% end %>
+          </div>
+        </div>
 
-          <% if ad.moderation_note.present? %>
-            <p class="mt-4 rounded-lg bg-stone-50 px-4 py-3 text-xs text-stone-600">
-              <span class="font-bold uppercase tracking-wide text-stone-500"><%= t("admin.ads.index.note") %>:</span>
-              <%= ad.moderation_note %>
-            </p>
-          <% end %>
+        <div class="flex flex-wrap items-center gap-3 border-t border-stone-200 bg-stone-50 px-5 py-4">
+          <button type="submit" class="cursor-pointer rounded-full bg-stone-900 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-stone-700">
+            <%= t("admin.ads.filters.apply") %>
+          </button>
 
-          <%= render "moderation/ads/reject", ad: ad %>
-        </article>
+          <%# Limpar volta à mesma aba sem critério nenhum: a fila aberta não é
+              um filtro a desfazer. %>
+          <%= link_to t("admin.ads.filters.clear"), admin_ads_path(status: @filter.status),
+                class: "text-xs font-bold uppercase tracking-wide text-stone-500 transition hover:text-stone-900" %>
+
+          <p class="ml-auto text-xs text-stone-500">
+            <%= t("admin.ads.index.count", count: @pagination.total_count) %>
+          </p>
+        </div>
       <% end %>
+    </div>
+  </div>
+
+  <% if @ads.any? %>
+    <div data-controller="bulk-select" data-bulk-select-text-value="<%= t('admin.ads.bulk.selected') %>">
+      <%# ------------------------------------------------------ Ações em lote %>
+      <%# O formulário é irmão da tabela: <table> dentro de <form> não é HTML
+          válido, então as caixas apontam para ele por `form=`.
+
+          O `modal` da rejeição em lote fica neste div, e não no de fora: cada
+          linha da tabela tem o seu, e o Stimulus dispara a ação em todos os
+          controllers do mesmo nome que contenham o botão — um `modal` por cima
+          da tabela abriria o diálogo do lote junto com o da linha. %>
+      <div data-controller="modal">
+      <%= form_with url: bulk_review_admin_ads_path, method: :patch, id: "bulk-review-form" do %>
+        <% list_state.each do |key, value| %>
+          <%= hidden_field_tag "list[#{key}]", value, id: nil %>
+        <% end %>
+
+        <div data-bulk-select-target="bar" hidden
+             class="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-brand-300 bg-brand-50 px-5 py-3">
+          <p data-bulk-select-target="count" class="text-xs font-bold uppercase tracking-wide text-stone-700"></p>
+
+          <div class="ml-auto flex flex-wrap items-center gap-2">
+            <button type="submit" name="to" value="approve"
+                    class="cursor-pointer rounded-full border border-emerald-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-emerald-700 transition hover:bg-emerald-600 hover:text-white">
+              <%= t("admin.ads.bulk.approve") %>
+            </button>
+
+            <%# Rejeitar em lote abre o mesmo modal de sempre, porque o motivo é
+                obrigatório também aqui. %>
+            <button type="button" data-action="modal#open"
+                    class="cursor-pointer rounded-full border border-red-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-600 hover:text-white">
+              <%= t("admin.ads.bulk.reject") %>
+            </button>
+
+            <button type="button" data-action="bulk-select#clear"
+                    class="cursor-pointer text-xs font-bold uppercase tracking-wide text-stone-500 transition hover:text-stone-900">
+              <%= t("admin.ads.bulk.clear") %>
+            </button>
+          </div>
+        </div>
+      <% end %>
+
+        <%= render "moderation/ads/bulk_reject" %>
+      </div>
+
+      <%# ----------------------------------------------------------- Tabela %>
+      <div class="mt-4 overflow-x-auto rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <table class="w-full min-w-[80rem] text-left text-sm">
+          <thead class="border-b border-stone-200 bg-stone-50">
+            <tr>
+              <th scope="col" class="w-10 px-4 py-2.5">
+                <%= check_box_tag :all, "1", false, form: "bulk-review-form", id: "select-all",
+                      "aria-label": t("admin.ads.bulk.select_all"),
+                      data: { bulk_select_target: "all", action: "change->bulk-select#toggleAll" },
+                      class: "size-4 cursor-pointer accent-brand-500" %>
+              </th>
+
+              <%= render "moderation/heading", filter: @filter, key: "title", path: queue_path,
+                    label: Ad.human_attribute_name(:title) %>
+              <%= render "moderation/heading", filter: @filter, key: "category", path: queue_path,
+                    label: Ad.human_attribute_name(:category) %>
+              <%= render "moderation/heading", filter: @filter, key: "advertiser", path: queue_path,
+                    label: t("admin.ads.index.advertiser_column") %>
+              <%= render "moderation/heading", filter: @filter, key: "price", path: queue_path,
+                    label: Ad.human_attribute_name(:price), align: "text-right" %>
+
+              <th scope="col" class="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                <%= t("admin.ads.index.photos_column") %>
+              </th>
+
+              <%= render "moderation/heading", filter: @filter, key: "views", path: queue_path,
+                    label: t("admin.ads.index.views_column"), align: "text-right" %>
+
+              <th scope="col" class="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                <%= Ad.human_attribute_name(:status) %>
+              </th>
+
+              <%= render "moderation/heading", filter: @filter, key: "created", path: queue_path,
+                    label: t("admin.ads.index.sent_column") %>
+
+              <th scope="col" class="px-4 py-2.5 text-right text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                <%= t("admin.ads.index.actions_column") %>
+              </th>
+            </tr>
+          </thead>
+
+          <%# Zebra pelo CSS e não por índice no ERB: o navegador reaplica
+              sozinho e a view não carrega contador. A linha de detalhe fica de
+              fora da conta porque acompanha a cor da linha que a abriu. %>
+          <%# Duas linhas por anúncio (dados e detalhe), então a zebra vai de dois
+              em dois: a linha de detalhe acompanha a cor da que a abriu. %>
+          <tbody class="divide-y divide-stone-100 [&>tr:nth-child(4n+3)]:bg-stone-50/70 [&>tr:nth-child(4n+4)]:bg-stone-50/70">
+            <% @ads.each do |ad| %>
+              <%= render "moderation/ads/row", ad: ad, list_state: list_state, open: params[:open] == ad.slug %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <%# O rodapé fecha o mesmo card da tabela, e não uma faixa solta abaixo. %>
+      <%= render "shared/pagination", pagination: @pagination, label: t("admin.ads.index.title"),
+            page_path: ->(page) { admin_ads_path(@filter.to_params.merge(page: page)) } %>
     </div>
   <% else %>
     <div class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-16 text-center">
       <h2 class="text-lg font-bold text-stone-800"><%= t("admin.ads.index.empty.title") %></h2>
       <p class="mt-2 text-sm text-stone-500"><%= t("admin.ads.index.empty.subtitle") %></p>
+      <% if @filter.applied? %>
+        <%= link_to t("admin.ads.filters.clear"), admin_ads_path(status: @filter.status),
+              class: "mt-6 inline-flex cursor-pointer rounded-full bg-brand-500 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+      <% end %>
     </div>
   <% end %>
 </section>

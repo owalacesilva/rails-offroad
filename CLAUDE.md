@@ -89,6 +89,12 @@ Portuguese segment — a route helper in the wrong language.
 an HTML *and* a text part, and a spec asserts the text part carries the link — a mail client
 that shows only text does not render the anchor.
 
+**A repeated YAML key does not fail — it silently wins.** `admin.images` once carried both
+`block: "Bloquear"` and `block: {success: ...}`; the mapping overwrote the label, and the
+button rendered the whole hash. The action labels and the flash messages now live under
+distinct keys (`block` / `blocked_notice`). The "no translation missing" assertions cannot
+catch this, because the key does exist — a spec asserts `t("admin.images.block")` is a String.
+
 **Locale keys must be added to both `config/locales/pt-BR.yml` and `en-US.yml`.**
 Several request specs assert `response.body` does not include `"translation missing"`,
 so a one-sided key fails the suite.
@@ -463,6 +469,44 @@ public controller and `AdFilter` starts from, so a new ad is invisible until a
 moderator clears it. `Ad#approve` records `admin_id` and `reviewed_at` and stamps
 `published_at`; `Ad#reject` records the review without publishing.
 
+**The queue is a table, the same one as `/admin/anunciantes`** — sortable columns, a
+collapsible filter panel (`AdQueueFilter`), per-row checkboxes driving a bulk approve/reject,
+and the shared card-footer pagination. `moderation/_heading` is the sortable `<th>` both
+tables use; it takes a **`path` lambda** because each one has its own route and its own set
+of parameters to preserve.
+
+Five things about that page are easy to break:
+
+- **Status is a tab, not a filter field.** It is how moderation starts the day, and the count
+  beside it is half the information. `AdQueueFilter::ALL` is the "todas" tab — deliberately
+  not an `Ad::STATUSES` value, because *absent* already means something else: the pending
+  queue. `applied_count` ignores status for the same reason, so the tab never reads as a
+  filter waiting to be cleared.
+- **`AdQueueFilter::SORTS` maps to a table *and* a column**, not just a column: sorting by
+  advertiser and by category orders on `users.name` and `categories.position`, which is why
+  `ordered` joins. Category sorts by position and never by name — the name lives in the
+  locales, so the database column would give the ordering of a language nobody picked.
+- **Every action carries the queue back in `list[...]`** — tab, filter, sort, page and the
+  open row. This replaced "approve, then jump to the approved queue", which in a table takes
+  the moderator out of their place on every click.
+- **The bulk reject note is not `required`.** It lives inside a `<dialog>`, and the approve
+  button submits the *same* form with that dialog closed — a required control that cannot be
+  focused makes Chrome refuse the submit in silence. `Moderation::AdsController` asks for the
+  reason instead.
+- **Bulk approve runs one ad at a time, never `update_all`.** Approving goes through the
+  3-to-10 photo validation; a mass UPDATE would publish incomplete ads. What fails is counted
+  and reported separately (`admin.ads.bulk.partial`).
+
+Photos are reviewed in a **detail row that opens by link** (`?open=<slug>`), not by
+JavaScript: blocking an image stays reachable with JS off. Both rows are always in the DOM —
+the closed one is `hidden` — which is what keeps the zebra regular, hence the `4n+3`/`4n+4`
+stripe.
+
+`ModerationHelper#moderation_status_badge` exists next to `AdsHelper#ad_status_badge` because
+the two speak different vocabularies for the same column: the advertiser's dashboard says
+"Publicado" and "Em análise", the queue says "Aprovado" and "Pendente" — the words on its own
+tabs. Only the labels differ; the colour map is shared.
+
 **Moderation talks back through `ads.moderation_note`.** Rejecting requires a reason (the
 queue asks for it in a modal), and the advertiser sees that text on their own listing page.
 The same column carries the note when a blocked photo drops an ad below the photo minimum.
@@ -499,7 +543,8 @@ constant in the model.
 
 ### Query objects, not gems
 
-`app/queries/` holds `AdFilter` (URL params → `Ad` scope) and `Pagination`
+`app/queries/` holds `AdFilter` (URL params → `Ad` scope), `AdQueueFilter`, `UserFilter` and
+`Pagination`
 (offset paging, hand-written rather than pulling in a gem). The project's bias is to write
 small objects instead of adding dependencies — follow it before reaching for a gem.
 

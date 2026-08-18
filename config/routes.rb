@@ -86,6 +86,9 @@ Rails.application.routes.draw do
         patch :reject,  path: "rejeitar"
       end
 
+      # Ação em lote sobre as linhas marcadas na tabela, como em anunciantes.
+      collection { patch :bulk_review, path: "avaliar-em-lote" }
+
       # Bloqueio de foto avulsa: tira uma imagem do ar sem rejeitar o anúncio.
       resources :images, only: %i[update destroy], path: "fotos", module: "ads"
     end
