@@ -132,6 +132,33 @@ RSpec.describe Event, type: :model do
       expect(build(:event, url: "javascript:alert(1)")).not_to be_valid
     end
 
+    # O campo do formulário mostra "https://" como prefixo fixo, então o que é
+    # digitado chega sem esquema.
+    describe "esquema completado na escrita" do
+      it "põe https:// no endereço digitado sem esquema" do
+        expect(build(:event, url: "exemplo.com.br/evento").url).to eq("https://exemplo.com.br/evento")
+      end
+
+      it "não mexe no que já tem esquema" do
+        expect(build(:event, url: "http://exemplo.com.br").url).to eq("http://exemplo.com.br")
+      end
+
+      # Completar aqui faria "javascript:alert(1)" virar um https:// qualquer e
+      # passar pela validação que existe para barrá-lo.
+      it "não completa esquema recusado" do
+        expect(build(:event, url: "javascript:alert(1)").url).to eq("javascript:alert(1)")
+      end
+
+      # Dois-pontos seguido de número é porta, não esquema.
+      it "completa endereço com porta" do
+        expect(build(:event, url: "exemplo.com.br:8080/evento").url).to eq("https://exemplo.com.br:8080/evento")
+      end
+
+      it "deixa em branco o que veio em branco" do
+        expect(build(:event, url: "").url).to eq("")
+      end
+    end
+
     describe "#external_url" do
       it "devolve a URL quando ela é http(s)" do
         expect(build(:event, :with_url).external_url).to eq("https://exemplo.com.br/evento")

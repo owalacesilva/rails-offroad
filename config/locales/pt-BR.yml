@@ -6,6 +6,7 @@ pt-BR:
     pagination:
       previous: "Anterior"
       next: "Próxima"
+      showing: "Mostrando %{from}–%{to} de %{total}"
     rich_text:
       label: "Formatação"
       bold: "Negrito"
@@ -13,6 +14,17 @@ pt-BR:
       bullet_list: "Lista com marcadores"
       ordered_list: "Lista numerada"
       heading: "Título"
+    money:
+      # Rótulo do seletor embutido do campo de dinheiro. A moeda é uma só; o
+      # seletor existe para deixar claro em que unidade o valor é digitado.
+      currency: "Moeda"
+      brl: "R$"
+    city:
+      placeholder: "Selecione o município"
+      search: "Buscar município"
+      empty: "Nenhum município encontrado"
+      choose_state: "Escolha a UF primeiro"
+      clear: "Limpar seleção"
 
   layout:
     nav:
@@ -308,8 +320,6 @@ pt-BR:
     empty:
       title: "Nenhum anúncio por aqui"
       subtitle: "Tente remover um filtro ou ampliar a busca para outra cidade."
-    pagination:
-      showing: "Mostrando %{from}–%{to} de %{total}"
     show:
       back: "Voltar para os anúncios"
       published_at: "Publicado em %{date}"
@@ -671,20 +681,35 @@ pt-BR:
       index:
         title: "Anunciantes"
         subtitle: "Quem anuncia no portal. Bloquear ou desativar tira os anúncios do ar sem mexer em cada um."
-        filter_label: "Filtrar por situação"
-        all: "Todos"
-        search: "Buscar"
-        search_placeholder: "Nome ou e-mail"
-        member_since: "No portal desde %{date}"
-        ads:
-          one: "1 anúncio"
-          other: "%{count} anúncios"
-        published:
-          one: "1 publicado"
-          other: "%{count} publicados"
+        count:
+          one: "1 anunciante"
+          other: "%{count} anunciantes"
+        ads_column: "Anúncios"
+        joined_column: "No portal desde"
+        actions_column: "Ações"
         empty:
           title: "Nenhum anunciante por aqui"
-          subtitle: "Ajuste a busca ou troque de aba."
+          subtitle: "Ajuste o filtro ou limpe as seleções."
+      filters:
+        title: "Filtros"
+        toggle: "Filtros"
+        applied:
+          one: "1 filtro ativo"
+          other: "%{count} filtros ativos"
+        any_status: "Qualquer situação"
+        ads_range: "Anúncios (de / até)"
+        min: "Mín."
+        max: "Máx."
+        apply: "Aplicar"
+        clear: "Limpar tudo"
+      bulk:
+        selected: "%{count} selecionado(s)"
+        select_all: "Selecionar todos desta página"
+        clear: "Limpar seleção"
+        success:
+          one: "1 anunciante agora está %{status}."
+          other: "%{count} anunciantes agora estão %{status}."
+        none: "Nenhum anunciante selecionado."
       status:
         success: "%{name} agora está %{status}."
     images:

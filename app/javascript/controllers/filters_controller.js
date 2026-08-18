@@ -20,12 +20,6 @@ export default class extends Controller {
     this.expand(this.panelTarget.classList.contains("hidden"))
   }
 
-  // Cidade pertence a um estado: trocar o estado invalida a escolha anterior.
-  resetCity() {
-    const city = this.element.querySelector("select[name='city']")
-    if (city) city.value = ""
-  }
-
   expand(expanded) {
     this.panelTarget.classList.toggle("hidden", !expanded)
 

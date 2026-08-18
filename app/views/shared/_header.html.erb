@@ -74,16 +74,15 @@
         <%# Abaixo de lg a navegação central não cabe: vem toda para cá. %>
         <div class="lg:hidden">
           <%= render layout: "shared/dropdown", locals: { label: t("layout.nav.menu") } do %>
-            <%= link_to t("layout.nav.home"), root_path, class: dropdown_item_class %>
-            <%= link_to t("layout.nav.blog"), posts_path, class: dropdown_item_class %>
+            <%= dropdown_link(root_path, icon: :home) { t("layout.nav.home") } %>
+            <%= dropdown_link(posts_path, icon: :document) { t("layout.nav.blog") } %>
             <%= render "shared/category_links" %>
 
             <% if authenticated? %>
-              <%= link_to current_user.name, account_path, class: separated_dropdown_item_class %>
-              <%= button_to t("layout.header.sign_out"), logout_path, method: :delete,
-                    class: "#{dropdown_item_class} cursor-pointer" %>
+              <%= dropdown_link(account_path, icon: :user, class: dropdown_separator_class) { current_user.name } %>
+              <%= dropdown_button(logout_path, icon: :logout, method: :delete) { t("layout.header.sign_out") } %>
             <% else %>
-              <%= link_to t("layout.header.sign_in"), login_path, class: separated_dropdown_item_class %>
+              <%= dropdown_link(login_path, icon: :user, class: dropdown_separator_class) { t("layout.header.sign_in") } %>
             <% end %>
 
             <%# O seletor de idioma da barra some no mobile; aqui ele reaparece. %>

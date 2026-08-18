@@ -7,9 +7,9 @@
 
 <% offered_locales.each do |locale| %>
   <% current = current_locale?(locale) %>
-  <%= link_to locale_switch_path(locale), hreflang: locale, lang: locale,
+  <%= dropdown_link(locale_switch_path(locale), icon: :globe, hreflang: locale, lang: locale,
         "aria-current": current ? "true" : nil,
-        class: "#{dropdown_item_class} #{'text-stone-900' if current}" do %>
+        class: ("text-stone-900" if current)) do %>
     <%= locale_name(locale) %>
     <% if current %>
       <svg class="ml-auto h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">

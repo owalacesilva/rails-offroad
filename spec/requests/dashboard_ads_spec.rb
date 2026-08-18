@@ -121,7 +121,7 @@ RSpec.describe "Meus Anúncios", type: :request do
       end
     end
 
-    describe "município por autocomplete" do
+    describe "município por menu com busca" do
       before { get new_account_ad_path }
 
       # Os 5.571 municípios não podem sair todos no HTML: a lista chega por
@@ -135,11 +135,18 @@ RSpec.describe "Meus Anúncios", type: :request do
       end
 
       it "aponta o campo para o endpoint de municípios" do
-        expect(response.body).to include(%(data-city-autocomplete-url-value="#{cities_path}"))
+        expect(response.body).to include(%(data-city-select-url-value="#{cities_path}"))
       end
 
-      it "liga o campo de cidade a um datalist" do
-        expect(response.body).to include('list="ad-city-options"', '<datalist id="ad-city-options"')
+      # É a UF que alimenta o menu; sem essa marca o componente não a encontra,
+      # porque os dois campos são irmãos e não pai e filho.
+      it "marca a UF como origem do menu" do
+        expect(response.body).to include("data-city-select-state")
+      end
+
+      it "traz a busca dentro do menu" do
+        expect(response.body).to include(%(data-city-select-target="search"))
+        expect(response.body).to include(I18n.t("shared.city.search"))
       end
     end
 

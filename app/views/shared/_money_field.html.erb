@@ -1,0 +1,25 @@
+<%# Campo de dinheiro com a moeda num menu à esquerda, colado ao campo.
+
+    Locais: form, field, label_class, field_class e — opcionais — required,
+    placeholder e label.
+
+    O portal negocia só em real, então o menu tem uma opção só e não é enviado
+    (sem `name`): ele diz em que moeda o número está, e é o modelo que converte
+    para os centavos inteiros da coluna. A máscara de digitação é a mesma dos
+    outros campos de valor. %>
+<div>
+  <%= form.label field, local_assigns[:label], class: label_class %>
+
+  <div class="mt-2 flex">
+    <%= select_tag :currency, options_for_select([ [ t("shared.money.brl"), "BRL" ] ]),
+          name: nil, id: nil, "aria-label": t("shared.money.currency"),
+          class: "cursor-pointer rounded-l-lg border border-r-0 border-stone-300 bg-stone-50 py-2.5 pl-3 pr-2 text-sm font-bold text-stone-600 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+
+    <%= form.text_field field,
+          required: local_assigns.fetch(:required, false),
+          inputmode: "numeric",
+          placeholder: local_assigns[:placeholder],
+          data: { controller: "mask", mask_type_value: "currency", action: "input->mask#format" },
+          class: "#{field_class} mt-0 rounded-l-none" %>
+  </div>
+</div>

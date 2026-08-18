@@ -54,6 +54,29 @@ class ApplicationRecord < ActiveRecord::Base
     Rails.application.routes.url_helpers.rails_storage_proxy_path(attachment, only_path: true)
   end
 
+  # Esquema de URL: uma letra seguida de letras, dígitos, "+", "." ou "-" até os
+  # dois-pontos. O `(?!\d)` no fim tira "exemplo.com.br:8080" da conta — ali os
+  # dois-pontos abrem uma porta, não um esquema.
+  URL_SCHEME = /\A[a-zA-Z][a-zA-Z0-9+.\-]*:(?!\d)/
+
+  # Completa o esquema de um endereço digitado sem ele.
+  #
+  # Os campos de URL do formulário mostram "https://" como prefixo fixo à
+  # esquerda, então o que é digitado normalmente chega sem esquema. Endereço que
+  # já traz um passa intacto — o prefixo é o padrão de quem digita, não uma
+  # correção do que já está salvo.
+  #
+  # Intacto vale inclusive para esquema que a validação recusa: completar
+  # "javascript:alert(1)" para "https://javascript:alert(1)" faria a linha
+  # passar por uma validação que existe justamente para barrá-la.
+  def self.with_http_scheme(value)
+    text = value.to_s.strip
+
+    return value if text.blank? || text.match?(URL_SCHEME)
+
+    "https://#{text}"
+  end
+
   # Segunda barreira, para a view não depender de a linha ter passado pela
   # validação: vale também para o que foi gravado por SQL direto.
   def self.http_url(value)

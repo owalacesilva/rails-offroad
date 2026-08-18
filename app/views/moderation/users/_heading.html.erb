@@ -1,0 +1,23 @@
+<%# Cabeçalho ordenável. Locais: filter, key, label e — opcional — align.
+
+    O link leva a mesma consulta com a coluna e a direção trocadas; a seta só
+    aparece na coluna que está ordenando, e aria-sort conta a mesma coisa para
+    quem não vê a seta. %>
+<% sorted = filter.sorted_by?(key) %>
+<th scope="col"
+    aria-sort="<%= sorted ? (filter.direction == "asc" ? "ascending" : "descending") : "none" %>"
+    class="px-4 py-2.5 <%= local_assigns[:align] %>">
+  <%= link_to admin_users_path(filter.to_params.merge(sort: key, dir: filter.next_direction(key))),
+        class: "inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider transition #{sorted ? 'text-stone-900' : 'text-stone-500 hover:text-stone-900'}" do %>
+    <%= label %>
+    <% if sorted %>
+      <svg class="h-3 w-3 <%= "rotate-180" if filter.direction == "desc" %>" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+      </svg>
+    <% else %>
+      <svg class="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+      </svg>
+    <% end %>
+  <% end %>
+</th>

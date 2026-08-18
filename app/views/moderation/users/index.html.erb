@@ -1,80 +1,238 @@
 <% content_for :title, "#{t('admin.users.index.title')} — #{t('admin.title')}" %>
 
-<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<% field_class = "mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+<% label_class = "block text-[11px] font-bold uppercase tracking-wide text-stone-500" %>
+
+<%# A tabela ocupa a largura toda: max-w-full em vez do max-w-7xl das outras
+    telas da gestão, porque são oito colunas e cortar espaço aqui espreme os
+    dados sem ganhar nada. %>
+<section class="mx-auto max-w-full px-4 py-10 sm:px-6 lg:px-8">
   <h1 class="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl"><%= t("admin.users.index.title") %></h1>
   <p class="mt-1 text-sm text-stone-500"><%= t("admin.users.index.subtitle") %></p>
 
-  <%# Abas por situação. Bloquear tira os anúncios do portal sem mexer em cada
-      um deles (ver Ad.published), e é o que esta tela existe para fazer. %>
-  <nav class="mt-6 flex flex-wrap gap-2" aria-label="<%= t("admin.users.index.filter_label") %>">
-    <%= link_to admin_users_path(q: @query),
-          "aria-current": @status.nil? ? "page" : nil,
-          class: "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition #{@status.nil? ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 bg-white text-stone-600 hover:border-stone-900 hover:text-stone-900'}" do %>
-      <%= t("admin.users.index.all") %>
-      <span class="rounded-full <%= @status.nil? ? "bg-white/20" : "bg-stone-100" %> px-1.5 py-0.5 text-[10px]"><%= @counts.values.sum %></span>
-    <% end %>
+  <%# ------------------------------------------------------------- Filtros %>
+  <%# Mesmo controller de recolher da vitrine: aberto a partir de lg, fechado no
+      mobile, e o botão alterna nos dois. O HTML renderiza aberto, então sem
+      JavaScript o filtro continua utilizável. %>
+  <div data-controller="filters" class="mt-6 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between gap-4 px-5 py-4">
+      <div class="flex items-center gap-3">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-stone-900"><%= t("admin.users.filters.title") %></h2>
 
-    <% User::STATUSES.each_value do |status| %>
-      <% current = status == @status %>
-      <%= link_to admin_users_path(status: status, q: @query),
-            "aria-current": current ? "page" : nil,
-            class: "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition #{current ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 bg-white text-stone-600 hover:border-stone-900 hover:text-stone-900'}" do %>
-        <%= t("admin.users.statuses.#{status}") %>
-        <span class="rounded-full <%= current ? "bg-white/20" : "bg-stone-100" %> px-1.5 py-0.5 text-[10px]"><%= @counts.fetch(status, 0) %></span>
-      <% end %>
-    <% end %>
-  </nav>
-
-  <%= form_with url: admin_users_path, method: :get, class: "mt-4 flex flex-wrap gap-2" do %>
-    <%= hidden_field_tag :status, @status %>
-    <%= label_tag :q, t("admin.users.index.search"), class: "sr-only" %>
-    <%= search_field_tag :q, @query, placeholder: t("admin.users.index.search_placeholder"),
-          class: "min-w-0 flex-1 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 sm:max-w-sm" %>
-    <button type="submit" class="cursor-pointer rounded-full bg-stone-900 px-5 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-stone-700">
-      <%= t("admin.users.index.search") %>
-    </button>
-  <% end %>
-
-  <% if @users.any? %>
-    <div class="mt-6 space-y-3">
-      <% @users.each do |user| %>
-        <article class="flex flex-wrap items-start gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-stone-100 text-lg font-extrabold text-stone-500">
-            <%= user.name.first.upcase %>
+        <% if @filter.applied? %>
+          <span class="rounded-full bg-brand-500/15 px-2.5 py-1 text-[11px] font-bold text-brand-700 ring-1 ring-brand-500/30">
+            <%= t("admin.users.filters.applied", count: @filter.applied_count) %>
           </span>
+        <% end %>
+      </div>
 
-          <div class="min-w-0 flex-1">
-            <h2 class="flex flex-wrap items-center gap-2 text-sm font-bold text-stone-900">
-              <%= user.name %>
-              <%= user_status_badge(user) %>
-            </h2>
-            <p class="mt-1 text-xs text-stone-500">
-              <%= mail_to user.email, user.email, class: "transition hover:text-brand-600" %>
-              &middot; <%= user.location %>
-              &middot; <%= t("admin.users.index.member_since", date: l(user.member_since, format: :long)) %>
-            </p>
-            <p class="mt-2 flex flex-wrap gap-3 text-xs text-stone-500">
-              <span><%= t("admin.users.index.ads", count: user.ads.size) %></span>
-              <span><%= t("admin.users.index.published", count: user.ads.count { |ad| ad.status == "approved" }) %></span>
-            </p>
+      <button type="button"
+              data-action="filters#toggle"
+              data-filters-target="toggle"
+              aria-expanded="true"
+              aria-controls="user-filters"
+              class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900">
+        <%= t("admin.users.filters.toggle") %>
+        <svg data-filters-target="chevron" class="h-4 w-4 transition-transform" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+    </div>
+
+    <div id="user-filters" data-filters-target="panel" class="border-t border-stone-200">
+      <%= form_with url: admin_users_path, method: :get do %>
+        <%# A ordenação viaja escondida: filtrar não pode desfazer a coluna que
+            o moderador escolheu ordenar. %>
+        <%= hidden_field_tag :sort, @filter.sort %>
+        <%= hidden_field_tag :dir, @filter.direction %>
+
+        <div class="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-5">
+          <div>
+            <%= label_tag :name, User.human_attribute_name(:name), class: label_class %>
+            <%= text_field_tag :name, @filter.name, autocomplete: "off", class: field_class %>
           </div>
 
-          <%# Só as transições que fazem sentido a partir da situação atual. %>
-          <div class="flex shrink-0 flex-wrap items-center gap-2">
-            <% User::STATUSES.each_value do |status| %>
-              <% next if status == user.status %>
-              <%= button_to t("admin.users.actions.#{status}"), status_admin_user_path(user, to: status), method: :patch,
-                    form: { data: { turbo_confirm: t("admin.users.actions.confirm.#{status}", name: user.name) } },
-                    class: "cursor-pointer rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition #{status == 'blocked' ? 'border-red-300 text-red-600 hover:bg-red-600 hover:text-white' : 'border-stone-300 text-stone-600 hover:border-stone-900 hover:text-stone-900'}" %>
+          <div>
+            <%= label_tag :email, User.human_attribute_name(:email), class: label_class %>
+            <%= render layout: "shared/leading_icon", locals: { icon: :envelope } do %>
+              <%= search_field_tag :email, @filter.email, autocomplete: "off",
+                    class: "#{field_class} pl-10" %>
             <% end %>
           </div>
-        </article>
+
+          <div>
+            <%= label_tag :phone, User.human_attribute_name(:phone), class: label_class %>
+            <%= text_field_tag :phone, @filter.phone, autocomplete: "off", placeholder: "(41) 9",
+                  data: { controller: "mask", mask_type_value: "phone", action: "input->mask#format" },
+                  class: field_class %>
+          </div>
+
+          <div>
+            <%= label_tag :status, User.human_attribute_name(:status), class: label_class %>
+            <%= select_tag :status,
+                  options_for_select([ [ t("admin.users.filters.any_status"), "" ] ] +
+                    User::STATUSES.values.map { |status| [ t("admin.users.statuses.#{status}"), status ] }, @filter.status),
+                  class: field_class %>
+          </div>
+
+          <div>
+            <span class="<%= label_class %>"><%= t("admin.users.filters.ads_range") %></span>
+            <div class="mt-1.5 flex items-center gap-2">
+              <%= number_field_tag :min_ads, @filter.min_ads, min: 0, placeholder: t("admin.users.filters.min"),
+                    class: "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+              <span class="text-xs text-stone-400">&ndash;</span>
+              <%= number_field_tag :max_ads, @filter.max_ads, min: 0, placeholder: t("admin.users.filters.max"),
+                    class: "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 border-t border-stone-200 bg-stone-50 px-5 py-4">
+          <button type="submit" class="cursor-pointer rounded-full bg-stone-900 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-stone-700">
+            <%= t("admin.users.filters.apply") %>
+          </button>
+
+          <%# Limpar é um link para a tela sem parâmetro nenhum: não há estado a
+              desfazer campo a campo. %>
+          <%= link_to t("admin.users.filters.clear"), admin_users_path,
+                class: "text-xs font-bold uppercase tracking-wide text-stone-500 transition hover:text-stone-900" %>
+
+          <p class="ml-auto text-xs text-stone-500">
+            <%= t("admin.users.index.count", count: @pagination.total_count) %>
+          </p>
+        </div>
       <% end %>
+    </div>
+  </div>
+
+  <% if @users.any? %>
+    <div data-controller="bulk-select" data-bulk-select-text-value="<%= t('admin.users.bulk.selected') %>">
+      <%# ------------------------------------------------------ Ações em lote %>
+      <%# O formulário é irmão da tabela: <table> dentro de <form> não é HTML
+          válido, então as caixas apontam para ele por `form=`. %>
+      <%= form_with url: bulk_status_admin_users_path, method: :patch, id: "bulk-status-form" do %>
+        <% @filter.to_params.merge(page: @pagination.page).each do |key, value| %>
+          <%= hidden_field_tag "list[#{key}]", value, id: nil %>
+        <% end %>
+
+        <div data-bulk-select-target="bar" hidden
+             class="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-brand-300 bg-brand-50 px-5 py-3">
+          <p data-bulk-select-target="count" class="text-xs font-bold uppercase tracking-wide text-stone-700"></p>
+
+          <div class="ml-auto flex flex-wrap items-center gap-2">
+            <% User::STATUSES.each_value do |status| %>
+              <button type="submit" name="to" value="<%= status %>"
+                      class="cursor-pointer rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition <%= status == 'blocked' ? 'border-red-300 text-red-600 hover:bg-red-600 hover:text-white' : 'border-stone-300 text-stone-600 hover:border-stone-900 hover:text-stone-900' %>">
+                <%= t("admin.users.actions.#{status}") %>
+              </button>
+            <% end %>
+
+            <button type="button" data-action="bulk-select#clear"
+                    class="cursor-pointer text-xs font-bold uppercase tracking-wide text-stone-500 transition hover:text-stone-900">
+              <%= t("admin.users.bulk.clear") %>
+            </button>
+          </div>
+        </div>
+      <% end %>
+
+      <%# ----------------------------------------------------------- Tabela %>
+      <div class="mt-4 overflow-x-auto rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <table class="w-full min-w-[64rem] text-left text-sm">
+          <thead class="border-b border-stone-200 bg-stone-50">
+            <tr>
+              <th scope="col" class="w-10 px-4 py-2.5">
+                <%= check_box_tag :all, "1", false, form: "bulk-status-form", id: "select-all",
+                      "aria-label": t("admin.users.bulk.select_all"),
+                      data: { bulk_select_target: "all", action: "change->bulk-select#toggleAll" },
+                      class: "size-4 cursor-pointer accent-brand-500" %>
+              </th>
+
+              <%= render "moderation/users/heading", filter: @filter, key: "name",
+                    label: User.human_attribute_name(:name) %>
+              <%= render "moderation/users/heading", filter: @filter, key: "email",
+                    label: User.human_attribute_name(:email) %>
+
+              <th scope="col" class="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                <%= User.human_attribute_name(:phone) %>
+              </th>
+
+              <%= render "moderation/users/heading", filter: @filter, key: "ads",
+                    label: t("admin.users.index.ads_column"), align: "text-right" %>
+              <%= render "moderation/users/heading", filter: @filter, key: "status",
+                    label: User.human_attribute_name(:status) %>
+              <%= render "moderation/users/heading", filter: @filter, key: "joined",
+                    label: t("admin.users.index.joined_column") %>
+
+              <th scope="col" class="px-4 py-2.5 text-right text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                <%= t("admin.users.index.actions_column") %>
+              </th>
+            </tr>
+          </thead>
+
+          <%# Zebra pelo CSS e não por índice no ERB: o navegador reaplica
+              sozinho e a view não carrega contador. %>
+          <tbody class="divide-y divide-stone-100 [&>tr:nth-child(even)]:bg-stone-50/70">
+            <% @users.each do |user| %>
+              <tr class="transition hover:bg-brand-50/50">
+                <td class="px-4 py-2">
+                  <%= check_box_tag "user_ids[]", user.id, false, form: "bulk-status-form", id: "user_#{user.id}",
+                        "aria-label": user.name,
+                        data: { bulk_select_target: "row", action: "change->bulk-select#refresh" },
+                        class: "size-4 cursor-pointer accent-brand-500" %>
+                </td>
+
+                <td class="px-4 py-2">
+                  <div class="flex items-center gap-2.5">
+                    <span aria-hidden="true"
+                          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-stone-100 text-xs font-extrabold text-stone-500">
+                      <%= user.name.first.upcase %>
+                    </span>
+                    <span class="font-semibold text-stone-900"><%= user.name %></span>
+                  </div>
+                </td>
+
+                <td class="px-4 py-2 text-stone-600">
+                  <%= mail_to user.email, user.email, class: "transition hover:text-brand-600" %>
+                </td>
+
+                <td class="px-4 py-2 tabular-nums text-stone-600"><%= admin_phone(user.phone) %></td>
+
+                <td class="px-4 py-2 text-right tabular-nums font-semibold text-stone-900"><%= user.ads_count %></td>
+
+                <td class="px-4 py-2"><%= user_status_badge(user) %></td>
+
+                <td class="px-4 py-2 whitespace-nowrap text-stone-500"><%= l(user.member_since, format: :long) %></td>
+
+                <td class="px-4 py-2">
+                  <div class="flex justify-end gap-1.5">
+                    <% User::STATUSES.each_value do |status| %>
+                      <% next if status == user.status %>
+                      <%= button_to t("admin.users.actions.#{status}"),
+                            status_admin_user_path(user, to: status, list: @filter.to_params.merge(page: @pagination.page)),
+                            method: :patch,
+                            form: { data: { turbo_confirm: t("admin.users.actions.confirm.#{status}", name: user.name) } },
+                            class: "cursor-pointer whitespace-nowrap rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition #{status == 'blocked' ? 'border-red-300 text-red-600 hover:bg-red-600 hover:text-white' : 'border-stone-300 text-stone-600 hover:border-stone-900 hover:text-stone-900'}" %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <%# O rodapé fecha o mesmo card da tabela, e não uma faixa solta abaixo dela. %>
+      <%= render "shared/pagination", pagination: @pagination, label: t("admin.users.index.title"),
+            page_path: ->(page) { admin_users_path(@filter.to_params.merge(page: page)) } %>
     </div>
   <% else %>
     <div class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-16 text-center">
       <h2 class="text-lg font-bold text-stone-800"><%= t("admin.users.index.empty.title") %></h2>
       <p class="mt-2 text-sm text-stone-500"><%= t("admin.users.index.empty.subtitle") %></p>
+      <% if @filter.applied? %>
+        <%= link_to t("admin.users.filters.clear"), admin_users_path,
+              class: "mt-6 inline-flex cursor-pointer rounded-full bg-brand-500 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-stone-950 transition hover:bg-brand-400" %>
+      <% end %>
     </div>
   <% end %>
 </section>

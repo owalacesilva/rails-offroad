@@ -1,13 +1,14 @@
-# Autocomplete de municípios, consumido pelo formulário de anúncio.
+# Municípios do menu de cidade (shared/_city_select).
 #
 # Existe para o formulário não carregar os 5.571 municípios de uma vez: o
-# navegador pede só os que casam com a UF escolhida e com o que já foi digitado.
+# navegador pede só os que casam com a UF escolhida e com o que já foi digitado
+# na busca do próprio menu.
 class CitiesController < ApplicationController
   allow_unauthenticated_access
 
-  # Quantos cabem na lista sem virar rolagem infinita. Quem não achou o
-  # município nos dez primeiros digita mais uma letra.
-  LIMIT = 10
+  # O menu rola, então cabe mais que os dez do antigo datalist; o teto existe
+  # para o estado inteiro não descer de uma vez (São Paulo tem 645).
+  LIMIT = 25
 
   def index
     render json: suggestions

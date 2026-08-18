@@ -77,6 +77,8 @@ Rails.application.routes.draw do
     # pessoais — o perfil é do próprio anunciante.
     resources :users, only: :index, path: "anunciantes" do
       member { patch :status, path: "situacao" }
+      # Ação em lote sobre as linhas marcadas na tabela.
+      collection { patch :bulk_status, path: "situacao-em-lote" }
     end
 
     # Capa de evento e de post, enviada pelos formulários da gestão.

@@ -5,6 +5,7 @@ en-US:
     pagination:
       previous: "Previous"
       next: "Next"
+      showing: "Showing %{from}–%{to} of %{total}"
     rich_text:
       label: "Formatting"
       bold: "Bold"
@@ -12,6 +13,15 @@ en-US:
       bullet_list: "Bulleted list"
       ordered_list: "Numbered list"
       heading: "Heading"
+    money:
+      currency: "Currency"
+      brl: "R$"
+    city:
+      placeholder: "Select a city"
+      search: "Search city"
+      empty: "No city found"
+      choose_state: "Choose the state first"
+      clear: "Clear selection"
 
   layout:
     nav:
@@ -304,8 +314,6 @@ en-US:
     empty:
       title: "Nothing here yet"
       subtitle: "Try removing a filter or widening the search to another city."
-    pagination:
-      showing: "Showing %{from}–%{to} of %{total}"
     show:
       back: "Back to listings"
       published_at: "Published on %{date}"
@@ -666,20 +674,35 @@ en-US:
       index:
         title: "Advertisers"
         subtitle: "Everyone who lists on the portal. Blocking or deactivating pulls their listings without touching each one."
-        filter_label: "Filter by status"
-        all: "All"
-        search: "Search"
-        search_placeholder: "Name or email"
-        member_since: "On the portal since %{date}"
-        ads:
-          one: "1 listing"
-          other: "%{count} listings"
-        published:
-          one: "1 live"
-          other: "%{count} live"
+        count:
+          one: "1 advertiser"
+          other: "%{count} advertisers"
+        ads_column: "Listings"
+        joined_column: "Member since"
+        actions_column: "Actions"
         empty:
           title: "No advertisers here"
-          subtitle: "Adjust the search or switch tabs."
+          subtitle: "Adjust the filter or clear the selections."
+      filters:
+        title: "Filters"
+        toggle: "Filters"
+        applied:
+          one: "1 active filter"
+          other: "%{count} active filters"
+        any_status: "Any status"
+        ads_range: "Listings (from / to)"
+        min: "Min"
+        max: "Max"
+        apply: "Apply"
+        clear: "Clear all"
+      bulk:
+        selected: "%{count} selected"
+        select_all: "Select every row on this page"
+        clear: "Clear selection"
+        success:
+          one: "1 advertiser is now %{status}."
+          other: "%{count} advertisers are now %{status}."
+        none: "No advertiser selected."
       status:
         success: "%{name} is now %{status}."
     images:

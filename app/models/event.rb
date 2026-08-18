@@ -44,6 +44,16 @@ class Event < ApplicationRecord
     upcoming.featured.first
   end
 
+  # O formulário mostra "https://" como prefixo; o que chega sem esquema ganha
+  # o dele aqui, antes da validação de formato.
+  def url=(value)
+    super(self.class.with_http_scheme(value))
+  end
+
+  def image_url=(value)
+    super(self.class.with_http_scheme(value))
+  end
+
   def single_day?
     ends_on.blank? || ends_on == starts_on
   end

@@ -39,21 +39,21 @@
                 direto a cada uma sem passar pela aba da página. %>
             <%= render layout: "shared/dropdown", locals: { label: current_admin.name } do %>
               <% Ad::STATUSES.each_value do |status| %>
-                <%= link_to t("admin.ads.statuses.#{status}"), admin_ads_path(status: status),
-                      class: dropdown_item_class %>
+                <%= dropdown_link(admin_ads_path(status: status), icon: :queue) do %>
+                  <%= t("admin.ads.statuses.#{status}") %>
+                <% end %>
               <% end %>
 
-              <%= link_to t("admin.nav.events"), admin_events_path, class: separated_dropdown_item_class %>
-              <%= link_to t("admin.nav.posts"), admin_posts_path, class: dropdown_item_class %>
-              <%= link_to t("admin.nav.users"), admin_users_path, class: dropdown_item_class %>
+              <%= dropdown_link(admin_events_path, icon: :calendar, class: dropdown_separator_class) { t("admin.nav.events") } %>
+              <%= dropdown_link(admin_posts_path, icon: :document) { t("admin.nav.posts") } %>
+              <%= dropdown_link(admin_users_path, icon: :users) { t("admin.nav.users") } %>
 
-              <%= link_to t("layout.account.back_to_portal"), root_path,
-                    class: dropdown_item_class %>
+              <%= dropdown_link(root_path, icon: :home) { t("layout.account.back_to_portal") } %>
 
               <%= render "shared/locale_menu_items" %>
 
-              <%= button_to t("admin.nav.sign_out"), admin_logout_path, method: :delete,
-                    class: "#{separated_dropdown_item_class} cursor-pointer" %>
+              <%= dropdown_button(admin_logout_path, icon: :logout, method: :delete,
+                    class: dropdown_separator_class) { t("admin.nav.sign_out") } %>
             <% end %>
           </div>
         <% end %>

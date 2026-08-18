@@ -57,15 +57,17 @@
             <%= label_tag :state, t("ads.filters.state"), class: "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
             <%= select_tag :state,
                   options_for_select([ [ t("ads.filters.any_state"), "" ] ] + @filter.state_options, @filter.state),
-                  data: { action: "change->filters#resetCity" },
+                  data: { city_select_state: true },
                   class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
           </div>
 
           <div>
-            <%= label_tag :city, t("ads.filters.city"), class: "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
-            <%= select_tag :city,
-                  options_for_select([ [ t("ads.filters.any_city"), "" ] ] + @filter.city_options, @filter.city),
-                  class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+            <%# Aqui a lista não vem do /municipios: o filtro só faz sentido com
+                as cidades que têm anúncio, e elas já cabem no HTML. %>
+            <%= render "shared/city_select", name: :city, value: @filter.city,
+                  label: t("ads.filters.city"), remote: false, options: @filter.city_options,
+                  label_class: "block text-xs font-semibold uppercase tracking-wide text-stone-500",
+                  field_class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
           </div>
 
           <div>
@@ -91,16 +93,12 @@
   </div>
 
   <%# ---------------------------------------------------- Resultados %>
-  <div class="mt-8 flex flex-wrap items-baseline justify-between gap-2">
+  <%# A contagem por página desceu para o rodapé da paginação, que é onde ela
+      é usada; aqui fica só o total. %>
+  <div class="mt-8">
     <p class="text-sm font-semibold text-stone-700">
       <%= t("ads.results", count: @pagination.total_count, formatted: number_with_delimiter(@pagination.total_count)) %>
     </p>
-
-    <% if @pagination.total_count.positive? %>
-      <p class="text-xs text-stone-500">
-        <%= t("ads.pagination.showing", from: @pagination.from, to: @pagination.to, total: number_with_delimiter(@pagination.total_count)) %>
-      </p>
-    <% end %>
   </div>
 
   <% if @ads.any? %>
@@ -108,10 +106,8 @@
       <%= render partial: "ads/card", collection: @ads, as: :ad %>
     </div>
 
-    <% if @pagination.many_pages? %>
-      <%= render "shared/pagination", pagination: @pagination, label: t("ads.title"),
-            page_path: ->(page) { ads_page_path(page) } %>
-    <% end %>
+    <%= render "shared/pagination", pagination: @pagination, label: t("ads.title"),
+          standalone: true, page_path: ->(page) { ads_page_path(page) } %>
   <% else %>
     <div class="mt-6 rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-6 py-16 text-center">
       <svg class="mx-auto h-10 w-10 text-stone-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">

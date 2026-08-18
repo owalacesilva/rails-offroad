@@ -1,0 +1,26 @@
+<%# Campo de endereço com "https://" fixo à esquerda.
+
+    Locais: form, field, label_class, field_class e — opcionais — placeholder e
+    label.
+
+    O prefixo não é enfeite: o modelo completa o esquema quando ele não vem
+    (ApplicationRecord.with_http_scheme), então dá para digitar só
+    "exemplo.com.br/evento". O valor exibido tira um "https://" que já esteja
+    gravado, para não aparecer duas vezes; "http://" continua à vista, porque
+    escondê-lo faria o campo mentir sobre o que está salvo. %>
+<div>
+  <%= form.label field, local_assigns[:label], class: label_class %>
+
+  <div class="mt-2 flex">
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-l-lg border border-r-0 border-stone-300 bg-stone-50 px-3 text-sm font-semibold text-stone-500">
+      <%= ui_icon(:link, css_class: "h-3.5 w-3.5") %>
+      https://
+    </span>
+
+    <%= form.text_field field,
+          value: form.object.public_send(field).to_s.delete_prefix("https://"),
+          placeholder: local_assigns[:placeholder],
+          inputmode: "url", autocomplete: "off", spellcheck: false,
+          class: "#{field_class} mt-0 rounded-l-none" %>
+  </div>
+</div>

@@ -10,7 +10,9 @@ class Ad < ApplicationRecord
 
   RELATED_LIMIT = 4
 
-  belongs_to :user
+  # counter_cache alimenta users.ads_count, que a gestão de anunciantes filtra
+  # e ordena.
+  belongs_to :user, counter_cache: true
   belongs_to :category
   # Quem avaliou. Nulo enquanto ninguém moderou.
   belongs_to :admin, optional: true

@@ -26,6 +26,11 @@ class Post < ApplicationRecord
   scope :scheduled, -> { where(published_at: Time.current..).order(:published_at) }
   scope :drafts, -> { where(published_at: nil).order(updated_at: :desc) }
 
+  # Mesmo prefixo fixo do formulário de evento (ver Event#url=).
+  def cover_url=(value)
+    super(self.class.with_http_scheme(value))
+  end
+
   # O corpo é texto rico, limpo na entrada: o banco só guarda o que está dentro
   # de RICH_TEXT_TAGS (ver ApplicationRecord).
   def body=(value)

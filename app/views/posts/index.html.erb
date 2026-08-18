@@ -17,10 +17,8 @@
       <%= render partial: "posts/card", collection: @posts, as: :post %>
     </div>
 
-    <% if @pagination.many_pages? %>
-      <%= render "shared/pagination", pagination: @pagination, label: t("posts.index.title"),
-            page_path: ->(page) { posts_path(page: page) } %>
-    <% end %>
+    <%= render "shared/pagination", pagination: @pagination, label: t("posts.index.title"),
+          standalone: true, page_path: ->(page) { posts_path(page: page) } %>
   <% else %>
     <div class="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-6 py-16 text-center">
       <h2 class="text-lg font-bold text-stone-800"><%= t("posts.index.empty.title") %></h2>

@@ -1,0 +1,16 @@
+<%# Campo com ícone fixo à esquerda. Locais: icon (nome em IconHelper::UI_ICONS)
+    e — opcionais — wrapper_class e inset (o recuo do ícone).
+
+    O campo vem do bloco e precisa de padding à esquerda para não passar por
+    baixo do ícone — quem chama acrescenta o `pl-*` correspondente à classe.
+
+    pointer-events-none no ícone: sem isso, clicar nele não põe o cursor no
+    campo, que é o que qualquer pessoa espera ao clicar dentro da caixa. %>
+<div class="relative <%= local_assigns[:wrapper_class] %>">
+  <span aria-hidden="true"
+        class="pointer-events-none absolute inset-y-0 left-0 flex items-center text-stone-400 <%= local_assigns.fetch(:inset, "pl-3") %>">
+    <%= ui_icon(icon) %>
+  </span>
+
+  <%= yield %>
+</div>

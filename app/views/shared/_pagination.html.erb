@@ -1,35 +1,58 @@
-<%# Régua de paginação, compartilhada pela listagem de anúncios e pelo blog.
+<%# Rodapé de paginação, compartilhado pela vitrine, pelo blog e pela tabela de
+    anunciantes.
 
-    Locais: pagination, label (o nome acessível da navegação) e page_path — uma
-    lambda que recebe o número e devolve o caminho. É lambda porque cada
-    listagem preserva parâmetros diferentes: os filtros na vitrine, nada no blog. %>
-<nav class="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="<%= label %>">
-  <% if pagination.first_page? %>
-    <span class="rounded-full border border-stone-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-400">
-      <%= t("shared.pagination.previous") %>
-    </span>
-  <% else %>
-    <%= link_to t("shared.pagination.previous"), page_path.call(pagination.page - 1),
-          class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
-  <% end %>
+    Locais: pagination, label (o nome acessível da navegação), page_path — uma
+    lambda que recebe o número e devolve o caminho, porque cada listagem
+    preserva parâmetros diferentes (os filtros na vitrine, nada no blog) — e
+    standalone.
 
-  <% paginated_page_numbers(pagination).each do |number| %>
-    <% if number == pagination.page %>
-      <span aria-current="page" class="rounded-full bg-brand-500 px-4 py-2 text-xs font-bold text-stone-950">
-        <%= number %>
-      </span>
-    <% else %>
-      <%= link_to number, page_path.call(number),
-            class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
+    É uma faixa de rodapé de card: contagem à esquerda, botões de página à
+    direita. `standalone` diz se a faixa precisa do card em volta (vitrine e
+    blog, cujo conteúdo é uma grade solta) ou se já está dentro de um (a tabela
+    de anunciantes, onde ela fecha o mesmo card). %>
+<% band = "flex flex-col gap-3 border-stone-200 bg-stone-50/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between" %>
+<% standalone = local_assigns.fetch(:standalone, false) %>
+
+<%= tag.div class: standalone ? "mt-8 overflow-hidden rounded-2xl border border-stone-200 bg-white" : "" do %>
+  <div class="<%= band %> <%= "border-t" unless standalone %>">
+    <p class="text-xs text-stone-500">
+      <%= t("shared.pagination.showing", from: pagination.from, to: pagination.to,
+            total: number_with_delimiter(pagination.total_count)) %>
+    </p>
+
+    <% if pagination.many_pages? %>
+      <nav class="flex flex-wrap items-center gap-1.5" aria-label="<%= label %>">
+        <% if pagination.first_page? %>
+          <span class="rounded-full border border-stone-200 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-stone-400">
+            <%= t("shared.pagination.previous") %>
+          </span>
+        <% else %>
+          <%= link_to t("shared.pagination.previous"), page_path.call(pagination.page - 1),
+                class: "rounded-full border border-stone-300 bg-white px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
+        <% end %>
+
+        <% paginated_page_numbers(pagination).each do |number| %>
+          <% if number == :gap %>
+            <span aria-hidden="true" class="px-1 text-xs font-bold text-stone-400">&hellip;</span>
+          <% elsif number == pagination.page %>
+            <span aria-current="page" class="min-w-[2rem] rounded-full bg-brand-500 px-3 py-1.5 text-center text-[11px] font-bold text-stone-950">
+              <%= number %>
+            </span>
+          <% else %>
+            <%= link_to number, page_path.call(number),
+                  class: "min-w-[2rem] rounded-full border border-stone-300 bg-white px-3 py-1.5 text-center text-[11px] font-bold text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
+          <% end %>
+        <% end %>
+
+        <% if pagination.last_page? %>
+          <span class="rounded-full border border-stone-200 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-stone-400">
+            <%= t("shared.pagination.next") %>
+          </span>
+        <% else %>
+          <%= link_to t("shared.pagination.next"), page_path.call(pagination.page + 1),
+                class: "rounded-full border border-stone-300 bg-white px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
+        <% end %>
+      </nav>
     <% end %>
-  <% end %>
-
-  <% if pagination.last_page? %>
-    <span class="rounded-full border border-stone-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-400">
-      <%= t("shared.pagination.next") %>
-    </span>
-  <% else %>
-    <%= link_to t("shared.pagination.next"), page_path.call(pagination.page + 1),
-          class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-700 transition hover:border-brand-500 hover:text-brand-600" %>
-  <% end %>
-</nav>
+  </div>
+<% end %>

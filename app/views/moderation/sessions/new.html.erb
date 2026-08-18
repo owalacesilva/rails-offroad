@@ -8,8 +8,10 @@
     <%= form_with url: admin_login_path, method: :post, class: "mt-8 space-y-4" do %>
       <div>
         <%= label_tag :email, Admin.human_attribute_name(:email), class: "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
-        <%= email_field_tag :email, params[:email], required: true, autofocus: true, autocomplete: "email",
-              class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+        <%= render layout: "shared/leading_icon", locals: { icon: :envelope } do %>
+          <%= email_field_tag :email, params[:email], required: true, autofocus: true, autocomplete: "email",
+                class: "mt-2 w-full rounded-lg border border-stone-300 bg-white pl-10 pr-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" %>
+        <% end %>
       </div>
 
       <div>

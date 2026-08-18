@@ -10,4 +10,4 @@
   <% end %>
 <% end %>
 
-<%= link_to t("layout.nav.all_categories"), ads_path, class: separated_dropdown_item_class %>
+<%= dropdown_link(ads_path, icon: :grid, class: dropdown_separator_class) { t("layout.nav.all_categories") } %>

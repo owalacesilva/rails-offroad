@@ -183,6 +183,64 @@ any layer so it wins without `!important`. The button uses `transition-colors`, 
 on hover makes the two fight. Tailwind tree-shakes the keyframes, so the rule only appears
 in the build while some template still carries the class.
 
+### Shared form furniture
+
+Four partials in `app/views/shared/` carry the field decorations, and every form uses them
+instead of rolling its own — a hand-built field is a field that will drift.
+
+| Partial | Where | Gotcha |
+| --- | --- | --- |
+| `_leading_icon` | every email field | wraps the field via `render layout:`; the **caller** adds the `pl-*` that keeps the text off the icon |
+| `_money_field` | `ad.price`, `proposal.offered_value` | the `R$` select carries **no `name` and no `id`** — it is not submitted, and the model still converts reais to the integer column |
+| `_url_field` | `event.url`, `_cover_field` | the `https://` add-on is functional, not decoration (below) |
+| `_city_select` | every city field | see below |
+
+`_money_field` and `_url_field` take a form builder; `_leading_icon` and `_city_select` do
+not — `_city_select` takes `name`/`value`/`label`, because the vitrine filter is a bare
+`form_with url:` with no object.
+
+**The `https://` add-on writes through the model.** `ApplicationRecord.with_http_scheme`
+completes a missing scheme, and `Event#url=`, `Event#image_url=` and `Post#cover_url=` call
+it, so `exemplo.com.br/evento` is stored as a real URL. It leaves anything that already has
+a scheme alone — **including one the validation rejects**. Completing `javascript:alert(1)`
+into `https://javascript:alert(1)` would sneak it past the http(s) validation that exists to
+block it. `URL_SCHEME` ends in `(?!\d)` so `exemplo.com.br:8080` still counts as
+scheme-less, because there the colon opens a port.
+
+**City is a menu with its own search, not a `<datalist>`.**
+`city_select_controller.js` hides the real text field and drives a button plus a panel; the
+value never leaves `ads.city` / `users.city` / `events.city`, and with JS off the plain text
+field is what remains. Two sources, chosen by whether `remote` is set: the forms fetch
+`/municipios` per UF (`CitiesController::LIMIT`, capped so São Paulo's 645 do not descend at
+once), while the vitrine filter embeds its options — there the list is *the cities that have
+an ad*, not the 5.571 of the country.
+
+The UF `select` and the city menu are **siblings, not parent and child**, so Stimulus scope
+cannot connect them: the select is marked `data-city-select-state` and the controller finds
+it with `closest("form")`. A new form with a city field must mark its UF select or the menu
+never populates.
+
+The hidden field is hidden with **`sr-only`, never `hidden`/`display:none`**. A `required`
+field that is not focusable makes Chrome refuse to submit in silence — the same trap as
+`required` inside a closed `<dialog>`. Clipped, it still validates and still shows the
+native message.
+
+### Pagination lives in a card footer
+
+`shared/_pagination` renders a footer band — the "showing X–Y of Z" count on the left, the
+page buttons on the right — and owns that count, which is why no listing prints it a second
+time above the grid. `standalone: true` wraps the band in its own card (the vitrine and the
+blog, whose content is a loose grid); without it the band closes a card that is already open
+(the advertiser table). The key is `shared.pagination.showing`, not `ads.pagination.*`.
+
+### Menu items all carry an icon
+
+`IconHelper::UI_ICONS` holds the interface icons, and `dropdown_link` / `dropdown_button`
+build a menu row from a path, an icon and a block. Every row in the three header menus takes
+one, **including the language options**: `dropdown_item_class` sets `gap-3`, so a row without
+an icon starts a column to the left of every other row and the menu reads as broken.
+`dropdown_separator_class` adds the rule that opens a new block within a menu.
+
 ### The ad form
 
 `app/views/dashboard/ads/new.html.erb` carries four Stimulus controllers and is the most
@@ -236,8 +294,10 @@ one feature.
 
 **`shared/_pagination` takes a lambda**, not a path helper: the ads listing has to carry its
 filters into every page link and the blog has nothing to carry, so each caller passes
-`page_path: ->(page) { ... }`. `paginated_page_numbers` moved to `ApplicationHelper` for the
-same reason.
+`page_path: ->(page) { ... }`. `paginated_page_numbers` lives in `ApplicationHelper` for the
+same reason, and returns `:gap` where the ruler skips — the partial draws those as an
+ellipsis. Up to seven pages it lists them all; beyond that it keeps the first, the last and a
+window around the current one.
 
 **Specifications are filled in a modal.** All four categories render a block of spec
 fields inside one `<dialog>`; `category_specs_controller.js` shows the selected category's
@@ -310,7 +370,7 @@ us and provably has three flat columns. `BrazilianCities::ROW` is the guard: a l
 does not match raises `InvalidRow` with a `file:line` reference instead of landing crooked
 in the database.
 
-**`cities` feeds the ad form's autocomplete**, through `GET /municipios?state=PR&q=curi`
+**`cities` feeds the city menu**, through `GET /municipios?state=PR&q=curi`
 (`CitiesController`, public, JSON, capped at `LIMIT`). It returns names only, because
 `ads.city` still stores the name as a string — there is no foreign key, and wiring one up
 is a separate change with a data migration for existing rows. The accent- and
@@ -324,11 +384,25 @@ and a spec asserts they partition the table so nothing can hide between them. On
 `published` reaches `/blog` and the home page; a draft or a scheduled post 404s publicly.
 
 `Event` and `NewsletterSubscription` hang off nothing: they are portal content, not an
-advertiser's. **Advertisers are managed from `/admin/anunciantes`** — list, search, status tabs, and
-buttons that move an account between `active` / `inactive` / `blocked`. Deliberately
-read-only on personal data: name, email and phone belong to the advertiser, who edits them
-in their own profile. Changing status is the whole point, because `Ad.published` filters by
-`User.active`, so blocking one account pulls all of its listings at once.
+advertiser's. **Advertisers are managed from `/admin/anunciantes`** — a sortable, paginated table with a
+collapsible filter panel (`UserFilter` in `app/queries/`, same shape as `AdFilter`) and
+per-row checkboxes driving a bulk status change. Deliberately read-only on personal data:
+name, email and phone belong to the advertiser, who edits them in their own profile.
+Changing status is the whole point, because `Ad.published` filters by `User.active`, so
+blocking one account pulls all of its listings at once.
+
+Three things about that page are easy to break:
+
+- **The checkboxes live outside their form.** A `<table>` cannot sit inside a `<form>` and
+  stay valid HTML, so the bulk form is the table's *sibling* and every checkbox carries
+  `form="bulk-status-form"`. Wrapping the table in the form renders fine and then submits
+  nothing predictable.
+- **Filtering by ad count reads `users.ads_count`**, a counter cache maintained by
+  `Ad belongs_to :user, counter_cache: true`. Without it, sorting and filtering on the count
+  would need a `GROUP BY` that offset pagination has to count twice.
+- **`UserFilter#to_params` is what keeps state together.** Sort links, page links and the
+  status buttons all round-trip it, so filtering never silently drops the sort and paging
+  never drops the filter. The status actions carry it back under `list[...]`.
 
 **Blog and events are both managed from the moderation area** (`Moderation::PostsController`
 at `/admin/blog`, `Moderation::EventsController` at

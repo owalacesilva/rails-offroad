@@ -16,29 +16,28 @@
       <%# As mesmas funções da navegação lateral, alcançáveis do topo — no mobile
           a lateral fica empurrada para cima do conteúdo. %>
       <%= render layout: "shared/dropdown", locals: { label: current_user.name } do %>
-        <%= link_to t("dashboard.nav.dashboard"), account_path, class: dropdown_item_class %>
+        <%= dropdown_link(account_path, icon: :grid) { t("dashboard.nav.dashboard") } %>
 
-        <%= link_to account_ads_path, class: dropdown_item_class do %>
+        <%= dropdown_link(account_ads_path, icon: :queue) do %>
           <%= t("dashboard.nav.ads") %>
           <%= render "shared/dropdown_count", count: account_counts[:ads] %>
         <% end %>
 
-        <%= link_to proposals_path, class: dropdown_item_class do %>
+        <%= dropdown_link(proposals_path, icon: :inbox) do %>
           <%= t("dashboard.nav.proposals") %>
           <%= render "shared/dropdown_count", count: account_counts[:proposals] %>
         <% end %>
 
-        <%= link_to t("dashboard.nav.profile"), edit_profile_path, class: dropdown_item_class %>
+        <%= dropdown_link(edit_profile_path, icon: :user) { t("dashboard.nav.profile") } %>
 
-        <%= link_to t("dashboard.ads_new.title"), new_account_ad_path, class: separated_dropdown_item_class %>
+        <%= dropdown_link(new_account_ad_path, icon: :plus, class: dropdown_separator_class) { t("dashboard.ads_new.title") } %>
 
-        <%= link_to t("layout.account.back_to_portal"), root_path,
-              class: "#{separated_dropdown_item_class} sm:hidden" %>
+        <%= dropdown_link(root_path, icon: :home, class: "#{dropdown_separator_class} sm:hidden") { t("layout.account.back_to_portal") } %>
 
         <%= render "shared/locale_menu_items" %>
 
-        <%= button_to t("dashboard.nav.sign_out"), logout_path, method: :delete,
-              class: "#{separated_dropdown_item_class} cursor-pointer" %>
+        <%= dropdown_button(logout_path, icon: :logout, method: :delete,
+              class: dropdown_separator_class) { t("dashboard.nav.sign_out") } %>
       <% end %>
     </nav>
   </div>

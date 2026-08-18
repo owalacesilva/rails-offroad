@@ -9,10 +9,41 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(helper.paginated_page_numbers(pagination)).to eq([ 1, 2, 3, 4 ])
     end
 
-    it "some com a régua numerada quando são muitas" do
-      pagination = stub(total_pages: described_class::MAX_NUMBERED_PAGES + 1)
+    # Acima disso a régua vira primeira, janela em torno da atual e última, com
+    # :gap onde há salto — é o que a view desenha como reticências.
+    it "abre reticências no meio quando são muitas" do
+      pagination = stub(total_pages: 20, page: 10)
 
-      expect(helper.paginated_page_numbers(pagination)).to be_empty
+      expect(helper.paginated_page_numbers(pagination)).to eq([ 1, :gap, 9, 10, 11, :gap, 20 ])
+    end
+
+    it "não abre reticências à esquerda quando a atual é do começo" do
+      pagination = stub(total_pages: 20, page: 2)
+
+      expect(helper.paginated_page_numbers(pagination)).to eq([ 1, 2, 3, :gap, 20 ])
+    end
+
+    it "não abre reticências à direita quando a atual é do fim" do
+      pagination = stub(total_pages: 20, page: 19)
+
+      expect(helper.paginated_page_numbers(pagination)).to eq([ 1, :gap, 18, 19, 20 ])
+    end
+
+    it "sempre oferece a primeira e a última" do
+      pagination = stub(total_pages: 50, page: 25)
+      numbers = helper.paginated_page_numbers(pagination)
+
+      expect(numbers.first).to eq(1)
+      expect(numbers.last).to eq(50)
+    end
+
+    it "não repete número nem deixa gap grudado na borda" do
+      pagination = stub(total_pages: 8, page: 4)
+      numbers = helper.paginated_page_numbers(pagination)
+
+      expect(numbers.count(1)).to eq(1)
+      expect(numbers.first).not_to eq(:gap)
+      expect(numbers.last).not_to eq(:gap)
     end
   end
 

@@ -33,24 +33,19 @@
     </div>
   </div>
 
-  <%# Mesmo autocomplete do formulário de anúncio: os municípios chegam por UF,
-      em vez de os 5.571 saírem no HTML. %>
-  <div class="grid gap-5 sm:grid-cols-3"
-       data-controller="city-autocomplete"
-       data-city-autocomplete-url-value="<%= cities_path %>">
+  <%# Mesmo seletor do formulário de anúncio: os municípios chegam por UF, em
+      vez de os 5.571 saírem no HTML. %>
+  <div class="grid gap-5 sm:grid-cols-3">
     <div>
       <%= form.label :state, class: label_class %>
       <%= form.select :state, User::BRAZILIAN_STATES, { include_blank: "—" }, required: true,
-            class: field_class,
-            data: { city_autocomplete_target: "state", action: "change->city-autocomplete#stateChanged" } %>
+            class: field_class, data: { city_select_state: true } %>
     </div>
 
     <div class="sm:col-span-2">
-      <%= form.label :city, class: label_class %>
-      <%= form.text_field :city, required: true, autocomplete: "off", list: "event-city-options",
-            placeholder: t("dashboard.ads_new.city_placeholder"), class: field_class,
-            data: { city_autocomplete_target: "city", action: "input->city-autocomplete#typed" } %>
-      <datalist id="event-city-options" data-city-autocomplete-target="list"></datalist>
+      <%= render "shared/city_select", name: form.field_name(:city), value: form.object.city,
+            label: Event.human_attribute_name(:city), required: true,
+            label_class: label_class, field_class: field_class %>
     </div>
   </div>
 
@@ -67,8 +62,8 @@
 
   <div class="grid gap-5 sm:grid-cols-2">
     <div>
-      <%= form.label :url, class: label_class %>
-      <%= form.url_field :url, placeholder: "https://exemplo.com.br/evento", class: field_class %>
+      <%= render "shared/url_field", form: form, field: :url,
+            placeholder: "exemplo.com.br/evento", label_class: label_class, field_class: field_class %>
       <p class="mt-1 text-xs text-stone-400"><%= t("admin.events.form.url_hint") %></p>
     </div>
 

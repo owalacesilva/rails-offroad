@@ -7,10 +7,16 @@ module ApplicationHelper
     DROPDOWN_ITEM
   end
 
-  # O mesmo item abrindo um bloco novo, com um filete acima: é o que separa
-  # navegar de sair.
+  # O filete que abre um bloco novo dentro do menu: é o que separa navegar de
+  # sair. Vive sozinho porque dropdown_link já traz a classe do item e só
+  # precisa do acréscimo.
+  def dropdown_separator_class
+    "mt-1 border-t border-stone-200 pt-3"
+  end
+
+  # O item e o filete juntos, para quem monta o link na mão.
   def separated_dropdown_item_class
-    "#{DROPDOWN_ITEM} mt-1 border-t border-stone-200 pt-3"
+    "#{DROPDOWN_ITEM} #{dropdown_separator_class}"
   end
 
   # Item da navegação central do header.
@@ -53,16 +59,38 @@ module ApplicationHelper
     html.include?("<") ? html : simple_format(html, {}, sanitize: false)
   end
 
-  # Números da régua de paginação. Acima disso ela fica ilegível e sobra só
-  # anterior/próxima.
-  MAX_NUMBERED_PAGES = 9
+  # Quantas páginas aparecem de cada lado da atual quando a régua é longa.
+  PAGE_WINDOW = 1
 
-  def paginated_page_numbers(pagination)
+  # Os números da régua de paginação, com :gap onde há salto.
+  #
+  # Até sete páginas saem todas. Acima disso saem a primeira, a última, a atual
+  # e as vizinhas — o resto vira reticências. É o que mantém a régua legível num
+  # acervo com dezenas de páginas sem esconder para onde dá para ir.
+  #
+  #   1 … 4 5 [6] 7 8 … 20
+  def paginated_page_numbers(pagination, window: PAGE_WINDOW)
     total = pagination.total_pages
-    return [] if total > MAX_NUMBERED_PAGES
+    return (1..total).to_a if total <= (window * 2) + 5
 
-    (1..total).to_a
+    with_gaps(visible_pages(pagination.page, total, window))
   end
+
+  private
+    # Sempre a primeira, a última e a janela em torno da atual.
+    def visible_pages(current, total, window)
+      ([ 1, total ] + ((current - window)..(current + window)).to_a)
+        .select { |page| page.between?(1, total) }
+        .uniq
+        .sort
+    end
+
+    # Onde a sequência salta um número, entra o :gap que a view desenha como "…".
+    def with_gaps(pages)
+      pages.each_cons(2).flat_map { |before, after| after - before > 1 ? [ before, :gap ] : [ before ] } + [ pages.last ]
+    end
+
+  public
 
   # Ícone de traço montado inline a partir dos seus paths. Os ícones do portal
   # são poucos e conhecidos em tempo de escrita: inline evita um sprite, uma

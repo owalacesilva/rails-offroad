@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_18_130003) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_18_160001) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -223,6 +223,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_130003) do
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "ads_count", default: 0, null: false
     t.string "city", null: false
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -233,6 +234,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_130003) do
     t.string "state", limit: 2, null: false
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.index ["ads_count"], name: "index_users_on_ads_count"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["status"], name: "index_users_on_status"
     t.check_constraint "`state` in (_utf8mb4'AC',_utf8mb4'AL',_utf8mb4'AP',_utf8mb4'AM',_utf8mb4'BA',_utf8mb4'CE',_utf8mb4'DF',_utf8mb4'ES',_utf8mb4'GO',_utf8mb4'MA',_utf8mb4'MT',_utf8mb4'MS',_utf8mb4'MG',_utf8mb4'PA',_utf8mb4'PB',_utf8mb4'PR',_utf8mb4'PE',_utf8mb4'PI',_utf8mb4'RJ',_utf8mb4'RN',_utf8mb4'RS',_utf8mb4'RO',_utf8mb4'RR',_utf8mb4'SC',_utf8mb4'SP',_utf8mb4'SE',_utf8mb4'TO')", name: "users_state_valid"

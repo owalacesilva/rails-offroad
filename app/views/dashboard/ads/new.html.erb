@@ -75,10 +75,8 @@
 
     <div class="grid gap-5 sm:grid-cols-2">
       <div>
-        <%= form.label :price, class: label_class %>
-        <%= form.text_field :price, required: true, inputmode: "numeric", placeholder: "45.000,00",
-              class: field_class,
-              data: { controller: "mask", mask_type_value: "currency", action: "input->mask#format" } %>
+        <%= render "shared/money_field", form: form, field: :price, required: true,
+              placeholder: "45.000,00", label_class: label_class, field_class: field_class %>
         <p class="mt-1 text-xs text-stone-400"><%= t("dashboard.ads_new.price_hint") %></p>
       </div>
 
@@ -93,26 +91,19 @@
     </div>
 
     <%# ------------------------------------------------------ UF e município %>
-    <%# O município é buscado por UF no /municipios, conforme se digita: os
-        5.571 do país nunca são carregados de uma vez. A lista é um <datalist>
-        nativo, então sem JavaScript sobra um campo de texto comum. %>
-    <div class="grid gap-5 sm:grid-cols-3"
-         data-controller="city-autocomplete"
-         data-city-autocomplete-url-value="<%= cities_path %>">
+    <%# O município sai de um menu com busca própria, alimentado por /municipios
+        conforme a UF escolhida: os 5.571 do país nunca são carregados de uma vez. %>
+    <div class="grid gap-5 sm:grid-cols-3">
       <div>
         <%= form.label :state, class: label_class %>
         <%= form.select :state, User::BRAZILIAN_STATES, { include_blank: "—" }, required: true,
-              class: field_class,
-              data: { city_autocomplete_target: "state", action: "change->city-autocomplete#stateChanged" } %>
+              class: field_class, data: { city_select_state: true } %>
       </div>
 
       <div class="sm:col-span-2">
-        <%= form.label :city, class: label_class %>
-        <%= form.text_field :city, required: true, autocomplete: "off", list: "ad-city-options",
-              placeholder: t("dashboard.ads_new.city_placeholder"),
-              class: field_class,
-              data: { city_autocomplete_target: "city", action: "input->city-autocomplete#typed" } %>
-        <datalist id="ad-city-options" data-city-autocomplete-target="list"></datalist>
+        <%= render "shared/city_select", name: form.field_name(:city), value: form.object.city,
+              label: Ad.human_attribute_name(:city), required: true,
+              label_class: label_class, field_class: field_class %>
         <p class="mt-1 text-xs text-stone-400"><%= t("dashboard.ads_new.city_hint") %></p>
       </div>
     </div>

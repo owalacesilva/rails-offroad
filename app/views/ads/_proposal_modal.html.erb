@@ -39,8 +39,10 @@
     <div class="grid gap-4 sm:grid-cols-2">
       <div>
         <%= form.label :email, class: "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
-        <%= form.email_field :email, required: true, autocomplete: "email",
-              class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+        <%= render layout: "shared/leading_icon", locals: { icon: :envelope } do %>
+          <%= form.email_field :email, required: true, autocomplete: "email",
+                class: "mt-2 w-full rounded-lg border border-stone-300 bg-white pl-10 pr-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+        <% end %>
       </div>
 
       <div>
@@ -52,10 +54,10 @@
     </div>
 
     <div>
-      <%= form.label :offered_value, class: "block text-xs font-semibold uppercase tracking-wide text-stone-500" %>
-      <%= form.text_field :offered_value, required: true, inputmode: "numeric", placeholder: "45.000,00",
-            data: { controller: "mask", mask_type_value: "currency", action: "input->mask#format" },
-            class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
+      <%= render "shared/money_field", form: form, field: :offered_value, required: true,
+            placeholder: "45.000,00",
+            label_class: "block text-xs font-semibold uppercase tracking-wide text-stone-500",
+            field_class: "mt-2 w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40" %>
       <p class="mt-1 text-xs text-stone-500"><%= t("ads.proposal_modal.amount_hint") %></p>
     </div>
 

@@ -71,6 +71,13 @@ RSpec.describe "Ads", type: :request do
   describe "paginação" do
     before { create_list(:ad, 15, category: vehicles) }
 
+    # O total é o do banco naquele exemplo, e não 15 fixo: a vitrine mostra
+    # tudo que está aprovado, inclusive o que outro `let` tenha criado.
+    def showing_text
+      I18n.t("shared.pagination.showing", from: 1, to: Pagination::PER_PAGE,
+             total: ActiveSupport::NumberHelper.number_to_delimited(Ad.published.count))
+    end
+
     it "limita a página ao tamanho configurado" do
       get ads_path
 
@@ -87,6 +94,23 @@ RSpec.describe "Ads", type: :request do
       get ads_path(category: "veiculos-4x4")
 
       expect(response.body).to include("category=veiculos-4x4&amp;page=2")
+    end
+
+    # Os botões de página moram no rodapé de um card, junto da contagem — não
+    # numa régua solta no meio da página.
+    it "põe os botões e a contagem no rodapé do card" do
+      get ads_path
+
+      footer = response.body[%r{<div class="mt-8 overflow-hidden rounded-2xl.*?</nav>}m]
+
+      expect(footer).to include(showing_text, I18n.t("shared.pagination.next"))
+    end
+
+    # A mesma contagem aparecia acima da grade e no rodapé; ficou só a de baixo.
+    it "não repete a contagem acima da grade" do
+      get ads_path
+
+      expect(response.body.scan(showing_text).size).to eq(1)
     end
   end
 
