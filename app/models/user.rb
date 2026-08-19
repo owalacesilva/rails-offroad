@@ -25,6 +25,9 @@ class User < ApplicationRecord
   # Proposta é preservada quando quem enviou some: o anunciante ainda precisa
   # do contato, que fica gravado na própria proposta.
   has_many :proposals, dependent: :nullify
+  # Cobranças do plano Premium, uma por mês pago. Vão junto com a conta: são
+  # histórico de pagamento dela, e o comprovante de verdade é o do PagBank.
+  has_many :subscriptions, dependent: :destroy
 
   enum :status, STATUSES
 
@@ -78,5 +81,20 @@ class User < ApplicationRecord
 
   def location
     "#{city}, #{state}"
+  end
+
+  # Até quando o Premium vale, ou nil para quem nunca pagou. É derivado das
+  # cobranças e não guardado em users: uma coluna a mais seria uma segunda
+  # verdade sobre a mesma coisa, e é `subscriptions.paid_through` que o
+  # pagamento move — a mesma razão pela qual Ad.published olha User.active em
+  # vez de copiar a situação para o anúncio.
+  def premium_until
+    subscriptions.paid.maximum(:paid_through)
+  end
+
+  # Tem Premium hoje? Consulta pelo escopo, para caber no índice
+  # (user_id, paid_through) em vez de trazer a data para comparar em Ruby.
+  def premium?
+    subscriptions.current.exists?
   end
 end

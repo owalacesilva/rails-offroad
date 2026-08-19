@@ -43,6 +43,28 @@
         79
       ],
       "note": "O href do card da agenda e Event#external_url, que devolve a URL apenas quando ela casa com https?://; qualquer outro esquema (javascript:, data:) vira nil e o card nao renderiza link. A mesma regra e validada em Event#url. O Brakeman marca qualquer atributo de modelo no href e nao enxerga a lista de esquemas, por isso a confianca Weak. Revisado em 2026-08-17."
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "7eb1d7b1fd8e83e6faf0be224abe58350b5e1483e8290d4a48a5d12a36855ab5",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/dashboard/subscriptions_controller.rb",
+      "line": 19,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Pagseguro.build.create_checkout(order_for(Subscription.open_for(current_user, :amount_cents => 4990))), :allow_other_host => true)",
+      "location": {
+        "type": "method",
+        "class": "Dashboard::SubscriptionsController",
+        "method": "create"
+      },
+      "user_input": "Subscription.open_for(current_user, :amount_cents => 4990)",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "O destino do redirect e o link de pagamento devolvido pela API do PagBank, nao entrada do usuario: o unico dado que vem de quem clica e o proprio clique. Pagseguro#pay_url so aceita o href marcado com rel PAY e apenas quando ele casa com PAY_URL (https://), entao um javascript:, um data: ou um http puro na resposta viram nil e a acao redireciona para a propria pagina de assinatura com um alerta. O Brakeman rastreia Subscription.open_for(current_user) como user_input porque o registro nasce na requisicao, e nao enxerga nem a origem HTTPS autenticada da URL nem a checagem de esquema, por isso a confianca Weak. Mesma situacao do LinkToHref do card da agenda. Revisado em 2026-08-19."
     }
   ],
   "brakeman_version": "8.0.6"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_110001) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -226,6 +226,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_100001) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "subscriptions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "amount_cents", null: false
+    t.datetime "created_at", null: false
+    t.string "gateway_reference", null: false
+    t.datetime "paid_at"
+    t.date "paid_through"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["gateway_reference"], name: "index_subscriptions_on_gateway_reference", unique: true
+    t.index ["user_id", "paid_through"], name: "index_subscriptions_on_user_id_and_paid_through"
+    t.index ["user_id"], name: "index_subscriptions_on_user_id"
+    t.check_constraint "`amount_cents` > 0", name: "subscriptions_amount_positive"
+    t.check_constraint "`status` in (_utf8mb4'pending',_utf8mb4'paid',_utf8mb4'declined',_utf8mb4'canceled')", name: "subscriptions_status_valid"
+  end
+
   create_table "technical_spec_values", primary_key: ["ad_id", "attribute_id"], charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "ad_id", null: false
     t.bigint "attribute_id", null: false
@@ -269,6 +285,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_100001) do
   add_foreign_key "proposals", "ads"
   add_foreign_key "proposals", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "subscriptions", "users"
   add_foreign_key "technical_spec_values", "ads"
   add_foreign_key "technical_spec_values", "attributes"
 end

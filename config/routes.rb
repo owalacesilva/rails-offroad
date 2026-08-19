@@ -54,6 +54,11 @@ Rails.application.routes.draw do
   # página própria para listar nem editar inscrição.
   post "newsletter", to: "newsletter_subscriptions#create", as: :newsletter_subscription
 
+  # Notificação de pagamento do PagBank. Pública e sem CSRF porque quem chama é
+  # o servidor deles, não um navegador com sessão; o que autentica é a assinatura
+  # SHA256 do corpo, conferida na controller.
+  post "pagseguro/notificacoes", to: "pagseguro_notifications#create", as: :pagseguro_notifications
+
   # Autocomplete de municípios (JSON). Alimenta o campo de cidade do formulário
   # de anúncio, que pede só os da UF escolhida em vez dos 5.571 de uma vez.
   get "municipios", to: "cities#index", as: :cities
@@ -69,6 +74,11 @@ Rails.application.routes.draw do
     post  "anuncios",      to: "ads#create",      as: nil
     # Uma requisição por foto, do Dropzone. Devolve o signed_id do blob.
     post  "anuncios/fotos", to: "ad_photos#create", as: :account_ad_photos
+    # Assinatura do plano Premium. O POST divide o caminho com o GET, então vai
+    # `as: nil` pelo mesmo motivo do POST de anúncios: sem isso o Rails
+    # inventaria o helper `premium_path`, fora do padrão account_*.
+    get   "premium",       to: "subscriptions#new",    as: :account_premium
+    post  "premium",       to: "subscriptions#create", as: nil
     get   "perfil",        to: "profiles#edit",   as: :edit_profile
     patch "perfil",        to: "profiles#update", as: :profile
     get   "propostas",     to: "proposals#index", as: :proposals

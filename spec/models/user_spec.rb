@@ -178,4 +178,45 @@ RSpec.describe User, type: :model do
       expect(first).not_to eq(described_class.random_password)
     end
   end
+
+  # O Premium é derivado das cobranças, e não de uma coluna em users: é
+  # subscriptions.paid_through que o pagamento move.
+  describe "plano Premium" do
+    let(:user) { create(:user) }
+
+    it "não é Premium sem cobrança paga" do
+      create(:subscription, user: user)
+
+      expect(user.premium?).to be(false)
+      expect(user.premium_until).to be_nil
+    end
+
+    it "é Premium enquanto o prazo vale" do
+      subscription = create(:subscription, :paid, user: user)
+
+      expect(user.premium?).to be(true)
+      expect(user.premium_until).to eq(subscription.paid_through)
+    end
+
+    it "deixa de ser Premium quando o prazo vence" do
+      create(:subscription, :expired, user: user)
+
+      expect(user.premium?).to be(false)
+    end
+
+    # Prazo vencido continua no histórico, então premium_until é o maior de
+    # todos — o que importa é o mais longe, não o mais recente.
+    it "considera o prazo mais longo entre as cobranças pagas" do
+      create(:subscription, :expired, user: user)
+      current = create(:subscription, :paid, user: user)
+
+      expect(user.premium_until).to eq(current.paid_through)
+    end
+
+    it "não confunde o Premium de um anunciante com o de outro" do
+      create(:subscription, :paid, user: create(:user))
+
+      expect(user.premium?).to be(false)
+    end
+  end
 end

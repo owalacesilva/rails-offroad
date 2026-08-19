@@ -113,6 +113,12 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       FACEBOOK_APP_ID: ${FACEBOOK_APP_ID:-}
       FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET:-}
+      # Pagamento do Premium (lib/pagseguro.rb). Default vazio de propósito: sem
+      # o token não há assinatura, e a rota devolve 404 em vez de tentar cobrar.
+      # O ambiente cai em sandbox quando não é dito — errar aqui não pode virar
+      # cobrança de verdade.
+      PAGSEGURO_TOKEN: ${PAGSEGURO_TOKEN:-}
+      PAGSEGURO_ENV: ${PAGSEGURO_ENV:-sandbox}
     volumes:
       - .:/app
       - bundle:/bundle

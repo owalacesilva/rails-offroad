@@ -113,8 +113,25 @@ pt-BR:
       dashboard: "Dashboard"
       ads: "Meus Anúncios"
       proposals: "Propostas"
+      premium: "Premium"
       profile: "Meu Perfil"
       sign_out: "Sair"
+    # Tela de assinatura do Premium (Dashboard::SubscriptionsController). O
+    # pagamento em si acontece no PagBank; aqui ficam a situação e o botão.
+    premium:
+      title: "Plano Premium"
+      subtitle: "Assine para tirar o limite de anúncios e aparecer na frente na busca da categoria."
+      # Nome que vai na tela do PagBank e na fatura do cartão. Lido sempre em
+      # pt-BR, porque não depende do idioma que a pessoa escolheu na sessão.
+      item: "OffRoad Classificados — Plano Premium (1 mês)"
+      active: "Premium ativo"
+      until: "Vale até %{date}. Pagar de novo antes disso soma um mês ao prazo, sem perder os dias que faltam."
+      inactive: "Você está no plano Gratuito"
+      inactive_hint: "Até três anúncios ativos ao mesmo tempo. O Premium tira esse limite."
+      pay: "Pagar com PagSeguro"
+      gateway_note: "Você vai para o ambiente do PagBank para pagar e volta para cá em seguida. Nenhum dado do seu cartão passa pelo portal. O Premium é liberado quando o PagBank confirma o pagamento — no cartão isso costuma ser na hora, no boleto e no Pix pode levar mais tempo."
+      compare: "Comparar com o plano Gratuito"
+      failure: "Não deu para abrir o pagamento agora. Tente de novo em alguns minutos."
     stats:
       ads: "Anúncios"
       proposals: "Propostas"

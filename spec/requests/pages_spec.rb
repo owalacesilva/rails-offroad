@@ -96,11 +96,24 @@ RSpec.describe "Páginas institucionais", type: :request do
       expect(response.body).to include(*features.map { |feature| ERB::Util.html_escape(feature) })
     end
 
-    # O gratuito leva ao formulário de anúncio, como o botão do header; o
-    # Premium não tem checkout e conversa por e-mail.
+    # O gratuito leva ao formulário de anúncio, como o botão do header. O Premium
+    # depende de haver gateway: sem credencial do PagBank não há checkout, e o
+    # botão volta a ser o e-mail de contato em vez de levar a uma rota que 404.
     it "aponta cada botão para o seu destino" do
       expect(response.body).to include(new_account_ad_path,
                                        "mailto:#{I18n.t('layout.footer.contact.email')}")
+    end
+
+    # O href do botão, e não só o caminho em qualquer lugar do corpo: o rodapé
+    # também tem um mailto para o mesmo endereço de contato.
+    it "leva o Premium ao pagamento quando o PagSeguro está configurado", :pagseguro do
+      get pricing_path
+
+      expect(response.body).to include(%(href="#{account_premium_path}"))
+    end
+
+    it "volta ao e-mail de contato quando não há gateway" do
+      expect(response.body).to include(%(href="mailto:#{I18n.t('layout.footer.contact.email')}"))
     end
 
     # O bloco de planos é uma chave opcional do partial compartilhado: página

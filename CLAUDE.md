@@ -128,9 +128,10 @@ carry is the amount: `PagesHelper::PLAN_PRICES` holds it in cents, for the same 
 disagree with itself. `plan_price` formats it with `AdsHelper#ad_price`, except for zero,
 which comes out as `pages.pricing.free_price`. The buttons' destinations are code too
 (`plan_cta_path`): the free plan goes to the ad form like the header's "Anunciar" button,
-and Premium has no checkout — it opens a mail to the contact address. **Nothing in the
-application enforces a plan.** There is no `users.plan` column, no listing cap, no billing:
-the page describes an offer, and honouring it is still to be built.
+and Premium goes to the checkout — or, where PagSeguro is not configured, back to a mail to
+the contact address. **Nothing in the application enforces a plan yet.** Paying grants
+`User#premium?` and nothing else: there is no listing cap, no search highlighting and no
+Premium badge, so the page still describes more than the code honours.
 
 **Money is stored in integer cents** — `ads.price_cents` and
 `proposals.offered_value_cents`, both `int` (the "int(11)" of the data dictionary; MySQL
@@ -708,6 +709,63 @@ returns `false` for that second case instead of guessing which one wins.
 Provider-only accounts still need a value in the `NOT NULL` `password_hash`, so they get
 `User.random_password` — unguessable and told to no one. Whoever also wants a password sets
 one in their own profile.
+
+### Paying for Premium (PagSeguro)
+
+Hand-written in `lib/pagseguro.rb`, no gem — the same call the OAuth flow made, for the same
+reason: the integration is two short conversations (create the checkout, receive the
+notification).
+
+**It is the hosted Checkout, not the transparent one.** Whoever pays leaves the portal, types
+the card at PagBank and comes back. That avoids three things at once: no card data passes
+through here, no third-party script enters the page (which the Privacy Policy promises), and
+no CPF or address column has to join `users`. It is also why the payload deliberately carries
+**no `customer` object** — the API requires `tax_id` alongside the name when it is present,
+and the portal does not keep a CPF. PagBank's own page asks for what it needs.
+
+**Credentials come from the environment, like the footer links and the login providers.**
+Without `PAGSEGURO_TOKEN` the feature does not exist: `/anunciante/premium` 404s, the Premium
+item disappears from the dashboard menu, and the pricing page's Premium button goes back to
+being the contact e-mail. An install that only wants free classifieds is untouched.
+
+**Sandbox is the default, and anything unrecognised also lands there** — `PAGSEGURO_ENV=prod`
+is a typo, and a typo must cost a charge that does not happen, never one that happens by
+accident.
+
+**The webhook is the only thing that grants Premium.** Coming back from the checkout proves
+nothing — that is just a browser, and a browser is forged with a URL. `POST
+/pagseguro/notificacoes` is what moves the record, and what proves it came from PagBank is
+`x-authenticity-token`: `SHA256("#{token}-#{body}")`. It must be hashed against
+`request.raw_post`, never the reserialised params — one different space and the hash stops
+matching. Without that check, whoever found the URL would grant themselves Premium with a POST.
+
+Five more things about that path are easy to break:
+
+- **An authentic notification always answers 200**, including for an unknown reference or a
+  status that is not an outcome. PagBank retries whatever did not answer 2xx, and retrying
+  would not make the row appear.
+- **`AUTHORIZED`, `WAITING` and `IN_ANALYSIS` are left alone.** Only `PAID`, `DECLINED` and
+  `CANCELED` are outcomes; overwriting with "pending" would erase a confirmed payment if the
+  notifications arrived out of order.
+- **`paid_at` is what makes it idempotent**, the same role `ad_images.watermarked_at` plays: a
+  resent webhook must not grant a second month.
+- **The column is `gateway_reference`, not `reference_id`.** A string column ending in `_id`
+  is what `spec/models/schema_spec.rb` exists to stop coming back (the old VARCHAR(36) keys),
+  and it fails the suite. PagBank's field name stays where it belongs — in the body built by
+  `Pagseguro::Order`.
+- **Renewing before expiry stacks.** `paid_through` counts from the later of today and the
+  advertiser's current expiry, so paying early does not burn the days still left.
+
+**It charges one month, and does not renew by itself.** Each payment is one `subscriptions`
+row; the Checkout API's `recurrence_plan` is not used, because its shape could not be verified
+against a live sandbox from here. `User#premium?` is derived from the rows
+(`subscriptions.current`) rather than a `users.plan` column, for the reason `Ad.published`
+reads `User.active` instead of copying status onto the ad.
+
+**In development the notification cannot reach `localhost`.** The URL is registered per charge
+by the portal itself, so there is nothing to set up in PagBank's panel — but a payment is only
+confirmed if PagBank can reach the portal, which means a tunnel (cloudflared, ngrok) and
+visiting the portal through that address.
 
 ### Storage and mail
 

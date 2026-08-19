@@ -7,6 +7,7 @@ module Dashboard
       "dashboard" => :dashboard,
       "ads" => :ads,
       "proposals" => :proposals,
+      "subscriptions" => :premium,
       "profiles" => :profile
     }.freeze
 

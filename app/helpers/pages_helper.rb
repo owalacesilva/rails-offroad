@@ -23,10 +23,23 @@ module PagesHelper
 
   # O plano gratuito não é assinatura: o botão leva direto ao formulário de
   # anúncio, como o "Anunciar" do header — quem não está logado cai no login e
-  # volta. O Premium não tem checkout, então conversa com a gente por e-mail.
+  # volta.
+  #
+  # O Premium leva à tela de assinatura, que é onde o pagamento no PagBank
+  # começa. Sem PAGSEGURO_TOKEN essa tela não existe (a rota devolve 404), e o
+  # botão volta ao que era antes de haver pagamento: o e-mail de contato. É a
+  # mesma regra dos provedores de login e dos links do rodapé — recurso sem
+  # credencial não vira botão quebrado.
   def plan_cta_path(key)
     return new_account_ad_path if key.to_s == "free"
+    return account_premium_path if Pagseguro.configured?
 
     "mailto:#{t('layout.footer.contact.email')}"
+  end
+
+  # O bloco do Premium na página de planos. A tela de assinatura mostra as mesmas
+  # vantagens: duas listas para manter alinhadas seriam uma a mais.
+  def premium_plan
+    t("pages.pricing.plans").find { |plan| plan[:key] == "premium" }
   end
 end

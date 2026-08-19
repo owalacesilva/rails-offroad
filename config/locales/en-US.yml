@@ -106,8 +106,25 @@ en-US:
       dashboard: "Dashboard"
       ads: "My Listings"
       proposals: "Proposals"
+      premium: "Premium"
       profile: "My Profile"
       sign_out: "Sign out"
+    # Premium subscription screen (Dashboard::SubscriptionsController). The
+    # payment itself happens at PagBank; what lives here is status and the button.
+    premium:
+      title: "Premium plan"
+      subtitle: "Subscribe to lift the listing cap and get top billing in your category's search."
+      # Name shown on the PagBank screen and on the card statement. Always read
+      # in pt-BR, since it must not depend on the language chosen in the session.
+      item: "OffRoad Classificados — Plano Premium (1 mês)"
+      active: "Premium active"
+      until: "Valid through %{date}. Paying again before then adds a month, without losing the days still left."
+      inactive: "You are on the Free plan"
+      inactive_hint: "Up to three active listings at a time. Premium lifts that cap."
+      pay: "Pay with PagSeguro"
+      gateway_note: "You will be taken to PagBank to pay and brought straight back here. No card details of yours pass through the portal. Premium is granted once PagBank confirms the payment — usually immediately for cards, and later for boleto or Pix."
+      compare: "Compare with the Free plan"
+      failure: "We could not open the payment right now. Try again in a few minutes."
     stats:
       ads: "Listings"
       proposals: "Proposals"
