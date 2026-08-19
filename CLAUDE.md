@@ -77,9 +77,9 @@ The advertiser dashboard is scoped under **`/anunciante`** while its helpers sta
 `account_*` (`account_path` → `/anunciante`, `account_ads_path` → `/anunciante/anuncios`).
 `spec/requests/account_prefix_spec.rb` is the only place that asserts the literal prefix —
 everything else goes through the helpers, so without it a prefix change is invisible.
-The four institutional routes follow the same split: `/sobre-nos`, `/como-anunciar`,
-`/politica-de-privacidade` and `/termos-de-uso` map to `PagesController#about`,
-`#how_to_advertise`, `#privacy` and `#terms`.
+The five institutional routes follow the same split: `/sobre-nos`, `/como-anunciar`,
+`/planos`, `/politica-de-privacidade` and `/termos-de-uso` map to `PagesController#about`,
+`#how_to_advertise`, `#pricing`, `#privacy` and `#terms`.
 
 **The `POST /anunciante/anuncios` route is declared `as: nil`.** It shares its path with
 the `GET`, so without that Rails would invent an `anuncios_path` helper out of the
@@ -111,13 +111,26 @@ specification labels live in the locale files keyed by slug (`categories.veiculo
 user content: they stay literal in the database.
 
 **The institutional pages are locale data, not templates.** `pages.about`,
-`pages.how_to_advertise`, `pages.privacy` and `pages.terms` each hold a `title`, a `lead`
-and a `sections` array of `{heading, body}`; `steps`, `items`, `cta` and `updated` are
-optional and simply do not render where absent. `app/views/pages/_document.html.erb`
-assembles all four, so a new section is a YAML entry in both locale files — never ERB.
+`pages.how_to_advertise`, `pages.pricing`, `pages.privacy` and `pages.terms` each hold a
+`title`, a `lead` and a `sections` array of `{heading, body}`; `steps`, `plans`, `items`,
+`cta` and `updated` are optional and simply do not render where absent.
+`app/views/pages/_document.html.erb` assembles all five, so a new section is a YAML entry
+in both locale files — never ERB.
 `body` uses `\n\n` for paragraph breaks and goes through `simple_format`.
 "Last updated" comes from `PagesController::LAST_UPDATED_ON`, not from the locale, so the
 two languages cannot drift apart on the date.
+
+**The two plans are locale text, but the price is code.** `pages.pricing.plans` carries a
+`key`, `name`, `period`, `tagline`, `features` and `cta` per plan (plus an optional `badge`
+and `note`), and `app/views/pages/_plans.html.erb` draws the cards. What it does *not*
+carry is the amount: `PagesHelper::PLAN_PRICES` holds it in cents, for the same reason as
+`LAST_UPDATED_ON` — a price written in two locale files is a price that will one day
+disagree with itself. `plan_price` formats it with `AdsHelper#ad_price`, except for zero,
+which comes out as `pages.pricing.free_price`. The buttons' destinations are code too
+(`plan_cta_path`): the free plan goes to the ad form like the header's "Anunciar" button,
+and Premium has no checkout — it opens a mail to the contact address. **Nothing in the
+application enforces a plan.** There is no `users.plan` column, no listing cap, no billing:
+the page describes an offer, and honouring it is still to be built.
 
 **Money is stored in integer cents** — `ads.price_cents` and
 `proposals.offered_value_cents`, both `int` (the "int(11)" of the data dictionary; MySQL

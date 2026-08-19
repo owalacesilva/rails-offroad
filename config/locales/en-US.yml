@@ -35,6 +35,7 @@ en-US:
       home: "Home"
       blog: "Blog"
       classifieds: "Classifieds"
+      pricing: "Pricing"
       all_categories: "See all"
       menu: "Menu"
     header:
@@ -58,6 +59,7 @@ en-US:
       institutional:
         about: "About us"
         how_to_advertise: "How to advertise"
+        pricing: "Plans and pricing"
         terms: "Terms of use"
         privacy: "Privacy policy"
       contact:
@@ -488,12 +490,62 @@ en-US:
         - heading: "About the photos"
           body: "Photos are submitted as URLs, one per line, and the order of the lines is the order in the gallery. The first is the cover.\n\nNothing is resized on our side: send images already at a good size and in landscape, which is the shape used across cards and galleries."
         - heading: "What it costs"
-          body: "Posting is free, and there is no cap on listings per account. We take no commission on the sale — the deal happens directly between you and the buyer, off the portal."
+          body: "Posting is free: the Free plan allows up to three active listings at a time, and we take no commission on the sale — the deal happens directly between you and the buyer, off the portal.\n\nWhoever lists in volume has Premium, with no listing cap and highlighting in category search. Both are laid out on the plans page."
         - heading: "After it goes live"
           body: "Offers you receive are collected under \"Proposals\" in your dashboard, with name, email, phone and the amount offered. Each one also reaches you by email, and you can reply straight to the buyer.\n\nIf a listing is rejected, your dashboard says so: fix what was flagged and submit it again."
       cta:
         title: "Ready to publish?"
         body: "Fill in the form, add your photos and follow the review from your dashboard."
+        label: "Create my listing"
+
+    # Pricing. The amounts are deliberately not here: they live in
+    # PagesHelper::PLAN_PRICES, so the two languages cannot drift on price.
+    pricing:
+      title: "Plans and pricing"
+      lead: "Listing on OffRoad Classificados starts free. Premium is for whoever sells in volume and wants to be seen first."
+      free_price: "R$ 0"
+      plans:
+        - key: "free"
+          name: "Free"
+          period: "forever"
+          tagline: "For selling the one rig, bike or part you have."
+          features:
+            - "Up to 3 active listings at a time"
+            - "3 to 10 photos per listing, carrying the portal's watermark"
+            - "Listings live for 60 days, renewable"
+            - "WhatsApp button on the listing"
+            - "Offers by email and collected in your dashboard"
+          cta: "Post for free"
+        - key: "premium"
+          name: "Premium"
+          featured: true
+          badge: "Most chosen"
+          period: "per month"
+          tagline: "For shops, builders and anyone who sells off-road for a living."
+          note: "Everything in Free, plus:"
+          features:
+            - "Unlimited active listings"
+            - "Top billing in your category's search"
+            - "Premium badge on the card and on the listing page"
+            - "Your photos in the home gallery"
+            - "Listings with no expiry date"
+            - "Priority support over WhatsApp"
+          cta: "Talk to us"
+      disclaimer: "Monthly price per advertiser account, in Brazilian reais. On both plans, every listing is moderated before it goes live."
+      sections:
+        - heading: "Which plan is yours"
+          body: "If you have one rig or one part to sell, Free covers it: up to three listings at a time, with the same photos, the same description and the same WhatsApp button as any listing on the portal.\n\nIf selling is what you do — shop, builder, dealer — the cap of three gets tight fast, and that is where Premium pays for itself: no listing cap, and top billing in your category's search."
+        - heading: "Does the portal take a commission?"
+          body: "No, on neither plan. OffRoad Classificados introduces the two sides and gets out of the way: price, payment, inspection and paperwork are settled directly between you and the buyer, off the portal.\n\nPremium is a subscription for the shop window, not a cut of what you sold."
+        - heading: "Can I switch plans later?"
+          body: "Both ways. When you subscribe, listings already live pick up the highlighting without being reposted.\n\nWhen you cancel, nothing is deleted: your listings stay live through the period you already paid for, and after that you keep the three that Free allows."
+        - heading: "How to subscribe and how to cancel"
+          body: "The subscription is monthly, per advertiser account, with no sign-up fee and no minimum term.\n\nSigning up goes through us: write to contato@offroadclassificados.com.br with the email on your account and we turn Premium on. Cancelling takes the same route."
+        - heading: "Is moderation the same on both plans?"
+          body: "It is the same. Every listing, free or Premium, joins the queue and a moderator checks the title, category, price and photos before publishing. Subscribing does not buy approval: Premium changes where your listing shows up once approved, not whether it is approved.\n\nThe photo rule holds for both as well: a published listing carries 3 to 10 images."
+      cta:
+        title: "Start for free"
+        body: "Post your first listing without paying anything and see the portal work. Premium will still be here the day the cap of three gets tight."
         label: "Create my listing"
 
     privacy:

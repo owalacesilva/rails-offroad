@@ -25,8 +25,9 @@ RSpec.describe "Rodapé", type: :request do
   describe "links institucionais" do
     before { get root_path }
 
-    it "leva às quatro páginas institucionais" do
-      expect(response.body).to include(about_path, how_to_advertise_path, terms_of_use_path, privacy_policy_path)
+    it "leva às cinco páginas institucionais" do
+      expect(response.body).to include(about_path, how_to_advertise_path, pricing_path,
+                                       terms_of_use_path, privacy_policy_path)
     end
 
     it "transforma e-mail e telefone de contato em links de verdade" do

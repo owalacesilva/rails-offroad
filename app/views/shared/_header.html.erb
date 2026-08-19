@@ -27,6 +27,11 @@
           <%= t("layout.nav.blog") %>
         <% end %>
 
+        <%= link_to pricing_path, class: nav_link_class do %>
+          <%= ui_icon(:tag, css_class: "h-4 w-4 text-brand-500") %>
+          <%= t("layout.nav.pricing") %>
+        <% end %>
+
         <details class="group relative" data-controller="dropdown">
           <summary class="<%= nav_link_class %> cursor-pointer list-none [&::-webkit-details-marker]:hidden">
             <svg class="h-4 w-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
@@ -76,6 +81,7 @@
           <%= render layout: "shared/dropdown", locals: { label: t("layout.nav.menu") } do %>
             <%= dropdown_link(root_path, icon: :home) { t("layout.nav.home") } %>
             <%= dropdown_link(posts_path, icon: :document) { t("layout.nav.blog") } %>
+            <%= dropdown_link(pricing_path, icon: :tag) { t("layout.nav.pricing") } %>
             <%= render "shared/category_links" %>
 
             <% if authenticated? %>

@@ -57,6 +57,7 @@ module ApplicationHelper
     {
       about: about_path,
       how_to_advertise: how_to_advertise_path,
+      pricing: pricing_path,
       terms: terms_of_use_path,
       privacy: privacy_policy_path
     }

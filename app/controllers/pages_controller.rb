@@ -1,6 +1,6 @@
-# Páginas institucionais: sobre nós, como anunciar, privacidade e termos.
+# Páginas institucionais: sobre nós, como anunciar, planos, privacidade e termos.
 #
-# Uma controller para as quatro porque nenhuma tem estado — o corpo de cada
+# Uma controller para as cinco porque nenhuma tem estado — o corpo de cada
 # página é uma lista de seções em config/locales, montada pelo mesmo partial.
 # A action só existe para dar nome ao template e à chave de tradução.
 class PagesController < ApplicationController
@@ -14,6 +14,8 @@ class PagesController < ApplicationController
   def about; end
 
   def how_to_advertise; end
+
+  def pricing; end
 
   def privacy; end
 

@@ -46,6 +46,7 @@ Rails.application.routes.draw do
   # estado nenhum: cada action escolhe um template e o texto vem dos locales.
   get "sobre-nos",               to: "pages#about",            as: :about
   get "como-anunciar",           to: "pages#how_to_advertise", as: :how_to_advertise
+  get "planos",                  to: "pages#pricing",          as: :pricing
   get "politica-de-privacidade", to: "pages#privacy",          as: :privacy_policy
   get "termos-de-uso",           to: "pages#terms",            as: :terms_of_use
 

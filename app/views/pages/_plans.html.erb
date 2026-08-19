@@ -1,0 +1,59 @@
+<%# Os dois planos, lado a lado. Local: plans — a lista de pages.pricing.plans.
+
+    O preço não sai do locale: é um número só, em PagesHelper::PLAN_PRICES, para
+    os dois idiomas não divergirem no valor. O destino do botão também é código
+    (PagesHelper#plan_cta_path); do locale vem o rótulo, como no cta das outras
+    páginas institucionais. %>
+<div class="mb-6 grid gap-6 sm:grid-cols-2">
+  <% plans.each do |plan| %>
+    <%# O plano destacado se separa pela borda e pela sombra em âmbar, não por
+        fundo escuro: o portal é claro e o card fica sobre fundo branco. %>
+    <% featured = plan[:featured] %>
+    <section class="relative flex flex-col rounded-2xl bg-white p-6 sm:p-7 <%= featured ? "border-2 border-brand-500 shadow-lg shadow-brand-500/10" : "border border-stone-200 shadow-sm" %>">
+      <% if plan[:badge].present? %>
+        <span class="absolute -top-3 left-6 rounded-full bg-brand-500 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-stone-950">
+          <%= plan[:badge] %>
+        </span>
+      <% end %>
+
+      <h2 class="text-sm font-extrabold uppercase tracking-wide <%= featured ? "text-brand-600" : "text-stone-500" %>">
+        <%= plan[:name] %>
+      </h2>
+
+      <p class="mt-3 flex flex-wrap items-baseline gap-x-2">
+        <span class="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+          <%= plan_price(plan[:key]) %>
+        </span>
+        <span class="text-sm font-semibold text-stone-500"><%= plan[:period] %></span>
+      </p>
+
+      <p class="mt-3 text-sm leading-relaxed text-stone-600"><%= plan[:tagline] %></p>
+
+      <% if plan[:note].present? %>
+        <p class="mt-6 text-xs font-bold uppercase tracking-wide text-stone-500"><%= plan[:note] %></p>
+      <% end %>
+
+      <ul class="mt-4 space-y-2.5">
+        <% plan[:features].each do |feature| %>
+          <li class="flex gap-3 text-sm leading-relaxed text-stone-600">
+            <%= ui_icon(:check, css_class: "mt-0.5 h-4 w-4 shrink-0 text-brand-500") %>
+            <span><%= feature %></span>
+          </li>
+        <% end %>
+      </ul>
+
+      <%# mt-auto no invólucro, e não no botão: alinha os dois botões na mesma
+          linha mesmo com listas de tamanhos diferentes, sem disputar a margem
+          com o pt- do respiro — duas classes Tailwind da mesma propriedade se
+          decidem pela ordem na folha construída, não pela do atributo. %>
+      <div class="mt-auto pt-8">
+        <%= link_to plan[:cta], plan_cta_path(plan[:key]),
+              class: "flex w-full items-center justify-center rounded-full px-6 py-3 text-sm font-bold transition #{featured ? 'bg-brand-500 text-stone-950 hover:bg-brand-400' : 'border border-stone-300 text-stone-800 hover:border-brand-500 hover:text-brand-600'}" %>
+      </div>
+    </section>
+  <% end %>
+</div>
+
+<p class="mb-14 text-center text-xs leading-relaxed text-stone-500">
+  <%= t("pages.pricing.disclaimer") %>
+</p>

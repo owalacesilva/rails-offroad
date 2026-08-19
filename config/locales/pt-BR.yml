@@ -39,6 +39,7 @@ pt-BR:
       home: "Início"
       blog: "Blog"
       classifieds: "Classificados"
+      pricing: "Planos"
       all_categories: "Ver todos"
       menu: "Menu"
     header:
@@ -65,6 +66,7 @@ pt-BR:
       institutional:
         about: "Sobre nós"
         how_to_advertise: "Como anunciar"
+        pricing: "Planos e preços"
         terms: "Termos de uso"
         privacy: "Política de privacidade"
       contact:
@@ -498,12 +500,62 @@ pt-BR:
         - heading: "Sobre as fotos"
           body: "As fotos são enviadas por URL, uma por linha, e a ordem das linhas é a ordem que aparece na galeria. A primeira é a capa.\n\nNão redimensionamos nada: mande imagens já em bom tamanho e na horizontal, que é o formato usado nos cards e na galeria."
         - heading: "Quanto custa"
-          body: "Publicar anúncio é gratuito, e não há limite de anúncios por conta. Não cobramos comissão sobre a venda — a negociação acontece direto entre você e o comprador, fora do portal."
+          body: "Publicar é gratuito: o plano Gratuito permite até três anúncios ativos ao mesmo tempo, e não cobramos comissão sobre a venda — a negociação acontece direto entre você e o comprador, fora do portal.\n\nQuem anuncia em volume tem o Premium, com anúncio sem limite e destaque na busca da categoria. Os dois estão detalhados na página de planos."
         - heading: "Depois de publicado"
           body: "As propostas recebidas ficam reunidas em \"Propostas\" no seu painel, com nome, e-mail, telefone e valor oferecido. Você também recebe cada uma por e-mail e pode responder direto para o interessado.\n\nSe o anúncio for rejeitado, o painel mostra a situação: ajuste o que foi apontado e envie de novo."
       cta:
         title: "Pronto para publicar?"
         body: "Preencha o formulário, envie as fotos e acompanhe a avaliação pelo seu painel."
+        label: "Criar meu anúncio"
+
+    # Planos. Os preços não estão aqui de propósito: ficam em
+    # PagesHelper::PLAN_PRICES, para os dois idiomas não divergirem no valor.
+    pricing:
+      title: "Planos e preços"
+      lead: "Anunciar no OffRoad Classificados começa de graça. O Premium é para quem vende em volume e quer aparecer na frente."
+      free_price: "R$ 0"
+      plans:
+        - key: "free"
+          name: "Gratuito"
+          period: "para sempre"
+          tagline: "Para quem tem um veículo, uma moto ou uma peça para vender."
+          features:
+            - "Até 3 anúncios ativos ao mesmo tempo"
+            - "De 3 a 10 fotos por anúncio, com a marca d'água do portal"
+            - "Anúncio no ar por 60 dias, renovável"
+            - "Botão de WhatsApp no anúncio"
+            - "Propostas por e-mail e reunidas no seu painel"
+          cta: "Anunciar de graça"
+        - key: "premium"
+          name: "Premium"
+          featured: true
+          badge: "Mais escolhido"
+          period: "por mês"
+          tagline: "Para loja, preparador e quem vive de vender fora de estrada."
+          note: "Tudo do plano Gratuito, e mais:"
+          features:
+            - "Anúncios ativos sem limite"
+            - "Destaque no topo da busca da categoria"
+            - "Selo Premium no card e na página do anúncio"
+            - "Suas fotos na galeria da home"
+            - "Anúncio sem prazo para expirar"
+            - "Atendimento prioritário por WhatsApp"
+          cta: "Falar com a gente"
+      disclaimer: "Valor mensal por conta de anunciante, em reais. Nos dois planos, todo anúncio passa pela moderação antes de ir ao ar."
+      sections:
+        - heading: "Qual plano é o seu"
+          body: "Se você tem um veículo ou uma peça para vender, o Gratuito resolve: são até três anúncios ao mesmo tempo, com as mesmas fotos, a mesma descrição e o mesmo botão de WhatsApp de qualquer anúncio do portal.\n\nSe vender é o seu dia a dia — loja, preparador, revenda — o limite de três aperta rápido, e é aí que o Premium se paga: anúncio sem limite e posição de destaque na busca da categoria."
+        - heading: "O portal cobra comissão pela venda?"
+          body: "Não, em nenhum dos dois planos. O OffRoad Classificados aproxima as duas pontas e sai da frente: preço, pagamento, vistoria e transferência são combinados diretamente entre você e o comprador, fora do portal.\n\nO Premium é assinatura de vitrine, não taxa sobre o que você vendeu."
+        - heading: "Posso trocar de plano depois?"
+          body: "Nas duas direções. Ao assinar, os anúncios que já estão no ar passam a contar com o destaque sem precisar ser republicados.\n\nAo cancelar, nada é apagado: os anúncios seguem no ar até o fim do período já pago e, depois disso, você continua com os três do plano Gratuito."
+        - heading: "Como assinar e como cancelar"
+          body: "A assinatura é mensal, por conta de anunciante, sem taxa de adesão e sem prazo de fidelidade.\n\nA contratação é feita com a gente: escreva para contato@offroadclassificados.com.br informando o e-mail da sua conta e nós ativamos o Premium. O cancelamento é pelo mesmo caminho."
+        - heading: "A moderação é a mesma nos dois planos?"
+          body: "É a mesma. Todo anúncio, gratuito ou Premium, entra na fila e um moderador confere título, categoria, preço e fotos antes de publicar. Assinar não compra aprovação: o Premium muda onde o seu anúncio aparece depois de aprovado, não se ele é aprovado.\n\nA regra das fotos também vale para os dois: anúncio publicado tem de 3 a 10 imagens."
+      cta:
+        title: "Comece de graça"
+        body: "Publique o primeiro anúncio sem pagar nada e veja o portal funcionando. O Premium continua aqui no dia em que o limite de três apertar."
         label: "Criar meu anúncio"
 
     privacy:

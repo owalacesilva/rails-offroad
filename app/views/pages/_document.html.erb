@@ -1,9 +1,9 @@
-<%# Corpo das quatro páginas institucionais. Local: page — o nome do escopo em
-    config/locales (about, how_to_advertise, privacy, terms).
+<%# Corpo das cinco páginas institucionais. Local: page — o nome do escopo em
+    config/locales (about, how_to_advertise, pricing, privacy, terms).
 
     O texto todo mora nos locales porque ele é o conteúdo: uma página nova ou um
-    parágrafo a mais não deveria pedir ERB. Chaves opcionais (steps, items, cta,
-    updated) simplesmente não são renderizadas quando o idioma não as define. %>
+    parágrafo a mais não deveria pedir ERB. Chaves opcionais (steps, plans, items,
+    cta, updated) simplesmente não são renderizadas quando o idioma não as define. %>
 <% scope = "pages.#{page}" %>
 <% content_for :title, "#{t("#{scope}.title")} — OffRoad Classificados" %>
 
@@ -47,6 +47,13 @@
         </li>
       <% end %>
     </ol>
+  <% end %>
+
+  <%# Os planos vêm antes das seções: em /planos as seções são as dúvidas sobre
+      os planos, e perguntar antes de mostrar o preço inverteria a leitura. %>
+  <% plans = t("#{scope}.plans", default: nil) %>
+  <% if plans.present? %>
+    <%= render "pages/plans", plans: plans %>
   <% end %>
 
   <%# space-y no lugar de margem por seção: a distância entre blocos é uma só. %>
