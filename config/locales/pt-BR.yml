@@ -31,6 +31,9 @@ pt-BR:
       clear: "Limpar seleção"
 
   layout:
+    # Botão que fecha o modal de feedback (SweetAlert), em shared/_flash.
+    flash:
+      confirm: "Entendi"
     nav:
       label: "Navegação principal"
       home: "Início"
@@ -595,6 +598,8 @@ pt-BR:
 
   admin:
     title: "Moderação"
+    # Nome acessível do botão de três pontos que abre as ações de uma linha.
+    row_menu: "Ações de %{name}"
     nav:
       queue: "Fila"
       events: "Eventos"

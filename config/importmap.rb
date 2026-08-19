@@ -7,3 +7,4 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "dropzone" # @6.0.0
 pin "just-extend" # @5.1.1
+pin "sweetalert2" # @11.26.25

@@ -319,6 +319,15 @@ RSpec.describe "Meus Anúncios", type: :request do
       expect { submit(photos: signed_ids.first(2) + [ "nao-e-um-signed-id" ]) }.not_to change(Ad, :count)
     end
 
+    # A marca d'água sai da requisição: são até dez fotos pela libvips.
+    it "enfileira a marca d'água nas fotos" do
+      expect { submit }.to have_enqueued_job(WatermarkAdPhotosJob).with { |ad| expect(ad).to eq(Ad.last) }
+    end
+
+    it "não enfileira nada quando o anúncio não é criado" do
+      expect { submit({ title: "" }) }.not_to have_enqueued_job(WatermarkAdPhotosJob)
+    end
+
     it "redireciona para a lista com aviso de moderação" do
       submit
 

@@ -173,6 +173,46 @@
     color: inherit;
     font: inherit;
   }
+
+  /* SweetAlert. Todo feedback do servidor sai por aqui (ver shared/_flash), e o
+     pacote traz o próprio CSS embutido no bundle — o que fica aqui é só o que
+     traz o modal para a paleta e o arredondamento do portal. A fonte não
+     precisa de regra: o pacote herda a do html, que é a Montserrat.
+
+     O botão é vestido daqui porque o controller passa buttonsStyling: false;
+     sem isso o azul padrão do pacote entraria no meio do laranja da marca. */
+  .swal2-popup {
+    border-radius: var(--radius-2xl);
+    padding: 2rem 1.75rem 1.5rem;
+    color: var(--color-stone-900);
+  }
+
+  .swal2-html-container {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-stone-600);
+  }
+
+  .swal2-confirm {
+    cursor: pointer;
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-brand-500);
+    padding: 0.625rem 1.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-stone-950);
+    transition: background-color 150ms;
+  }
+
+  .swal2-confirm:hover {
+    background-color: var(--color-brand-400);
+  }
+
+  .swal2-container {
+    backdrop-filter: blur(2px);
+  }
 }
 
 /* Movimento é decoração aqui: quem pede menos animação continua vendo o botão,

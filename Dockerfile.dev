@@ -13,7 +13,11 @@ RUN apt-get update -qq && \
       tzdata \
       # libvips: variantes de imagem do Active Storage (gem image_processing).
       libvips42 \
-      libvips-tools && \
+      libvips-tools \
+      # A marca d'água escreve o nome do portal com o pango, que sem fonte
+      # instalada não desenha nada. Hoje o pacote entra de carona no
+      # fontconfig-config; declarado aqui, deixa de depender disso.
+      fonts-dejavu-core && \
     rm -rf /var/lib/apt/lists/*
 
 ENV LANG=C.UTF-8 \

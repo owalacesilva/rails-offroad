@@ -50,14 +50,19 @@
             <% end %>
           </div>
 
-          <div class="flex shrink-0 items-center gap-2">
-            <%= link_to t("admin.events.index.edit"), edit_admin_event_path(event, scope: @scope),
-                  class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
+          <div class="flex shrink-0 items-center">
+            <%= render layout: "shared/row_menu", locals: { label: t("admin.row_menu", name: event.title) } do %>
+              <%= dropdown_link edit_admin_event_path(event, scope: @scope), icon: :pencil do %>
+                <%= t("admin.events.index.edit") %>
+              <% end %>
 
-            <%# turbo_confirm porque apagar não tem volta e não há lixeira. %>
-            <%= button_to t("admin.events.index.destroy"), admin_event_path(event), method: :delete,
-                  form: { data: { turbo_confirm: t("admin.events.index.destroy_confirm", title: event.title) } },
-                  class: "cursor-pointer rounded-full border border-red-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-600 hover:text-white" %>
+              <%# turbo_confirm porque apagar não tem volta e não há lixeira. %>
+              <%= dropdown_button admin_event_path(event), icon: :trash, tone: :danger, method: :delete,
+                    class: dropdown_separator_class,
+                    form: { data: { turbo_confirm: t("admin.events.index.destroy_confirm", title: event.title) } } do %>
+                <%= t("admin.events.index.destroy") %>
+              <% end %>
+            <% end %>
           </div>
         </article>
       <% end %>

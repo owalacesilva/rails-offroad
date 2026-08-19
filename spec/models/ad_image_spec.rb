@@ -61,6 +61,57 @@ RSpec.describe AdImage, type: :model do
     expect { ad.destroy }.to change(described_class, :count).by(-Ad::IMAGE_COUNT.min)
   end
 
+  describe "#apply_watermark" do
+    let(:ad) { create(:ad, image_count: 0, status: :pending) }
+
+    # Foto como o formulário a deixa: blob anexado, sem file_url.
+    def attached_image
+      image = build(:ad_image, ad: ad, file_url: nil)
+      image.file.attach(photo_blob)
+      image.save!
+
+      image
+    end
+
+    it "troca o blob pelo carimbado" do
+      image = attached_image
+
+      expect { image.apply_watermark }.to change { image.reload.file.blob.id }
+    end
+
+    it "registra quando carimbou" do
+      image = attached_image
+      image.apply_watermark
+
+      expect(image.reload.watermarked_at).to be_present
+    end
+
+    # O blob novo entra no lugar do antigo: nome e tipo continuam sendo os da
+    # foto que o anunciante enviou.
+    it "mantém o nome e o tipo do arquivo" do
+      image = attached_image
+      image.apply_watermark
+
+      expect(image.reload.file.blob).to have_attributes(filename: image.file.filename, content_type: "image/png")
+    end
+
+    # O ActiveJob repete a tentativa, e marca dobrada não sai mais.
+    it "não carimba a mesma foto duas vezes" do
+      image = attached_image
+      image.apply_watermark
+
+      expect { expect(image.apply_watermark).to be(false) }.not_to change { image.reload.file.blob.id }
+    end
+
+    # Foto do seed aponta para /seed-images: não há blob para reescrever.
+    it "passa direto pela foto que só tem URL" do
+      image = create(:ad_image, ad: ad)
+
+      expect(image.apply_watermark).to be(false)
+      expect(image.reload.watermarked_at).to be_nil
+    end
+  end
+
   # Foto bloqueada pela moderação some do portal, mas continua no banco: a
   # gestão precisa dela para poder liberar de volta.
   describe "bloqueio" do

@@ -11,6 +11,19 @@ module ModerationHelper
   # gravada por SQL direto não pode desmontar a tabela.
   UNKNOWN_STATUS_STYLE = "bg-stone-100 text-stone-600 ring-stone-300".freeze
 
+  # Ícone e cor do item que leva o anunciante a cada situação, no menu de três
+  # pontos da linha. Bloquear sai em vermelho porque tira do ar todos os
+  # anúncios da conta de uma vez.
+  USER_STATUS_ACTIONS = {
+    "active" => { icon: :check, tone: :positive },
+    "inactive" => { icon: :pause, tone: :default },
+    "blocked" => { icon: :no_symbol, tone: :danger }
+  }.freeze
+
+  def user_status_action(status)
+    USER_STATUS_ACTIONS.fetch(status, { icon: :user, tone: :default })
+  end
+
   def user_status_badge(user)
     status = user.status
 

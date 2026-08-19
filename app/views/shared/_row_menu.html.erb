@@ -1,0 +1,22 @@
+<%# Menu de ações de uma linha de listagem administrativa: um botão de três
+    pontos e, dentro dele, as ações daquele registro.
+
+    Renderize com `render layout:`, passando `label` (o nome acessível do
+    gatilho, normalmente o título do registro) e os itens no bloco — cada um com
+    dropdown_link, dropdown_button ou a classe de dropdown_item_class.
+
+    É um details/summary, como shared/_dropdown: abre, fecha e navega por teclado
+    sozinho, e sem JavaScript continua servindo. O row_menu_controller só
+    acrescenta o que o elemento nativo não faz — ver o comentário dele sobre o
+    recorte da tabela. %>
+<details class="group relative inline-block text-left" data-controller="row-menu">
+  <summary aria-label="<%= label %>" title="<%= label %>"
+           class="flex size-8 cursor-pointer list-none items-center justify-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-900 group-open:bg-stone-100 [&::-webkit-details-marker]:hidden">
+    <%= ui_icon(:ellipsis, css_class: "h-5 w-5") %>
+  </summary>
+
+  <nav data-row-menu-target="panel"
+       class="absolute right-0 z-50 mt-1 w-56 overflow-hidden rounded-xl border border-stone-200 bg-white py-1 shadow-lg shadow-stone-900/10">
+    <%= yield %>
+  </nav>
+</details>

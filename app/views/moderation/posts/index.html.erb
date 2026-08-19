@@ -52,19 +52,25 @@
             <p class="mt-2 line-clamp-2 text-xs leading-relaxed text-stone-500"><%= post.summary %></p>
           </div>
 
-          <div class="flex shrink-0 items-center gap-2">
-            <% if post.published? %>
-              <%= link_to t("admin.posts.index.view"), post_path(post), target: "_blank", rel: "noopener",
-                    class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
+          <div class="flex shrink-0 items-center">
+            <%= render layout: "shared/row_menu", locals: { label: t("admin.row_menu", name: post.title) } do %>
+              <% if post.published? %>
+                <%= dropdown_link post_path(post), icon: :eye, target: "_blank", rel: "noopener" do %>
+                  <%= t("admin.posts.index.view") %>
+                <% end %>
+              <% end %>
+
+              <%= dropdown_link edit_admin_post_path(post, scope: @scope), icon: :pencil do %>
+                <%= t("admin.posts.index.edit") %>
+              <% end %>
+
+              <%# turbo_confirm porque apagar não tem volta e não há lixeira. %>
+              <%= dropdown_button admin_post_path(post), icon: :trash, tone: :danger, method: :delete,
+                    class: dropdown_separator_class,
+                    form: { data: { turbo_confirm: t("admin.posts.index.destroy_confirm", title: post.title) } } do %>
+                <%= t("admin.posts.index.destroy") %>
+              <% end %>
             <% end %>
-
-            <%= link_to t("admin.posts.index.edit"), edit_admin_post_path(post, scope: @scope),
-                  class: "rounded-full border border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
-
-            <%# turbo_confirm porque apagar não tem volta e não há lixeira. %>
-            <%= button_to t("admin.posts.index.destroy"), admin_post_path(post), method: :delete,
-                  form: { data: { turbo_confirm: t("admin.posts.index.destroy_confirm", title: post.title) } },
-                  class: "cursor-pointer rounded-full border border-red-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-600 hover:text-white" %>
           </div>
         </article>
       <% end %>

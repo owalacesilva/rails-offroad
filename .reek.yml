@@ -46,6 +46,14 @@ detectors:
       - "Dashboard::DashboardController"
       - "HomeController"
 
+  # Watermark compõe duas imagens: a foto e a faixa com o nome. Elas viajam
+  # juntas por place, offsets e fit porque são os dois operandos da composição —
+  # não há um terceiro conceito escondido no par, e um objeto só para carregá-lo
+  # seria uma struct sem comportamento.
+  DataClump:
+    exclude:
+      - "Watermark"
+
   # Ad é o modelo central do portal e concentra as regras de quatro assuntos:
   # moderação, fotos, dinheiro e slug. Quebrá-lo em concerns só para caber no
   # limite espalharia por quatro arquivos o que hoje se lê de uma vez.

@@ -209,14 +209,16 @@
                 <td class="px-4 py-2 whitespace-nowrap text-stone-500"><%= l(user.member_since, format: :long) %></td>
 
                 <td class="px-4 py-2">
-                  <div class="flex justify-end gap-1.5">
-                    <% User::STATUSES.each_value do |status| %>
-                      <% next if status == user.status %>
-                      <%= button_to t("admin.users.actions.#{status}"),
-                            status_admin_user_path(user, to: status, list: @filter.to_params.merge(page: @pagination.page)),
-                            method: :patch,
-                            form: { data: { turbo_confirm: t("admin.users.actions.confirm.#{status}", name: user.name) } },
-                            class: "cursor-pointer whitespace-nowrap rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition #{status == 'blocked' ? 'border-red-300 text-red-600 hover:bg-red-600 hover:text-white' : 'border-stone-300 text-stone-600 hover:border-stone-900 hover:text-stone-900'}" %>
+                  <div class="flex justify-end">
+                    <%= render layout: "shared/row_menu", locals: { label: t("admin.row_menu", name: user.name) } do %>
+                      <% User::STATUSES.each_value do |status| %>
+                        <% next if status == user.status %>
+                        <%= dropdown_button status_admin_user_path(user, to: status, list: @filter.to_params.merge(page: @pagination.page)),
+                              method: :patch, **user_status_action(status),
+                              form: { data: { turbo_confirm: t("admin.users.actions.confirm.#{status}", name: user.name) } } do %>
+                          <%= t("admin.users.actions.#{status}") %>
+                        <% end %>
+                      <% end %>
                     <% end %>
                   </div>
                 </td>

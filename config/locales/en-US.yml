@@ -28,6 +28,8 @@ en-US:
       clear: "Clear selection"
 
   layout:
+    flash:
+      confirm: "Got it"
     nav:
       label: "Main navigation"
       home: "Home"
@@ -586,6 +588,7 @@ en-US:
 
   admin:
     title: "Moderation"
+    row_menu: "Actions for %{name}"
     nav:
       queue: "Queue"
       events: "Events"

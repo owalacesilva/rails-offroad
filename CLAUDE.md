@@ -235,6 +235,25 @@ field that is not focusable makes Chrome refuse to submit in silence — the sam
 `required` inside a closed `<dialog>`. Clipped, it still validates and still shows the
 native message.
 
+### Feedback is a modal
+
+Flash goes through `shared/_flash`, which renders nothing visible: it hands the messages to
+`flash_controller` as JSON, and the controller opens SweetAlert (`sweetalert2`, vendored into
+`vendor/javascript` by importmap — the bundle carries its own CSS). `.swal2-*` rules in the
+Tailwind entry file bring the modal into the portal's palette, and the controller passes
+`buttonsStyling: false` so the package's own blue button never appears.
+
+Three things about it:
+
+- **The carrier element is removed in `connect()`, before anything opens.** Turbo snapshots
+  the page when you leave it; an element still in the DOM would replay the same message on
+  the browser's back button.
+- **The banner fallback lives in `<noscript>`.** Without JS there is no modal, and no feedback
+  at all after saving is worse than a banner. Inside `<noscript>` the browser with scripting
+  on never builds it, so there is no flash of banner before the modal.
+- **Messages are queued through the previous one's promise.** SweetAlert keeps one modal
+  open at a time; in practice there is almost always only one message.
+
 ### Pagination lives in a card footer
 
 `shared/_pagination` renders a footer band — the "showing X–Y of Z" count on the left, the
@@ -250,6 +269,33 @@ build a menu row from a path, an icon and a block. Every row in the three header
 one, **including the language options**: `dropdown_item_class` sets `gap-3`, so a row without
 an icon starts a column to the left of every other row and the menu reads as broken.
 `dropdown_separator_class` adds the rule that opens a new block within a menu.
+
+**Colour comes from `tone:`, and each tone is the whole set.** `ApplicationHelper::DROPDOWN_TONES`
+maps `:default` / `:positive` / `:danger` to the item's colours *and* its icon's, and
+`dropdown_item_class(tone:)` returns them complete rather than letting a caller append
+`text-red-600` over the default `text-stone-600`: between two Tailwind classes for the same
+property the winner is whichever lands later in the built stylesheet, not whichever comes
+later in the attribute — the same trap `share_controller` avoids by adding its display class
+instead of toggling `hidden`. `tone:` rides inside `**options` rather than being a parameter
+of its own, which is what keeps both builders at three parameters and reek quiet.
+
+### Record actions in admin listings are a three-dot menu
+
+All four listings — the ads queue, advertisers, blog and events — put their per-row actions
+behind `shared/_row_menu`: a kebab `<summary>` and a panel of `dropdown_link` /
+`dropdown_button` rows. Two of them are real tables, two are card lists; the menu is the same.
+
+**The panel is moved to `position: fixed` on open, by `row_menu_controller`.** Both tables sit
+in a wrapper with `overflow-x-auto`, and CSS turns the other axis into `auto` along with it,
+so an absolutely-positioned panel would be clipped under its own row. The controller anchors
+the panel to the trigger, flips it above when there is no room below, and re-places it on
+scroll (captured, because the scroll happens in the wrapper and never reaches `window`).
+With JS off the panel stays `absolute` — clipped but still reachable inside the scrolling
+area in the tables, and perfectly visible in blog and events, which have no such wrapper.
+
+**The reject item is hand-built, not a `dropdown_*` helper.** It neither navigates nor
+submits — it opens the row's `<dialog>` — and it carries `row-menu#close` alongside
+`modal#open`, or the panel would stay open behind the modal.
 
 ### The ad form
 
@@ -680,6 +726,49 @@ to `Dashboard::AdPhotosController`, which validates and returns a blob `signed_i
 submits those ids as `photo_signed_ids[]` and the create action attaches them in array
 order. A blob whose form is abandoned stays unattached — `bin/rails
 active_storage:purge_unattached` is what collects them, and nothing runs it automatically.
+
+**Every photo of a new ad gets the portal's name across it.** `Dashboard::AdsController#create`
+enqueues `WatermarkAdPhotosJob` after the save, and the job walks `ad.ad_images` calling
+`AdImage#apply_watermark` one at a time. It is the only place ad photos are created — there
+is no ad edit — so watermarking at create covers the whole catalog.
+
+The mark itself is `lib/watermark.rb`: one diagonal band with `layout.header.brand` on it,
+rotated `ANGLE`, centred, scaled to `SCALE` of whichever dimension is tighter, all through
+libvips. It writes back in the format the photo arrived in (`FORMATS` maps the three content
+types `PhotoUpload` accepts), takes and returns **bytes** rather than a file, and returns
+`nil` for a format outside the map — handing back the untouched photo beats rewriting it
+into a format nobody asked for.
+
+Five things about that path are easy to break:
+
+- **The band is stamped twice: black, offset a few pixels, then white on top.** The shadow
+  is not decoration. The mark is identical on every photo — nothing picks a colour by
+  looking at the background — so on a light photo plain white text would vanish.
+- **`flatten` before writing is load-bearing.** `composite` always returns an alpha channel
+  and JPEG has nowhere to put it. Only a photo that arrived with transparency keeps it.
+- **The name is read at `I18n.default_locale`, never the current one.** What gets burned
+  into the pixels cannot depend on which language the moderator happened to be using.
+- **The typeface is whatever fontconfig resolves as "sans bold"** — `fonts-dejavu-core`,
+  pinned in both Dockerfiles for that reason. The portal's Montserrat cannot be used here:
+  `app/assets/fonts` holds woff2, which this image's FreeType does not decompress, and pango
+  falls back to the default without saying so. Drop the font package and `Vips::Image.text`
+  draws nothing.
+- **`ad_images.watermarked_at` is what makes it idempotent.** ActiveJob retries, and a second
+  pass would stamp the band twice. Nil means "not stamped"; a photo that came from `file_url`
+  (the seed) has no blob to rewrite and keeps it nil forever.
+
+Two more about the swap, in `AdImage#replace_file`:
+
+- **The stamped blob is uploaded before it is attached**, with `create_and_upload!` exactly
+  like `PhotoUpload#store_photo`. Passing `io:` straight to `attach` defers the upload to
+  `after_commit`, so inside a transaction — which is where every example in the suite runs —
+  the file would never reach the storage and `download` would raise `FileNotFoundError`.
+- **`update!(watermarked_at:)` runs after the attach, not before.** `attach` only saves by
+  itself on a record with no other pending changes, so stamping the date first would leave
+  the swapped file unsaved.
+
+The job rescues `Vips::Error` and `ActiveStorage::FileNotFoundError` per image and logs;
+anything else would retry the whole ad forever over a single unreadable file.
 
 `db/seeds.rb` generates placeholder PNGs through `lib/placeholder_image.rb`, which writes
 the file byte by byte with `Zlib` — no image gem, no binary assets in the repo — and drops

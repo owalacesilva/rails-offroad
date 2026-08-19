@@ -27,6 +27,10 @@ module Dashboard
       # O contexto :submission é o que cobra as 3 a 10 fotos já na criação.
       return render :new, status: :unprocessable_content unless @ad.save(context: :submission)
 
+      # A marca d'água sai da requisição: são até dez fotos pela libvips, e o
+      # anunciante não tem por que esperar por elas para ver o anúncio na lista.
+      WatermarkAdPhotosJob.perform_later(@ad)
+
       redirect_to account_ads_path, notice: t("dashboard.ads.create.success", title: @ad.title)
     end
 

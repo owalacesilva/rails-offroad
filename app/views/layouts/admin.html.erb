@@ -61,16 +61,7 @@
     </header>
 
     <main class="flex-1">
-      <% if flash.any? %>
-        <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-          <% flash.each do |type, message| %>
-            <div role="status"
-                 class="rounded-xl border px-5 py-4 text-sm font-semibold <%= type.to_s == "alert" ? "border-red-300 bg-red-50 text-red-700" : "border-emerald-300 bg-emerald-50 text-emerald-700" %>">
-              <%= message %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
+      <%= render "shared/flash" %>
 
       <%= yield %>
     </main>

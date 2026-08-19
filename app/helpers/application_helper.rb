@@ -1,10 +1,25 @@
 module ApplicationHelper
-  DROPDOWN_ITEM = "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm " \
-                  "font-semibold text-stone-600 transition hover:bg-stone-50 hover:text-stone-900".freeze
+  DROPDOWN_ITEM = "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-semibold transition".freeze
 
-  # Item do menu de shared/_dropdown.
-  def dropdown_item_class
-    DROPDOWN_ITEM
+  # A cor do item e a do seu ícone, juntas. As três variantes trazem o conjunto
+  # inteiro em vez de sobrescrever a cor da variante padrão: entre duas classes
+  # Tailwind da mesma propriedade quem vence é a que sair depois na folha
+  # construída, não a que vier depois no atributo — o mesmo motivo pelo qual
+  # share_controller acrescenta a classe de exibição em vez de alternar `hidden`.
+  DROPDOWN_TONES = {
+    default: [ "text-stone-600 hover:bg-stone-50 hover:text-stone-900", "text-stone-400" ],
+    positive: [ "text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800", "text-emerald-500" ],
+    danger: [ "text-red-600 hover:bg-red-50 hover:text-red-700", "text-red-400" ]
+  }.freeze
+
+  # Item do menu de shared/_dropdown e de shared/_row_menu.
+  def dropdown_item_class(tone: :default)
+    "#{DROPDOWN_ITEM} #{DROPDOWN_TONES.fetch(tone).first}"
+  end
+
+  # O ícone do item acompanha o tom, um degrau mais claro que o texto.
+  def dropdown_icon_class(tone: :default)
+    "h-4 w-4 shrink-0 #{DROPDOWN_TONES.fetch(tone).last}"
   end
 
   # O filete que abre um bloco novo dentro do menu: é o que separa navegar de
@@ -16,7 +31,17 @@ module ApplicationHelper
 
   # O item e o filete juntos, para quem monta o link na mão.
   def separated_dropdown_item_class
-    "#{DROPDOWN_ITEM} #{dropdown_separator_class}"
+    "#{dropdown_item_class} #{dropdown_separator_class}"
+  end
+
+  # Cor da faixa de flash do <noscript> em shared/_flash. Só duas: "alert" é
+  # tudo que deu errado, e qualquer outra chave é aviso de que deu certo.
+  def flash_banner_class(type)
+    if type.to_s == "alert"
+      "border-red-300 bg-red-50 text-red-700"
+    else
+      "border-emerald-300 bg-emerald-50 text-emerald-700"
+    end
   end
 
   # Item da navegação central do header.

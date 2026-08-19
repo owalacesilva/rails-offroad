@@ -77,22 +77,30 @@
 
   <%# --------------------------------------------------------------- Ações %>
   <td class="px-4 py-2">
-    <div class="flex justify-end gap-1.5">
-      <%= link_to t("admin.ads.index.view"), ad_path(ad), target: "_blank", rel: "noopener",
-            class: "whitespace-nowrap rounded-full border border-stone-300 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-stone-600 transition hover:border-stone-900 hover:text-stone-900" %>
+    <div class="flex justify-end">
+      <%= render layout: "shared/row_menu", locals: { label: t("admin.row_menu", name: ad.title) } do %>
+        <%= dropdown_link ad_path(ad), icon: :eye, target: "_blank", rel: "noopener" do %>
+          <%= t("admin.ads.index.view") %>
+        <% end %>
 
-      <% unless ad.approved? %>
-        <%= button_to t("admin.ads.index.approve"), approve_admin_ad_path(ad, list: list_state), method: :patch,
-              class: "cursor-pointer whitespace-nowrap rounded-full border border-emerald-300 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-emerald-700 transition hover:bg-emerald-600 hover:text-white" %>
-      <% end %>
+        <% unless ad.approved? %>
+          <%= dropdown_button approve_admin_ad_path(ad, list: list_state), icon: :check, tone: :positive,
+                method: :patch, class: dropdown_separator_class do %>
+            <%= t("admin.ads.index.approve") %>
+          <% end %>
+        <% end %>
 
-      <% unless ad.rejected? %>
-        <%# Rejeitar abre o modal: o motivo é obrigatório, e é ele que o
-            anunciante vê no painel dele. %>
-        <button type="button" data-action="modal#open"
-                class="cursor-pointer whitespace-nowrap rounded-full border border-red-300 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-600 hover:text-white">
-          <%= t("admin.ads.index.reject") %>
-        </button>
+        <% unless ad.rejected? %>
+          <%# Rejeitar abre o modal: o motivo é obrigatório, e é ele que o
+              anunciante vê no painel dele. Montado à mão porque não navega nem
+              envia — só abre o <dialog> logo abaixo —, e fecha o menu junto,
+              senão o painel ficaria aberto atrás do modal. %>
+          <button type="button" data-action="modal#open row-menu#close"
+                  class="<%= dropdown_item_class(tone: :danger) %> cursor-pointer">
+            <%= ui_icon(:x_mark, css_class: dropdown_icon_class(tone: :danger)) %>
+            <%= t("admin.ads.index.reject") %>
+          </button>
+        <% end %>
       <% end %>
     </div>
 
